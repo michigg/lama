@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from .models import LdapGroup, LdapUser
 from django.contrib.auth.models import User
-from .forms import AddLDAPUserForm
+from .forms import AddLDAPUserForm, AddLDAPGroupForm
 
 
 # @login_required
@@ -18,7 +18,8 @@ from .forms import AddLDAPUserForm
 
 def userlist(request):
     user = LdapUser.objects.all()
-    context = {'users': user, }
+    groups = LdapGroup.objects.all()
+    context = {'users': user, 'groups': groups}
     # ldap_user = LdapUser.objects.get(username='fred')
     # ldap_user = LdapUser.objects.create(rdn='ou=people,ou=fs_wiai,ou=fachschaften', username='b3',
     #                                     password='lappen1', first_name='ferdinand1',
@@ -58,3 +59,24 @@ def adduser(request):
         form = AddLDAPUserForm()
 
     return render(request, 'user_add.jinja', {'form': form})
+
+
+def addgroup(request):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = AddLDAPGroupForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            rdn = form.cleaned_data['rdn']
+            name = form.cleaned_data['name']
+            members = form.cleaned_data['members']
+            members = [member.dn for member in members]
+            LdapGroup.objects.create(rdn=rdn, name=name, members=members)
+            return redirect('user-list')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = AddLDAPGroupForm()
+
+    return render(request, 'group_add.jinja', {'form': form})

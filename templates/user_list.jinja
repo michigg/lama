@@ -1,7 +1,13 @@
 {% extends 'base.jinja' %}
 {% block content %}
-
+    <a href="{{ url('user-add') }}">Nutzer anlegen</a> | <a href="{{ url('group-add') }}">Gruppe anlegen</a>
+    <h2>Nutzer</h2>
     {% for user in users %}
-        <p><a href="{{ url('user', args=[user.dn]) }}">{{ user.dn }}</a> - {{ user.username }}</p>
+        <p>{{ user.username }} - <a href="{{ url('user', args=[user.dn]) }}">{{ user.dn }}</a></p>
+    {% endfor %}
+
+    <h2>Gruppen</h2>
+    {% for group in groups %}
+        <p>{{ group.name }} - <a href="{{ url('user', args=[group.dn]) }}">{{ group.dn }}</a></p>
     {% endfor %}
 {% endblock %}
