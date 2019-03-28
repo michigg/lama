@@ -19,17 +19,17 @@ def userlist(request):
     user = LdapUser.objects.all()
     context = {'users': user, }
     # ldap_user = LdapUser.objects.get(username='fred')
-    # ldap_user = LdapUser.objects.create(rdn='ou=people,ou=fs_sowi,ou=fachschaften', username='a123456789',
+    # ldap_user = LdapUser.objects.create(rdn='ou=people,ou=fs_wiai,ou=fachschaften', username='b3',
     #                                     password='lappen1', first_name='ferdinand1',
     #                                     last_name='red1', )
-    # new_group = LdapGroup.objects.create(rdn='ou=groups,ou=fs_sowi,ou=fachschaften', name="funny_sowi1",
-    # members = ['dc=stuve,dc=de'])
+    # new_group = LdapGroup.objects.create(rdn='ou=groups,ou=fs_wiai,ou=fachschaften', name="funny_wiai12",
+    #                                      members=['dc=stuve,dc=de'])
     # new_group.save()
 
     return render(request, 'user_list.jinja', context)
 
 
 def changelist(request, dn):
-    user = User.objects.get(id=uid)
+    user = User.objects.get(dn=dn)
     context = {'user': user, }
     return render(request, 'user_detail.jinja', context)

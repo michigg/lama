@@ -1,15 +1,9 @@
-from django.db import models
-
 # Create your models here.
-from django.db import models
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-import ldapdb.models
 from ldapdb.models import fields as ldap_fields
+from ldapdb.models.base import Model
 
 
-class LdapUser(ldapdb.models.Model):
+class LdapUser(Model):
     """
     Class for representing an LDAP user entry.
     """
@@ -29,6 +23,18 @@ class LdapUser(ldapdb.models.Model):
     mobile_phone = ldap_fields.CharField(db_column='mobile', blank=True)
     photo = ldap_fields.ImageField(db_column='jpegPhoto')
 
+    def __init__(self, *args, **kwargs):
+        self.rdn = kwargs.get('rdn', None)
+        if self.rdn:
+            del kwargs['rdn']
+        super().__init__(*args, **kwargs)
+
+    def build_dn(self):
+        """
+        Build the Distinguished Name for this entry.
+        """
+        return "%s,%s,%s" % (self.build_rdn(), self.rdn, self.base_dn)
+
     def __str__(self):
         return self.username
 
@@ -36,7 +42,7 @@ class LdapUser(ldapdb.models.Model):
         return self.full_name
 
 
-class LdapGroup(ldapdb.models.Model):
+class LdapGroup(Model):
     """
     Class for representing an LDAP group entry.
     """
@@ -48,6 +54,18 @@ class LdapGroup(ldapdb.models.Model):
     rdn = ''
     name = ldap_fields.CharField(db_column='cn', max_length=200, primary_key=True)
     members = ldap_fields.ListField(db_column='member')
+
+    def __init__(self, *args, **kwargs):
+        self.rdn = kwargs.get('rdn', None)
+        if self.rdn:
+            del kwargs['rdn']
+        super().__init__(*args, **kwargs)
+
+    def build_dn(self):
+        """
+        Build the Distinguished Name for this entry.
+        """
+        return "%s,%s,%s" % (self.build_rdn(), self.rdn, self.base_dn)
 
     def __str__(self):
         return self.name
