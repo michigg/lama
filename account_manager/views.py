@@ -1,8 +1,5 @@
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from .models import LdapGroup, LdapUser
-from django.contrib.auth.models import User
 from .forms import AddLDAPUserForm, AddLDAPGroupForm
 
 
@@ -31,8 +28,8 @@ def userlist(request):
     return render(request, 'user_list.jinja', context)
 
 
-def changelist(request, dn):
-    user = User.objects.get(dn=dn)
+def user_detail(request, dn):
+    user = LdapUser.objects.get(dn=dn)
     context = {'user': user, }
     return render(request, 'user_detail.jinja', context)
 
