@@ -34,6 +34,12 @@ def user_detail(request, dn):
     return render(request, 'user_detail.jinja', context)
 
 
+def group_detail(request, dn):
+    group = LdapGroup.objects.get(dn=dn)
+    context = {'group': group, }
+    return render(request, 'group_detail.jinja', context)
+
+
 def adduser(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':

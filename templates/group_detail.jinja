@@ -1,0 +1,11 @@
+{% extends 'base.jinja' %}
+{% block content %}
+    <h1>{{ group.name }}</h1>
+    <a href="{{ url('user-list') }}">Nutzerübersicht</a>
+    <p>DN: {{ group.dn }}</p>
+    <p>Nutzername: {{ group.name }}</p>
+    <h2>Mitglieder</h2>
+    {% for user in group.members %}
+        <p>{{ user }}</p>
+    {% endfor %}
+{% endblock %}

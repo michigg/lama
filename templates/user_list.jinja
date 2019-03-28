@@ -8,6 +8,6 @@
 
     <h2>Gruppen</h2>
     {% for group in groups %}
-        <p>{{ group.name }} - <a href="{{ url('user', args=[group.dn]) }}">{{ group.dn }}</a></p>
+        <p>{{ group.name }} - <a href="{{ url('group', args=[group.dn]) }}">{{ group.dn }}</a></p>
     {% endfor %}
 {% endblock %}
