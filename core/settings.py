@@ -29,6 +29,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'realm-home'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account_manager',
-    'rdn_helper',
+    'account_helper',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,18 @@
+{% extends 'base.jinja' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <div class="col-12 ">
+        <div class="row justify-content-center justify-content-sm-center">
+            <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3 bg-white text-dark text-center p-3 mt-5">
+                <h2>Login</h2>
+                <form method="post">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    {{ form.as_p()|safe }}
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

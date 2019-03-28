@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import LdapGroup, LdapUser
-from .forms import AddLDAPUserForm, AddLDAPGroupForm
+from .forms import AddLDAPUserForm, AddLDAPGroupForm, RealmAddForm, RealmUpdateForm
+from account_helper.models import Realm
 
 
 # @login_required
@@ -12,18 +13,47 @@ from .forms import AddLDAPUserForm, AddLDAPGroupForm
 #     context = {'request': request, 'ldapuser': ldapuserprofile, }
 #     return render(request, 'myapp/userinfo.html', context)
 
+def realm(request):
+    realms = Realm.objects.all()
+    if request.method == 'POST':
+        form = RealmAddForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            ldap_rdn_org = form.cleaned_data['ldap_rdn_org']
+            realm_obj = Realm.objects.create(name=name, ldap_rdn_org=ldap_rdn_org)
+            realm_obj.save()
+            return redirect('realm-detail', realm_obj.id)
+    else:
+        form = RealmAddForm()
+    return render(request, 'realm/realm_home.jinja', {'realms': realms, 'form': form})
+
+
+def realm_detail(request, id):
+    if request.user.is_superuser:
+        realm_obj = Realm.objects.get(id=id)
+        data = {'id': realm_obj.id, 'ldap_rdn_org': realm_obj.ldap_rdn_org, 'name': realm_obj.name,
+                'email': realm_obj.email,
+                'admin_group': realm_obj.admin_group}
+        if request.method == 'POST':
+            form = RealmUpdateForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                ldap_rdn_org = form.cleaned_data['ldap_rdn_org']
+                realm_obj = Realm.objects.create(name=name, ldap_rdn_org=ldap_rdn_org)
+                realm_obj.save()
+                return redirect('realm-detail', realm_obj.id)
+        else:
+            form = RealmUpdateForm(initial=data)
+            return render(request, 'realm/realm_home.jinja', {'realm': realm_obj, 'form': form})
+    else:
+        realm_obj = Realm.objects.get(id=id)
+        return render(request, 'realm/realm_home.jinja', {'realm': realm_obj})
+
 
 def userlist(request):
     user = LdapUser.objects.all()
     groups = LdapGroup.objects.all()
     context = {'users': user, 'groups': groups}
-    # ldap_user = LdapUser.objects.get(username='fred')
-    # ldap_user = LdapUser.objects.create(rdn='ou=people,ou=fs_wiai,ou=fachschaften', username='b3',
-    #                                     password='lappen1', first_name='ferdinand1',
-    #                                     last_name='red1', )
-    # new_group = LdapGroup.objects.create(rdn='ou=groups,ou=fs_wiai,ou=fachschaften', name="funny_wiai12",
-    #                                      members=['dc=stuve,dc=de'])
-    # new_group.save()
 
     return render(request, 'user_list.jinja', context)
 

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from rdn_helper.models import LdapGroupRDN, LdapUserRDN
+from account_helper.models import LdapGroupRDN, LdapUserRDN
 
 LDAP_OUS = ['ou=fs_wiai,ou=fachschaften', 'ou=fs_sowi,ou=fachschaften']
 
