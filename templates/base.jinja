@@ -1,0 +1,44 @@
+{#{% load static %}#}
+{# ===== HTML ===== #}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+{# ===== Head ===== #}
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Fachschaftszitate</title>
+    <link rel="icon"
+          type="image/png"
+          href="{{ static('images/logo.png')  }}">
+    <meta name="author" content="Michael Götz"/>
+    {% block js_extra %}{% endblock %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ static('libs/font-awesome-4.7.0/css/font-awesome.css') }}">
+    <link rel="stylesheet" href="{{ static('libs/bootstrap-4.0.0-beta-dist/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ static('home/form.css') }}">
+    <link rel="stylesheet" href="{{ static('home/main.css') }}">
+    <script src="{{ static('libs/jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ static('libs/handlebars-379172e.js') }}"></script>
+    <script src="{{ static('js/main.js') }}"></script>
+    <script src="{{ static('libs/popper.js-1.14.4/dist/umd/popper.js') }}"></script>
+    <script src="{{ static('libs/bootstrap-4.0.0-beta-dist/js/bootstrap.js') }}"></script>
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.js"></script>#}
+
+
+    {% block css_extra %}{% endblock %}
+</head>
+
+{# ===== Body ===== #}
+<body class="bg-dark">
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">{% block bottom_nav %}{% endblock %}</div>
+        <div class="row bg-dark text-white">
+            {% block content %}{% endblock %}
+        </div>
+{% endblock %}
+<script src="{{ static('js/form.js') }}"></script>
+{% block js_tail %}{% endblock %}
+</body>
+</html>

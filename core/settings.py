@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import ldap
+from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -26,7 +27,6 @@ SECRET_KEY = 'r$_n!+7(w&jo3obu!1f#pu3nfs0s56@58y((6c9*tr(r2u*3vd'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -54,8 +54,18 @@ ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'DIRS': [
+            'templates',
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'environment': 'core.jinja2.environment'
+        },
+    },
+    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates/admin', ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,18 +80,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
+    'ldap': {
+        'ENGINE': 'ldapdb.backends.ldap',
+        'NAME': 'ldap://localhost:1389',
+        'USER': 'cn=admin,dc=stuve,dc=de',
+        'PASSWORD': 'secret',
+    },
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
-
+DATABASE_ROUTERS = ['ldapdb.router.Router']
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
@@ -100,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
@@ -114,8 +127,52 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static'
+
+########################################################################################################################
+#                                         LDAP Config                                                                  #
+########################################################################################################################
+
+AUTHENTICATION_BACKENDS = [
+    'multiple_ldap_backends.ldap.LDAPBackend1',
+    'multiple_ldap_backends.ldap.LDAPBackend2',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AUTH_LDAP_1_SERVER_URI = "ldap://localhost:1389"
+AUTH_LDAP_1_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,ou=fs_wiai,ou=fachschaften,dc=stuve,dc=de"
+AUTH_LDAP_1_GROUP_SEARCH = LDAPSearch("ou=groups,ou=fs_wiai,ou=fachschaften,dc=stuve,dc=de",
+                                      ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
+                                      )
+AUTH_LDAP_1_GROUP_TYPE = GroupOfNamesType()
+
+AUTH_LDAP_2_SERVER_URI = "ldap://localhost:1389"
+AUTH_LDAP_2_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,ou=fs_sowi,ou=fachschaften,dc=stuve,dc=de"
+AUTH_LDAP_2_GROUP_SEARCH = LDAPSearch("ou=groups,ou=fs_sowi,ou=fachschaften,dc=stuve,dc=de",
+                                      ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
+                                      )
+AUTH_LDAP_2_GROUP_TYPE = GroupOfNamesType()
+
+AUTH_LDAP_PROFILE_ATTR_MAP = {
+    "uid": "uid",
+    "cn": "cn",
+    "sn": "sn",
+    "givenName": "givenName",
+    "userPassword": "userPassword",
+    "shadowLastChange": "shadowLastChange",
+    "shadowMax": "shadowMax",
+    "shadowWarning": "shadowWarning",
+    "loginShell": "loginShell",
+    "uidNumber": "uidNumber",
+    "gidNumber": "gidNumber",
+    "homeDirectory": "homeDirectory",
+    "gecos": "gecos",
+    "mail": "mail",
+    "l": "l",
+    "telephoneNumber": "telephoneNumber",
+}
+AUTH_PROFILE_MODULE = 'account_manager.UserProfile'

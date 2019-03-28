@@ -1,0 +1,7 @@
+{% extends 'base.jinja' %}
+{% block content %}
+
+    {% for user in users %}
+        <p><a href="{{ url('user', args=[user.dn]) }}">{{ user.dn }}</a> - {{ user.username }}</p>
+    {% endfor %}
+{% endblock %}
