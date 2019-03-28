@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import LdapGroup, LdapUser
 from django.contrib.auth.models import User
+from .forms import AddLDAPUserForm
 
 
 # @login_required
@@ -33,3 +34,27 @@ def changelist(request, dn):
     user = User.objects.get(dn=dn)
     context = {'user': user, }
     return render(request, 'user_detail.jinja', context)
+
+
+def adduser(request):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = AddLDAPUserForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            rdn = form.cleaned_data['rdn']
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            LdapUser.objects.create(rdn=rdn, username=username,
+                                    password=password, first_name=first_name,
+                                    last_name=last_name, )
+            return redirect('user-list')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = AddLDAPUserForm()
+
+    return render(request, 'user_add.jinja', {'form': form})

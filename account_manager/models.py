@@ -1,4 +1,5 @@
 # Create your models here.
+from django.db import models
 from ldapdb.models import fields as ldap_fields
 from ldapdb.models.base import Model
 
