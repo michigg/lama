@@ -6,10 +6,11 @@
     <p>LDAP OU: {{ realm.ldap_base_dn }}</p>
     <p>Email: {{ realm.email }}</p>
     <p>Admin Gruppe: {{ realm.admin_group }}</p>
-
-    {% block realm_form %}
-        <h2><a href="{{ url('realm-update', args=[realm.id]) }}">Bereichsinformationen anpassen</a></h2>
-    {% endblock %}
+    {% if request.user.is_superuser %}
+        {% block realm_form %}
+            <h2><a href="{{ url('realm-update', args=[realm.id]) }}">Bereichsinformationen anpassen</a></h2>
+        {% endblock %}
+    {% endif %}
 
     <h2><a href="{{ url('realm-user-add', args=[realm.id]) }}">Nutzer hinzufügen</a></h2>
     {% block user_content %}
