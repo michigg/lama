@@ -8,6 +8,7 @@
     </form>
     <h2>Realms</h2>
     {% for realm in realms %}
-        <p><a href="{{ url('realm-detail', args=[realm.id]) }}">{{ realm.name }}</a></p>
+        <p><a href="{{ url('realm-detail', args=[realm.id]) }}">{{ realm.name }}</a> <a
+                href="{{ url('realm-delete', args=[realm.id]) }}">Delete</a></p>
     {% endfor %}
 {% endblock %}

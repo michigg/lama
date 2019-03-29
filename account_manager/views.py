@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .models import LdapGroup, LdapUser
 from .forms import AddLDAPUserForm, AddLDAPGroupForm, RealmAddForm, RealmUpdateForm
 from account_helper.models import Realm
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.contrib.auth.decorators import login_required
 
 
@@ -22,7 +22,7 @@ def is_realm_admin(view_func):
 
 
 @login_required
-def realm(request):
+def realm_home(request):
     user = request.user
     if not user.is_superuser:
         realms = Realm.objects.filter(admin_group__user__username__contains=user.username)
@@ -45,6 +45,28 @@ def realm(request):
         else:
             form = RealmAddForm()
         return render(request, 'realm/realm_home.jinja2', {'realms': realms, 'form': form})
+
+
+def realm_delete(request, realm_id):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = realm.ldap_base_dn
+    LdapGroup.base_dn = realm.ldap_base_dn
+    ldap_users = LdapUser.objects.all()
+    ldap_usernames = [user.username for user in ldap_users]
+    ldap_groups = LdapGroup.objects.all()
+    ldap_groupnames = [group.name for group in ldap_groups]
+    django_user = User.objects.filter(username__contains=ldap_usernames)
+    django_groups = Group.objects.filter(name__contains=ldap_groupnames)
+    for user in django_user:
+        user.delete()
+    for group in django_groups:
+        group.delete()
+    for user in ldap_users:
+        user.delete()
+    for group in ldap_groups:
+        group.delete()
+    realm.delete()
+    return redirect('realm-home')
 
 
 @login_required
