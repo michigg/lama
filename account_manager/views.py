@@ -20,8 +20,8 @@ def realm(request):
         form = RealmAddForm(request.POST)
         if form.is_valid():
             name = form.cleaned_data['name']
-            ldap_rdn_org = form.cleaned_data['ldap_rdn_org']
-            realm_obj = Realm.objects.create(name=name, ldap_rdn_org=ldap_rdn_org)
+            ldap_base_dn = form.cleaned_data['ldap_base_dn']
+            realm_obj = Realm.objects.create(name=name, ldap_base_dn=ldap_base_dn)
             realm_obj.save()
             return redirect('realm-detail', realm_obj.id)
     else:
@@ -101,7 +101,7 @@ def user_add(request, realm_id):
             password = form.cleaned_data['password']
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
-            LdapUser.base_dn = realm_obj.ldap_base_dn
+            LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
             LdapUser.objects.create(username=username,
                                     password=password, first_name=first_name,
                                     last_name=last_name, )
@@ -130,7 +130,7 @@ def group_add(request, realm_id):
             name = form.cleaned_data['name']
             members = form.cleaned_data['members']
             members = [member.dn for member in members]
-            LdapGroup.base_dn = realm_obj.ldap_base_dn
+            LdapGroup.base_dn = f'ou=groups,{realm_obj.ldap_base_dn}'
             LdapGroup.objects.create(name=name, members=members)
             return redirect('realm-group-list', realm_id)
 

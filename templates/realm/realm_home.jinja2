@@ -1,7 +1,5 @@
 {% extends 'base.jinja2' %}
 {% block content %}
-    <a href="{{ url('user-add') }}">Nutzer anlegen</a> | <a href="{{ url('group-add') }}">Gruppe anlegen</a>
-
     <h2>Neuen Bereich anlegen</h2>
     <form method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
