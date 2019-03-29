@@ -4,12 +4,12 @@
 
     <h2>Neuen Bereich anlegen</h2>
     <form method="post">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                    {{ form.as_p()|safe }}
-                    <button type="submit">Login</button>
-                </form>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        {{ form.as_p()|safe }}
+        <button type="submit">Anlegen</button>
+    </form>
     <h2>Realms</h2>
     {% for realm in realms %}
-        <p>{{ realm.name }}</p>
+        <p><a href="{{ url('realm-detail', args=[realm.id]) }}">{{ realm.name }}</a></p>
     {% endfor %}
 {% endblock %}

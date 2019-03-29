@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User, Group
 from account_helper.models import LdapUserRDN, LdapGroupRDN
-from .models import LdapUser
+from .models import LdapUser, LdapGroup
 
 
 class AddLDAPUserForm(forms.Form):
@@ -27,4 +27,4 @@ class RealmUpdateForm(forms.Form):
     ldap_rdn_org = forms.CharField(label='ldap_rdn_org', max_length=200)
     name = forms.CharField(label='name', max_length=200)
     email = forms.EmailField()
-    admins = forms.ModelChoiceField(widget=forms.CheckboxSelectMultiple, queryset=Group.objects.all())
+    admin_group = forms.ModelChoiceField(widget=forms.CheckboxSelectMultiple, queryset=LdapGroup.objects.all())

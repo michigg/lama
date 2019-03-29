@@ -44,10 +44,10 @@ def realm_detail(request, id):
                 return redirect('realm-detail', realm_obj.id)
         else:
             form = RealmUpdateForm(initial=data)
-            return render(request, 'realm/realm_home.jinja', {'realm': realm_obj, 'form': form})
+            return render(request, 'realm/realm_detailed.jinja', {'realm': realm_obj, 'form': form})
     else:
         realm_obj = Realm.objects.get(id=id)
-        return render(request, 'realm/realm_home.jinja', {'realm': realm_obj})
+        return render(request, 'realm/realm_detailed.jinja', {'realm': realm_obj})
 
 
 def userlist(request):

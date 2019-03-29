@@ -6,10 +6,6 @@
     <form method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         {{ form.as_p()|safe }}
-        <button type="submit">Login</button>
+        <button type="submit">Speichern</button>
     </form>
-    <h2>Realms</h2>
-    {% for realm in realms %}
-        <p>{{ realm.name }}</p>
-    {% endfor %}
 {% endblock %}
