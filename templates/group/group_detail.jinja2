@@ -1,11 +1,21 @@
-{% extends 'base.jinja' %}
-{% block content %}
-    <h1>{{ group.name }}</h1>
-    <a href="{{ url('user-list') }}">Nutzerübersicht</a>
-    <p>DN: {{ group.dn }}</p>
-    <p>Nutzername: {{ group.name }}</p>
-    <h2>Mitglieder</h2>
-    {% for user in group.members %}
-        <p>{{ user }}</p>
-    {% endfor %}
+{% extends 'realm/realm_detailed.jinja2' %}
+{% import 'macros/forms_macro.jinja2' as forms %}
+{% block extra_content %}
+    {% if not form %}
+        <h1>{{ group.name }}</h1>
+        <p>DN: {{ group.dn }}</p>
+        <p>Nutzername: {{ group.name }}</p>
+        <h2>Mitglieder</h2>
+        {% for user in group.members %}
+            <p>{{ user }}</p>
+        {% endfor %}
+        <a href="{{ url('realm-group-update', args = [realm.id, group.dn]) }}">Update Gruppe</a>
+        <a href="{{ url('realm-group-delete', args = [realm.id, group.dn]) }}">Delete Gruppe</a>
+    {% else %}
+        <form method="post">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            {{ form.as_p()|safe }}
+            <button type="submit">Speichern</button>
+        </form>
+    {% endif %}
 {% endblock %}

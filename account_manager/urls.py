@@ -21,9 +21,9 @@ urlpatterns = [
     # Realm Group
     path('realm/<int:realm_id>/groups/', account_manager.views.group_views.realm_groups, name='realm-group-list'),
     path('realm/<int:realm_id>/groups/add/', account_manager.views.group_views.group_add, name='realm-group-add'),
-    path('realm/<int:realm_id>/group/<str:group_dn>/', account_manager.views.user_views.user_add, name='realm-group-detail'),
-    path('realm/<int:realm_id>/group/<str:group_dn>/update/', account_manager.views.user_views.user_add, name='realm-group-update'),
-    path('realm/<int:realm_id>/group/<str:group_dn>/delete/', account_manager.views.user_views.user_add, name='realm-group-delete'),
+    path('realm/<int:realm_id>/group/<str:group_dn>/', account_manager.views.group_views.group_detail, name='realm-group-detail'),
+    path('realm/<int:realm_id>/group/<str:group_dn>/update/', account_manager.views.group_views.group_update, name='realm-group-update'),
+    path('realm/<int:realm_id>/group/<str:group_dn>/delete/', account_manager.views.group_views.group_delete, name='realm-group-delete'),
 
     # Permission Info
     path('permission-denied', main_views.permission_denied, name='permission-denied')

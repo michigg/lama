@@ -17,13 +17,16 @@ def realm_groups(request, realm_id):
 
 
 @login_required
-def group_detail(request, dn):
-    group = LdapGroup.objects.get(dn=dn)
-    context = {'group': group, }
-    return render(request, 'user/group_detail.jinja2', context)
+@is_realm_admin
+def group_detail(request, realm_id, group_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+    group = LdapGroup.objects.get(dn=group_dn)
+    return render(request, 'group/group_detail.jinja2', {'group': group, 'realm': realm})
 
 
 @login_required
+@is_realm_admin
 def group_add(request, realm_id):
     realm_obj = Realm.objects.get(id=realm_id)
     # if this is a POST request we need to process the form data
@@ -44,3 +47,39 @@ def group_add(request, realm_id):
         form = AddLDAPGroupForm()
 
     return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm_obj})
+
+
+@login_required
+@is_realm_admin
+def group_update(request, realm_id, group_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+    group = LdapGroup.objects.get(dn=group_dn)
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = AddLDAPGroupForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            group.name = form.cleaned_data['name']
+            members = form.cleaned_data['members']
+            group.members = [member.dn for member in members]
+            group.save()
+            return redirect('realm-group-detail', realm_id, group.dn)
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        # TODO: Automatic checkbox selection
+        data = {'name': group.name, 'members': group.members}
+        form = AddLDAPGroupForm(initial=data)
+
+    return render(request, 'group/group_detail.jinja2', {'form': form, 'realm': realm})
+
+
+def group_delete(request, realm_id, group_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+    group = LdapGroup.objects.get(dn=group_dn)
+    group.delete()
+
+    return redirect('realm-group-list', realm_id)

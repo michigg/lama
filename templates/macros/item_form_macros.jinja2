@@ -1,0 +1,73 @@
+{% import 'macros/utils_macros.jinja2' as utils %}
+
+{% macro item_base_attributes(item_base_form, forms, item) %}
+    <input type="hidden" name="type" value="{{ item_base_form.type.value() }}">
+    {% for error in  item_base_form.non_field_errors() %}
+        <p class="alert alert-danger" role="alert">
+            {{ error }}
+        </p>
+    {% endfor %}
+    {{ forms.text_input(item_base_form.title) }}
+    {{ forms.textarea_input(item_base_form.description) }}
+    {{ forms.select_input(item_base_form.categories, multiple=True) }}
+    {{ forms.file_input(item_base_form.loan_agreement_file) }}
+    {{ forms.file_input(item_base_form.images, multiple=True) }}
+    {% if item and item.images.count() > 0 %}
+        <label>
+            Bestehende Bilder (Zum Löschen selektieren)
+        </label>
+        {{ forms.image_deletion_input(existing_images=item.images.all()) }}
+         <a class="btn btn-primary" href="{{ url('accounts:order-images', args=[item.id]) }}">Bilder manuell sortieren</a>
+    {% endif %}
+{% endmacro %}
+
+{% macro item_location(item_base_form, forms) %}
+    <div class="pb-4">
+        <p>Ort</p>
+        {{ forms.text_input(item_base_form.location_title) }}
+        {{ forms.number_input(item_base_form.location_house_number,step_size='1') }}
+        {{ forms.text_input(item_base_form.location_street) }}
+        {{ forms.text_input(item_base_form.location_city) }}
+        {{ forms.number_input(item_base_form.location_latitude) }}
+        {{ forms.number_input(item_base_form.location_longitude) }}
+    </div>
+{% endmacro %}
+
+{% macro item_dimension(item_base_form, forms) %}
+    <div class="pb-4">
+        <p>Abmessungen</p>
+        {{ forms.number_input(item_base_form.dimension_width) }}
+        {{ forms.number_input(item_base_form.dimension_height) }}
+        {{ forms.number_input(item_base_form.dimension_depth) }}
+    </div>
+{% endmacro %}
+
+{% macro item_weight_amount(item_base_form, forms) %}
+    <div class="pb-4">
+        {{ forms.number_input(item_base_form.weight) }}
+        {{ forms.number_input(item_base_form.amount, step_size='1') }}
+    </div>
+{% endmacro %}
+
+{% macro item_loan_agreement(item_base_form, forms) %}
+    <div class="pb-4">
+        <p>Leihvereinbarung
+            <small>(Für eine Schenkung bitte leer lassen)</small>
+        </p>
+        {{ forms.number_input(item_base_form.loan_caution) }}
+        {{ forms.number_input(item_base_form.loan_single_rent) }}
+        {{ forms.select_input(item_base_form.loan_rental_fee_interval_unit) }}
+        {{ forms.number_input(item_base_form.loan_rental_fee_costs) }}
+    </div>
+{% endmacro %}
+
+{% macro item_form_buttons(item_base_form, forms) %}
+    <div class="row mb-2">
+        <div class="col-6 text-right">
+            <a href="{{ url('accounts:account') }}" class="btn btn-danger">Abbrechen</a>
+        </div>
+        <div class="col-6 text-left">
+            <button type="submit" class="btn btn-primary text-right">Speichern</button>
+        </div>
+    </div>
+{% endmacro %}
