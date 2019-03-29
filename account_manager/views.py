@@ -4,6 +4,7 @@ from .forms import AddLDAPUserForm, AddLDAPGroupForm, RealmAddForm, RealmUpdateF
 from account_helper.models import Realm
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
+from functools import wraps
 
 
 # @login_required
@@ -26,27 +27,45 @@ def realm(request):
             return redirect('realm-detail', realms[0].id)
         else:
             return render(request, 'realm/realm_home.jinja2', {'realms': realms})
-    realms = Realm.objects.all()
-    if request.method == 'POST':
-        form = RealmAddForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            ldap_base_dn = form.cleaned_data['ldap_base_dn']
-            realm_obj = Realm.objects.create(name=name, ldap_base_dn=ldap_base_dn)
-            realm_obj.save()
-            return redirect('realm-detail', realm_obj.id)
     else:
-        form = RealmAddForm()
-    return render(request, 'realm/realm_home.jinja2', {'realms': realms, 'form': form})
+        realms = Realm.objects.all()
+        if request.method == 'POST':
+            form = RealmAddForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                ldap_base_dn = form.cleaned_data['ldap_base_dn']
+                realm_obj = Realm.objects.create(name=name, ldap_base_dn=ldap_base_dn)
+                realm_obj.save()
+                return redirect('realm-detail', realm_obj.id)
+        else:
+            form = RealmAddForm()
+        return render(request, 'realm/realm_home.jinja2', {'realms': realms, 'form': form})
+
+
+def is_realm_admin(view_func):
+    def decorator(request, *args, **kwargs):
+        print(args)
+        print(kwargs)
+        realm_id = kwargs.get('id', None)
+        if realm_id and (request.user.is_superuser or len(
+                Realm.objects.filter(id=realm_id).filter(
+                    admin_group__user__username__contains=request.user.username)) > 0):
+            return view_func(request, *args, **kwargs)
+        else:
+            return redirect('permission-denied')
+
+    return decorator
 
 
 @login_required
+@is_realm_admin
 def realm_detail(request, id):
     realm_obj = Realm.objects.get(id=id)
     return render(request, 'realm/realm_detailed.jinja2', {'realm': realm_obj})
 
 
 @login_required
+@is_realm_admin
 def realm_update(request, id):
     if request.user.is_superuser:
         realm_obj = Realm.objects.get(id=id)
@@ -73,6 +92,7 @@ def realm_update(request, id):
 
 
 @login_required
+@is_realm_admin
 def realm_user(request, id):
     realm_obj = Realm.objects.get(id=id)
     LdapUser.base_dn = realm_obj.ldap_base_dn
@@ -81,6 +101,7 @@ def realm_user(request, id):
 
 
 @login_required
+@is_realm_admin
 def realm_groups(request, id):
     realm_obj = Realm.objects.get(id=id)
     LdapGroup.base_dn = realm_obj.ldap_base_dn
@@ -159,3 +180,7 @@ def group_add(request, realm_id):
         form = AddLDAPGroupForm()
 
     return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm_obj})
+
+
+def permission_denied(request):
+    return render(request, 'permission_denied.jinja2', {})

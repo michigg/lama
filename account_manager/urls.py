@@ -17,4 +17,6 @@ urlpatterns = [
     path('user/add/', views.user_add, name='user-add'),
     path('group/add/', views.group_add, name='group-add'),
     path('group/get/<str:dn>/', views.group_detail, name='group'),
+
+    path('permission-denied', views.permission_denied, name='permission-denied')
 ]

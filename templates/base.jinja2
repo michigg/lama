@@ -31,6 +31,7 @@
 
 {# ===== Body ===== #}
 <body class="bg-dark">
+Login as {{ request.user.username }}
 {% block body %}
     <div class="container-fluid">
         <div class="row">{% block bottom_nav %}{% endblock %}</div>
