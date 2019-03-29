@@ -1,14 +1,19 @@
 {% extends 'base.jinja2' %}
 {% block content %}
-    <h2>Neuen Bereich anlegen</h2>
-    <form method="post">
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        {{ form.as_p()|safe }}
-        <button type="submit">Anlegen</button>
-    </form>
+    {% if request.user.is_superuser %}
+        <h2>Neuen Bereich anlegen</h2>
+        <form method="post">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            {{ form.as_p()|safe }}
+            <button type="submit">Anlegen</button>
+        </form>
+    {% endif %}
     <h2>Realms</h2>
     {% for realm in realms %}
-        <p><a href="{{ url('realm-detail', args=[realm.id]) }}">{{ realm.name }}</a> <a
-                href="{{ url('realm-delete', args=[realm.id]) }}">Delete</a></p>
+        <p><a href="{{ url('realm-detail', args=[realm.id]) }}">{{ realm.name }}</a>
+            {% if request.user.is_superuser %}
+                <a href="{{ url('realm-delete', args=[realm.id]) }}">Delete</a>
+            {% endif %}
+        </p>
     {% endfor %}
 {% endblock %}
