@@ -10,7 +10,7 @@ class Realm(models.Model):
     ldap_base_dn = models.CharField(max_length=400, unique=True)
 
     def __str__(self):
-        return f'{self.name} - {self.ldap_rdn_org}'
+        return f'{self.name} - {self.ldap_base_dn}'
 
 
 class LdapUserRDN(models.Model):

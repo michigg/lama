@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from .models import LdapGroup, LdapUser
 from .forms import AddLDAPUserForm, AddLDAPGroupForm, RealmAddForm, RealmUpdateForm
 from account_helper.models import Realm
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
 # @login_required
@@ -14,7 +15,17 @@ from django.contrib.auth.models import User, Group
 #     context = {'request': request, 'ldapuser': ldapuserprofile, }
 #     return render(request, 'myapp/userinfo.html', context)
 
+@login_required
 def realm(request):
+    user = request.user
+    if not user.is_superuser:
+        realms = Realm.objects.filter(admin_group__user__username__contains=user.username)
+        if len(realms) == 0:
+            return redirect('user-detail')
+        elif len(realms) == 1:
+            return redirect('realm-detail', realms[0].id)
+        else:
+            return render(request, 'realm/realm_home.jinja2', {'realms': realms})
     realms = Realm.objects.all()
     if request.method == 'POST':
         form = RealmAddForm(request.POST)
@@ -29,11 +40,13 @@ def realm(request):
     return render(request, 'realm/realm_home.jinja2', {'realms': realms, 'form': form})
 
 
+@login_required
 def realm_detail(request, id):
     realm_obj = Realm.objects.get(id=id)
     return render(request, 'realm/realm_detailed.jinja2', {'realm': realm_obj})
 
 
+@login_required
 def realm_update(request, id):
     if request.user.is_superuser:
         realm_obj = Realm.objects.get(id=id)
@@ -59,6 +72,7 @@ def realm_update(request, id):
         return render(request, 'realm/realm_update.jinja2', {'realm': realm_obj})
 
 
+@login_required
 def realm_user(request, id):
     realm_obj = Realm.objects.get(id=id)
     LdapUser.base_dn = realm_obj.ldap_base_dn
@@ -66,6 +80,7 @@ def realm_user(request, id):
     return render(request, 'realm/realm_user.jinja2', {'realm': realm_obj, 'realm_user': realm_users})
 
 
+@login_required
 def realm_groups(request, id):
     realm_obj = Realm.objects.get(id=id)
     LdapGroup.base_dn = realm_obj.ldap_base_dn
@@ -73,6 +88,7 @@ def realm_groups(request, id):
     return render(request, 'realm/realm_groups.jinja2', {'realm': realm_obj, 'realm_groups': realm_groups_obj})
 
 
+@login_required
 def userlist(request):
     LdapUser.base_dn = LdapUser.ROOT_DN
     LdapGroup.base_dn = LdapGroup.ROOT_DN
@@ -83,12 +99,14 @@ def userlist(request):
     return render(request, 'user/user_list.jinja2', context)
 
 
+@login_required
 def user_detail(request, dn):
     user = LdapUser.objects.get(dn=dn)
     context = {'user': user, }
     return render(request, 'user/user_detail.jinja2', context)
 
 
+@login_required
 def user_add(request, realm_id):
     realm_obj = Realm.objects.get(id=realm_id)
     # if this is a POST request we need to process the form data
@@ -113,12 +131,14 @@ def user_add(request, realm_id):
     return render(request, 'user/user_add.jinja2', {'form': form, 'realm': realm_obj})
 
 
+@login_required
 def group_detail(request, dn):
     group = LdapGroup.objects.get(dn=dn)
     context = {'group': group, }
     return render(request, 'user/group_detail.jinja2', context)
 
 
+@login_required
 def group_add(request, realm_id):
     realm_obj = Realm.objects.get(id=realm_id)
     # if this is a POST request we need to process the form data
