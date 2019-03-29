@@ -26,10 +26,15 @@ def realm(request):
             return redirect('realm-detail', realm_obj.id)
     else:
         form = RealmAddForm()
-    return render(request, 'realm/realm_home.jinja', {'realms': realms, 'form': form})
+    return render(request, 'realm/realm_home.jinja2', {'realms': realms, 'form': form})
 
 
 def realm_detail(request, id):
+    realm_obj = Realm.objects.get(id=id)
+    return render(request, 'realm/realm_detailed.jinja2', {'realm': realm_obj})
+
+
+def realm_update(request, id):
     if request.user.is_superuser:
         realm_obj = Realm.objects.get(id=id)
         data = {'id': realm_obj.id, 'ldap_rdn_org': realm_obj.ldap_rdn_org, 'name': realm_obj.name,
@@ -48,10 +53,25 @@ def realm_detail(request, id):
                 return redirect('realm-detail', realm_obj.id)
         else:
             form = RealmUpdateForm(initial=data)
-        return render(request, 'realm/realm_detailed.jinja', {'realm': realm_obj, 'form': form})
+        return render(request, 'realm/realm_update.jinja2', {'realm': realm_obj, 'form': form})
     else:
         realm_obj = Realm.objects.get(id=id)
-        return render(request, 'realm/realm_detailed.jinja', {'realm': realm_obj})
+        return render(request, 'realm/realm_update.jinja2', {'realm': realm_obj})
+
+
+def realm_user(request, id):
+    realm_obj = Realm.objects.get(id=id)
+    dn = f'uid=*,ou=people,{realm_obj.ldap_rdn_org},{LdapUser.base_dn}'
+    realm_users = LdapUser.objects.filter(dn=dn)
+    return render(request, 'realm/realm_user.jinja2', {'realm': realm_obj, 'realm_user': realm_users})
+
+
+def realm_groups(request, id):
+    realm_obj = Realm.objects.get(id=id)
+    dn = f'ou=groups,{realm_obj.ldap_rdn_org},{LdapUser.base_dn}'
+    LdapGroup.base_dn = dn
+    realm_groups_obj = LdapGroup.objects.all()
+    return render(request, 'realm/realm_groups.jinja2', {'realm': realm_obj, 'realm_groups': realm_groups_obj})
 
 
 def userlist(request):
@@ -59,13 +79,13 @@ def userlist(request):
     groups = LdapGroup.objects.all()
     context = {'users': user, 'groups': groups}
 
-    return render(request, 'user/user_list.jinja', context)
+    return render(request, 'user/user_list.jinja2', context)
 
 
 def user_detail(request, dn):
     user = LdapUser.objects.get(dn=dn)
     context = {'user': user, }
-    return render(request, 'user/user_detail.jinja', context)
+    return render(request, 'user/user_detail.jinja2', context)
 
 
 def user_add(request):
@@ -89,13 +109,13 @@ def user_add(request):
     else:
         form = AddLDAPUserForm()
 
-    return render(request, 'user/user_add.jinja', {'form': form})
+    return render(request, 'user/user_add.jinja2', {'form': form})
 
 
 def group_detail(request, dn):
     group = LdapGroup.objects.get(dn=dn)
     context = {'group': group, }
-    return render(request, 'user/group_detail.jinja', context)
+    return render(request, 'user/group_detail.jinja2', context)
 
 
 def group_add(request):
@@ -116,4 +136,4 @@ def group_add(request):
     else:
         form = AddLDAPGroupForm()
 
-    return render(request, 'group/group_add.jinja', {'form': form})
+    return render(request, 'group/group_add.jinja2', {'form': form})

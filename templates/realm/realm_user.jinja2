@@ -1,0 +1,7 @@
+{% extends 'realm/realm_detailed.jinja2' %}
+{% block user_content %}
+    <h2>Nutzer</h2>
+    {% for user in realm_user %}
+        <p>{{ user.username }} - <a href="{{ url('user', args=[user.dn]) }}">{{ user.dn }}</a></p>
+    {% endfor %}
+{% endblock %}

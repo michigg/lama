@@ -1,0 +1,8 @@
+{% extends 'realm/realm_detailed.jinja2' %}
+{% block realm_form %}
+    <form method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        {{ form.as_p()|safe }}
+        <button type="submit">Speichern</button>
+    </form>
+{% endblock %}
