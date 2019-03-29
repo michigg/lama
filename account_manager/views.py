@@ -10,7 +10,7 @@ def is_realm_admin(view_func):
     def decorator(request, *args, **kwargs):
         print(args)
         print(kwargs)
-        realm_id = kwargs.get('id', None)
+        realm_id = kwargs.get('realm_id', None)
         if realm_id and (request.user.is_superuser or len(
                 Realm.objects.filter(id=realm_id).filter(
                     admin_group__user__username__contains=request.user.username)) > 0):
@@ -71,16 +71,16 @@ def realm_delete(request, realm_id):
 
 @login_required
 @is_realm_admin
-def realm_detail(request, id):
-    realm_obj = Realm.objects.get(id=id)
+def realm_detail(request, realm_id):
+    realm_obj = Realm.objects.get(id=realm_id)
     return render(request, 'realm/realm_detailed.jinja2', {'realm': realm_obj})
 
 
 @login_required
 @is_realm_admin
-def realm_update(request, id):
+def realm_update(request, realm_id):
     if request.user.is_superuser:
-        realm_obj = Realm.objects.get(id=id)
+        realm_obj = Realm.objects.get(id=realm_id)
         data = {'id': realm_obj.id, 'ldap_base_dn': realm_obj.ldap_base_dn, 'name': realm_obj.name,
                 'email': realm_obj.email,
                 'admin_group': realm_obj.admin_group}
@@ -99,14 +99,14 @@ def realm_update(request, id):
             form = RealmUpdateForm(initial=data)
         return render(request, 'realm/realm_update.jinja2', {'realm': realm_obj, 'form': form})
     else:
-        realm_obj = Realm.objects.get(id=id)
+        realm_obj = Realm.objects.get(id=realm_id)
         return render(request, 'realm/realm_update.jinja2', {'realm': realm_obj})
 
 
 @login_required
 @is_realm_admin
-def realm_user(request, id):
-    realm_obj = Realm.objects.get(id=id)
+def realm_user(request, realm_id):
+    realm_obj = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm_obj.ldap_base_dn
     realm_users = LdapUser.objects.all()
     return render(request, 'realm/realm_user.jinja2', {'realm': realm_obj, 'realm_user': realm_users})
@@ -114,32 +114,24 @@ def realm_user(request, id):
 
 @login_required
 @is_realm_admin
-def realm_groups(request, id):
-    realm_obj = Realm.objects.get(id=id)
+def realm_groups(request, realm_id):
+    realm_obj = Realm.objects.get(id=realm_id)
     LdapGroup.base_dn = realm_obj.ldap_base_dn
     realm_groups_obj = LdapGroup.objects.all()
     return render(request, 'realm/realm_groups.jinja2', {'realm': realm_obj, 'realm_groups': realm_groups_obj})
 
 
 @login_required
-def userlist(request):
-    LdapUser.base_dn = LdapUser.ROOT_DN
-    LdapGroup.base_dn = LdapGroup.ROOT_DN
-    user = LdapUser.objects.all()
-    groups = LdapGroup.objects.all()
-    context = {'users': user, 'groups': groups}
-
-    return render(request, 'user/user_list.jinja2', context)
+@is_realm_admin
+def user_detail(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = realm.ldap_base_dn
+    user = LdapUser.objects.get(dn=user_dn)
+    return render(request, 'user/user_detail.jinja2', {'user': user, 'realm': realm})
 
 
 @login_required
-def user_detail(request, dn):
-    user = LdapUser.objects.get(dn=dn)
-    context = {'user': user, }
-    return render(request, 'user/user_detail.jinja2', context)
-
-
-@login_required
+@is_realm_admin
 def user_add(request, realm_id):
     realm_obj = Realm.objects.get(id=realm_id)
     # if this is a POST request we need to process the form data
@@ -152,16 +144,58 @@ def user_add(request, realm_id):
             password = form.cleaned_data['password']
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
+            email = form.cleaned_data['email']
             LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
             LdapUser.objects.create(username=username,
                                     password=password, first_name=first_name,
-                                    last_name=last_name, )
+                                    last_name=last_name, email=email)
             return redirect('realm-user-list', realm_id)
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = AddLDAPUserForm()
     return render(request, 'user/user_add.jinja2', {'form': form, 'realm': realm_obj})
+
+
+@login_required
+@is_realm_admin
+def user_update(request, realm_id, user_dn):
+    realm_obj = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    if request.method == 'POST':
+        form = AddLDAPUserForm(request.POST)
+        if form.is_valid():
+            ldap_user.username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            if password:
+                ldap_user.password = password
+            ldap_user.first_name = form.cleaned_data['first_name']
+            ldap_user.last_name = form.cleaned_data['last_name']
+            ldap_user.email = form.cleaned_data['email']
+            ldap_user.save()
+
+            return redirect('realm-user-detail', realm_id, user_dn)
+    else:
+        form_data = {'username': ldap_user.username, 'first_name': ldap_user.first_name,
+                     'last_name': ldap_user.last_name, 'email': ldap_user.email}
+        form = AddLDAPUserForm(initial=form_data)
+    return render(request, 'user/user_detail.jinja2', {'form': form, 'realm': realm_obj})
+
+
+@login_required
+@is_realm_admin
+def user_delete(request, realm_id, user_dn):
+    realm_obj = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
+    LdapGroup.base_dn = f'ou=groups,{realm_obj.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
+    for group in user_groups:
+        group.members.remove(ldap_user.dn)
+        group.save()
+    ldap_user.delete()
+    return redirect('realm-user-list', realm_id)
 
 
 @login_required

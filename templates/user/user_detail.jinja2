@@ -1,12 +1,21 @@
-{% extends 'base.jinja2' %}
-{% block content %}
-    <a href="{{ url('user-list') }}">Nutzerübersicht</a>
-    <p>DN: {{ user.dn }}</p>
-    <p>Nutzername: {{ user.username }}</p>
-    <p>Vorname: {{ user.first_name }}</p>
-    <p>Nachname: {{ user.last_name }}</p>
-    <p>Email: {{ user.email }}</p>
-    <p>Passwort: {{ user.password }}</p>
-    <p>Telefon: {{ user.phone }}</p>
-    <p>Mobiltelefon: {{ user.mobile_phone }}</p>
+{% extends 'realm/realm_detailed.jinja2' %}
+{% block extra_content %}
+    {% if not form %}
+        <p>DN: {{ user.dn }}</p>
+        <p>Nutzername: {{ user.username }}</p>
+        <p>Vorname: {{ user.first_name }}</p>
+        <p>Nachname: {{ user.last_name }}</p>
+        <p>Email: {{ user.email }}</p>
+        <p>Passwort: {{ user.password }}</p>
+        <p>Telefon: {{ user.phone }}</p>
+        <p>Mobiltelefon: {{ user.mobile_phone }}</p>
+        <a href="{{ url('realm-user-update', args = [realm.id, user.dn]) }}">Update User</a>
+        <a href="{{ url('realm-user-delete', args = [realm.id, user.dn]) }}">Delete User</a>
+    {% else %}
+        <form method="post">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            {{ form.as_p()|safe }}
+            <button type="submit">Speichern</button>
+        </form>
+    {% endif %}
 {% endblock %}
