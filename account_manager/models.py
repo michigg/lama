@@ -16,7 +16,6 @@ class LdapUser(Model):
 
     # inetOrgPerson
     username = ldap_fields.CharField(db_column='uid', primary_key=True)
-    # rdn = ''
     password = ldap_fields.CharField(db_column='userPassword')
     first_name = ldap_fields.CharField(db_column='cn', blank=True)
     last_name = ldap_fields.CharField(db_column='sn', blank=True)
@@ -24,18 +23,6 @@ class LdapUser(Model):
     phone = ldap_fields.CharField(db_column='telephoneNumber', blank=True)
     mobile_phone = ldap_fields.CharField(db_column='mobile', blank=True)
     photo = ldap_fields.ImageField(db_column='jpegPhoto')
-
-    # def __init__(self, *args, **kwargs):
-    #     self.rdn = kwargs.get('rdn', None)
-    #     if self.rdn:
-    #         del kwargs['rdn']
-    #     super().__init__(*args, **kwargs)
-    #
-    # def build_dn(self):
-    #     """
-    #     Build the Distinguished Name for this entry.
-    #     """
-    #     return "%s,%s,%s" % (self.build_rdn(), self.rdn, self.base_dn)
 
     def __str__(self):
         return self.username
@@ -53,22 +40,8 @@ class LdapGroup(Model):
     base_dn = "dc=stuve,dc=de"
     object_classes = ['groupOfNames']
 
-    # posixGroup attributes
-    # rdn = ''
     name = ldap_fields.CharField(db_column='cn', max_length=200, primary_key=True)
     members = ldap_fields.ListField(db_column='member')
-
-    # def __init__(self, *args, **kwargs):
-    #     self.rdn = kwargs.get('rdn', None)
-    #     if self.rdn:
-    #         del kwargs['rdn']
-    #     super().__init__(*args, **kwargs)
-    #
-    # def build_dn(self):
-    #     """
-    #     Build the Distinguished Name for this entry.
-    #     """
-    #     return "%s,%s,%s" % (self.build_rdn(), self.rdn, self.base_dn)
 
     def __str__(self):
         return self.name

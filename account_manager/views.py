@@ -3,18 +3,23 @@ from .models import LdapGroup, LdapUser
 from .forms import AddLDAPUserForm, AddLDAPGroupForm, RealmAddForm, RealmUpdateForm
 from account_helper.models import Realm
 from django.contrib.auth.models import Group
-from django.contrib.auth.decorators import login_required, user_passes_test
-from functools import wraps
+from django.contrib.auth.decorators import login_required
 
 
-# @login_required
-# def userinfo(request):
-#     try:
-#         ldapuserprofile = UserProfile.objects.get(uid=request.user.username)
-#     except UserProfile.DoesNotExist:
-#         return HttpResponseRedirect('/login/')
-#     context = {'request': request, 'ldapuser': ldapuserprofile, }
-#     return render(request, 'myapp/userinfo.html', context)
+def is_realm_admin(view_func):
+    def decorator(request, *args, **kwargs):
+        print(args)
+        print(kwargs)
+        realm_id = kwargs.get('id', None)
+        if realm_id and (request.user.is_superuser or len(
+                Realm.objects.filter(id=realm_id).filter(
+                    admin_group__user__username__contains=request.user.username)) > 0):
+            return view_func(request, *args, **kwargs)
+        else:
+            return redirect('permission-denied')
+
+    return decorator
+
 
 @login_required
 def realm(request):
@@ -40,21 +45,6 @@ def realm(request):
         else:
             form = RealmAddForm()
         return render(request, 'realm/realm_home.jinja2', {'realms': realms, 'form': form})
-
-
-def is_realm_admin(view_func):
-    def decorator(request, *args, **kwargs):
-        print(args)
-        print(kwargs)
-        realm_id = kwargs.get('id', None)
-        if realm_id and (request.user.is_superuser or len(
-                Realm.objects.filter(id=realm_id).filter(
-                    admin_group__user__username__contains=request.user.username)) > 0):
-            return view_func(request, *args, **kwargs)
-        else:
-            return redirect('permission-denied')
-
-    return decorator
 
 
 @login_required
