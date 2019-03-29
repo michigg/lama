@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .models import LdapGroup, LdapUser
 from .forms import AddLDAPUserForm, AddLDAPGroupForm, RealmAddForm, RealmUpdateForm
 from account_helper.models import Realm
+from django.contrib.auth.models import User, Group
 
 
 # @login_required
@@ -37,14 +38,17 @@ def realm_detail(request, id):
         if request.method == 'POST':
             form = RealmUpdateForm(request.POST)
             if form.is_valid():
-                name = form.cleaned_data['name']
-                ldap_rdn_org = form.cleaned_data['ldap_rdn_org']
-                realm_obj = Realm.objects.create(name=name, ldap_rdn_org=ldap_rdn_org)
+                realm_obj.name = form.cleaned_data['name']
+                realm_obj.ldap_rdn_org = form.cleaned_data['ldap_rdn_org']
+                realm_obj.email = form.cleaned_data['email']
+
+                admin_ldap_group = form.cleaned_data['admin_group']
+                realm_obj.admin_group, _ = Group.objects.get_or_create(name=admin_ldap_group.name)
                 realm_obj.save()
                 return redirect('realm-detail', realm_obj.id)
         else:
             form = RealmUpdateForm(initial=data)
-            return render(request, 'realm/realm_detailed.jinja', {'realm': realm_obj, 'form': form})
+        return render(request, 'realm/realm_detailed.jinja', {'realm': realm_obj, 'form': form})
     else:
         realm_obj = Realm.objects.get(id=id)
         return render(request, 'realm/realm_detailed.jinja', {'realm': realm_obj})
@@ -55,22 +59,16 @@ def userlist(request):
     groups = LdapGroup.objects.all()
     context = {'users': user, 'groups': groups}
 
-    return render(request, 'user_list.jinja', context)
+    return render(request, 'user/user_list.jinja', context)
 
 
 def user_detail(request, dn):
     user = LdapUser.objects.get(dn=dn)
     context = {'user': user, }
-    return render(request, 'user_detail.jinja', context)
+    return render(request, 'user/user_detail.jinja', context)
 
 
-def group_detail(request, dn):
-    group = LdapGroup.objects.get(dn=dn)
-    context = {'group': group, }
-    return render(request, 'group_detail.jinja', context)
-
-
-def adduser(request):
+def user_add(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -91,10 +89,16 @@ def adduser(request):
     else:
         form = AddLDAPUserForm()
 
-    return render(request, 'user_add.jinja', {'form': form})
+    return render(request, 'user/user_add.jinja', {'form': form})
 
 
-def addgroup(request):
+def group_detail(request, dn):
+    group = LdapGroup.objects.get(dn=dn)
+    context = {'group': group, }
+    return render(request, 'user/group_detail.jinja', context)
+
+
+def group_add(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -112,4 +116,4 @@ def addgroup(request):
     else:
         form = AddLDAPGroupForm()
 
-    return render(request, 'group_add.jinja', {'form': form})
+    return render(request, 'group/group_add.jinja', {'form': form})

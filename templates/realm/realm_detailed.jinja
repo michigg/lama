@@ -1,11 +1,23 @@
 {% extends 'base.jinja' %}
 {% block content %}
     <a href="{{ url('user-add') }}">Nutzer anlegen</a> | <a href="{{ url('group-add') }}">Gruppe anlegen</a>
+    <h1>Bereich {{ realm.name }}</h1>
+    <h2>Bereich Info</h2>
+    <p>LDAP OU: {{ realm.ldap_rdn_org }}</p>
+    <p>Email: {{ realm.email }}</p>
+    <p>Admin Gruppe: {{ realm.admin_group }}</p>
 
-    <h2>Neuen Bereich anlegen</h2>
+    <h2>Bereichsinformationen anpassen</h2>
     <form method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         {{ form.as_p()|safe }}
         <button type="submit">Speichern</button>
     </form>
+
+    <h2>Nutzer</h2>
+    {% block user_content %}
+    {% endblock %}
+    <h2>Gruppen</h2>
+    {% block gruppen_content %}
+    {% endblock %}
 {% endblock %}

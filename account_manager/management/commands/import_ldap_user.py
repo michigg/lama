@@ -17,7 +17,6 @@ class Command(BaseCommand):
             ldap_dn = ldap_config[1].split(',')
             ldap_dn.pop(0)
             ldap_dn = ",".join(ldap_dn)
-            print(ldap_dn)
             results = ldap_server.search_s(ldap_dn, ldap.SCOPE_SUBTREE,
                                            "(objectClass=inetOrgPerson)")
 

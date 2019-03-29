@@ -148,34 +148,23 @@ AUTHENTICATION_BACKENDS = [
 
 AUTH_LDAP_1_SERVER_URI = "ldap://localhost:1389"
 AUTH_LDAP_1_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,ou=fs_wiai,ou=fachschaften,dc=stuve,dc=de"
-AUTH_LDAP_1_GROUP_SEARCH = LDAPSearch("ou=groups,ou=fs_wiai,ou=fachschaften,dc=stuve,dc=de",
-                                      ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
-                                      )
-AUTH_LDAP_1_GROUP_TYPE = GroupOfNamesType()
+AUTH_LDAP_1_GROUP_SEARCH = LDAPSearch("dc=stuve,dc=de",
+                                    ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
+                                    )
+AUTH_LDAP_1_GROUP_TYPE = GroupOfNamesType(name_attr='cn')
+AUTH_LDAP_1_MIRROR_GROUPS = True
 
 AUTH_LDAP_2_SERVER_URI = "ldap://localhost:1389"
 AUTH_LDAP_2_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,ou=fs_sowi,ou=fachschaften,dc=stuve,dc=de"
-AUTH_LDAP_2_GROUP_SEARCH = LDAPSearch("ou=groups,ou=fs_sowi,ou=fachschaften,dc=stuve,dc=de",
-                                      ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
-                                      )
-AUTH_LDAP_2_GROUP_TYPE = GroupOfNamesType()
+AUTH_LDAP_2_GROUP_SEARCH = LDAPSearch("dc=stuve,dc=de",
+                                    ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
+                                    )
+AUTH_LDAP_2_GROUP_TYPE = GroupOfNamesType(name_attr='cn')
+AUTH_LDAP_2_MIRROR_GROUPS = True
 
-AUTH_LDAP_PROFILE_ATTR_MAP = {
-    "uid": "uid",
-    "cn": "cn",
-    "sn": "sn",
-    "givenName": "givenName",
-    "userPassword": "userPassword",
-    "shadowLastChange": "shadowLastChange",
-    "shadowMax": "shadowMax",
-    "shadowWarning": "shadowWarning",
-    "loginShell": "loginShell",
-    "uidNumber": "uidNumber",
-    "gidNumber": "gidNumber",
-    "homeDirectory": "homeDirectory",
-    "gecos": "gecos",
-    "mail": "mail",
-    "l": "l",
-    "telephoneNumber": "telephoneNumber",
+AUTH_LDAP_USER_ATTR_MAP = {
+    'first_name': 'cn',
+    'last_name': 'sn',
+    'email': 'mail',
 }
 AUTH_PROFILE_MODULE = 'account_manager.UserProfile'
