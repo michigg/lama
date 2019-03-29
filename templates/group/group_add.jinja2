@@ -1,4 +1,4 @@
-<form action="{{ url('group-add') }}" method="post">
+<form action="{{ url('realm-group-add', args=[realm.id]) }}" method="post">
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     {{ form.as_p() }}
     <input type="submit" value="Submit">

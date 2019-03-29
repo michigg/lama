@@ -7,7 +7,7 @@ class Realm(models.Model):
     name = models.CharField(max_length=200, unique=True)
     email = models.EmailField(blank=True, null=True)
     admin_group = models.ForeignKey(Group, models.PROTECT, blank=True, null=True)
-    ldap_rdn_org = models.CharField(max_length=400, unique=True)
+    ldap_base_dn = models.CharField(max_length=400, unique=True)
 
     def __str__(self):
         return f'{self.name} - {self.ldap_rdn_org}'

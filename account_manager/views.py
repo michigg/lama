@@ -37,14 +37,14 @@ def realm_detail(request, id):
 def realm_update(request, id):
     if request.user.is_superuser:
         realm_obj = Realm.objects.get(id=id)
-        data = {'id': realm_obj.id, 'ldap_rdn_org': realm_obj.ldap_rdn_org, 'name': realm_obj.name,
+        data = {'id': realm_obj.id, 'ldap_base_dn': realm_obj.ldap_base_dn, 'name': realm_obj.name,
                 'email': realm_obj.email,
                 'admin_group': realm_obj.admin_group}
         if request.method == 'POST':
             form = RealmUpdateForm(request.POST)
             if form.is_valid():
                 realm_obj.name = form.cleaned_data['name']
-                realm_obj.ldap_rdn_org = form.cleaned_data['ldap_rdn_org']
+                realm_obj.ldap_base_dn = form.cleaned_data['ldap_base_dn']
                 realm_obj.email = form.cleaned_data['email']
 
                 admin_ldap_group = form.cleaned_data['admin_group']
@@ -61,20 +61,21 @@ def realm_update(request, id):
 
 def realm_user(request, id):
     realm_obj = Realm.objects.get(id=id)
-    dn = f'uid=*,ou=people,{realm_obj.ldap_rdn_org},{LdapUser.base_dn}'
-    realm_users = LdapUser.objects.filter(dn=dn)
+    LdapUser.base_dn = realm_obj.ldap_base_dn
+    realm_users = LdapUser.objects.all()
     return render(request, 'realm/realm_user.jinja2', {'realm': realm_obj, 'realm_user': realm_users})
 
 
 def realm_groups(request, id):
     realm_obj = Realm.objects.get(id=id)
-    dn = f'ou=groups,{realm_obj.ldap_rdn_org},{LdapUser.base_dn}'
-    LdapGroup.base_dn = dn
+    LdapGroup.base_dn = realm_obj.ldap_base_dn
     realm_groups_obj = LdapGroup.objects.all()
     return render(request, 'realm/realm_groups.jinja2', {'realm': realm_obj, 'realm_groups': realm_groups_obj})
 
 
 def userlist(request):
+    LdapUser.base_dn = LdapUser.ROOT_DN
+    LdapGroup.base_dn = LdapGroup.ROOT_DN
     user = LdapUser.objects.all()
     groups = LdapGroup.objects.all()
     context = {'users': user, 'groups': groups}
@@ -88,28 +89,28 @@ def user_detail(request, dn):
     return render(request, 'user/user_detail.jinja2', context)
 
 
-def user_add(request):
+def user_add(request, realm_id):
+    realm_obj = Realm.objects.get(id=realm_id)
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = AddLDAPUserForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            rdn = form.cleaned_data['rdn']
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
-            LdapUser.objects.create(rdn=rdn, username=username,
+            LdapUser.base_dn = realm_obj.ldap_base_dn
+            LdapUser.objects.create(username=username,
                                     password=password, first_name=first_name,
                                     last_name=last_name, )
-            return redirect('user-list')
+            return redirect('realm-user-list', realm_id)
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = AddLDAPUserForm()
-
-    return render(request, 'user/user_add.jinja2', {'form': form})
+    return render(request, 'user/user_add.jinja2', {'form': form, 'realm': realm_obj})
 
 
 def group_detail(request, dn):
@@ -118,22 +119,23 @@ def group_detail(request, dn):
     return render(request, 'user/group_detail.jinja2', context)
 
 
-def group_add(request):
+def group_add(request, realm_id):
+    realm_obj = Realm.objects.get(id=realm_id)
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = AddLDAPGroupForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            rdn = form.cleaned_data['rdn']
             name = form.cleaned_data['name']
             members = form.cleaned_data['members']
             members = [member.dn for member in members]
-            LdapGroup.objects.create(rdn=rdn, name=name, members=members)
-            return redirect('user-list')
+            LdapGroup.base_dn = realm_obj.ldap_base_dn
+            LdapGroup.objects.create(name=name, members=members)
+            return redirect('realm-group-list', realm_id)
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = AddLDAPGroupForm()
 
-    return render(request, 'group/group_add.jinja2', {'form': form})
+    return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm_obj})

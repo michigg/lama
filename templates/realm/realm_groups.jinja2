@@ -5,11 +5,11 @@
     {% for group in realm_groups %}
         <h3>{{ group.name }}</h3>
         <p>DN: {{ group.dn }}</p>
-        <p>Nutzername: {{ group.name }}</p>
-        <h2>Mitglieder</h2>
-        {% for user in group.members %}
-            <p>{{ user }}</p>
-        {% endfor %}
+{#        <p>Nutzername: {{ group.name }}</p>#}
+{#        <h2>Mitglieder</h2>#}
+{#        {% for user in group.members %}#}
+{#            <p>{{ user }}</p>#}
+{#        {% endfor %}#}
         <hr>
     {% endfor %}
 {% endblock %}
