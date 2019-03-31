@@ -4,7 +4,9 @@ from django.shortcuts import render, redirect
 from account_helper.models import Realm
 from account_manager.forms import AddLDAPUserForm
 from account_manager.models import LdapUser, LdapGroup
+from django.contrib.auth.models import User
 from account_manager.main_views import is_realm_admin
+from django.core.exceptions import ObjectDoesNotExist
 
 
 @login_required
@@ -126,11 +128,15 @@ def user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, red
 
 
 def user_delete_controller(request, ldap_user, realm_id, redirect_name):
-    django_user = request.user
     user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
+
     for group in user_groups:
         group.members.remove(ldap_user.dn)
         group.save()
     ldap_user.delete()
-    django_user.delete()
+    try:
+        django_user = User.objects.get(username=ldap_user.username)
+        django_user.delete()
+    except ObjectDoesNotExist:
+        pass
     return redirect(redirect_name, realm_id)
