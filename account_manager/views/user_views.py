@@ -17,12 +17,16 @@ def realm_user(request, realm_id):
 
 
 @login_required
-@is_realm_admin
-def user_detail(request, realm_id, user_dn):
+def realm_user_detail(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm.ldap_base_dn
     user = LdapUser.objects.get(dn=user_dn)
-    return render(request, 'user/user_detail.jinja2', {'user': user, 'realm': realm})
+    if realm_id and (request.user.is_superuser or len(
+            Realm.objects.filter(id=realm_id).filter(
+                admin_group__user__username__contains=request.user.username)) > 0):
+        return render(request, 'user/realm_user_detail.jinja2', {'user': user, 'realm': realm})
+    else:
+        return render(request, 'user/user_detail.jinja2', {'user': user, 'realm': realm})
 
 
 @login_required
@@ -49,15 +53,58 @@ def user_add(request, realm_id):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = AddLDAPUserForm()
-    return render(request, 'user/user_add.jinja2', {'form': form, 'realm': realm_obj})
+    return render(request, 'user/realm_user_add.jinja2', {'form': form, 'realm': realm_obj})
 
 
 @login_required
 @is_realm_admin
+def realm_user_update(request, realm_id, user_dn):
+    realm_obj = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    return user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, 'realm-user-detail',
+                                  'user/realm_user_detail.jinja2')
+
+
+@login_required
+@is_realm_admin
+def realm_user_delete(request, realm_id, user_dn):
+    realm_obj = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
+    LdapGroup.base_dn = f'ou=groups,{realm_obj.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    return user_delete_controller(request, ldap_user, realm_id, 'realm-user-list')
+
+
+@login_required
 def user_update(request, realm_id, user_dn):
     realm_obj = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
+    if request.user.username == ldap_user.username:
+        return user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, 'realm-user-detail',
+                                      'user/user_detail.jinja2')
+    else:
+        return redirect('permission-denied')
+
+
+@login_required
+def user_delete(request, realm_id, user_dn):
+    realm_obj = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
+    LdapGroup.base_dn = f'ou=groups,{realm_obj.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    if request.user.username == ldap_user.username:
+        return user_delete_controller(request, ldap_user, realm_id, 'account-deleted')
+    else:
+        return redirect('permission-denied')
+
+
+def user_deleted(request, realm_id):
+    return render(request, 'account_deleted.jinja2', {'realm': Realm.objects.get(id=realm_id)})
+
+
+def user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, redirect_name, detail_page):
     if request.method == 'POST':
         form = AddLDAPUserForm(request.POST)
         if form.is_valid():
@@ -70,24 +117,20 @@ def user_update(request, realm_id, user_dn):
             ldap_user.email = form.cleaned_data['email']
             ldap_user.save()
 
-            return redirect('realm-user-detail', realm_id, user_dn)
+            return redirect(redirect_name, realm_id, user_dn)
     else:
         form_data = {'username': ldap_user.username, 'first_name': ldap_user.first_name,
                      'last_name': ldap_user.last_name, 'email': ldap_user.email}
         form = AddLDAPUserForm(initial=form_data)
-    return render(request, 'user/user_detail.jinja2', {'form': form, 'realm': realm_obj})
+    return render(request, detail_page, {'form': form, 'realm': realm_obj})
 
 
-@login_required
-@is_realm_admin
-def user_delete(request, realm_id, user_dn):
-    realm_obj = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
-    LdapGroup.base_dn = f'ou=groups,{realm_obj.ldap_base_dn}'
-    ldap_user = LdapUser.objects.get(dn=user_dn)
+def user_delete_controller(request, ldap_user, realm_id, redirect_name):
+    django_user = request.user
     user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
     for group in user_groups:
         group.members.remove(ldap_user.dn)
         group.save()
     ldap_user.delete()
-    return redirect('realm-user-list', realm_id)
+    django_user.delete()
+    return redirect(redirect_name, realm_id)

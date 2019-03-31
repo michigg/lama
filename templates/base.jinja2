@@ -10,7 +10,7 @@
     <title>Fachschaftszitate</title>
     <link rel="icon"
           type="image/png"
-          href="{{ static('images/logo.png')  }}">
+          href="{{ static('images/logo.png') }}">
     <meta name="author" content="Michael Götz"/>
     {% block js_extra %}{% endblock %}
     <!-- Bootstrap CSS -->
@@ -31,13 +31,18 @@
 
 {# ===== Body ===== #}
 <body class="bg-dark">
-Login as {{ request.user.username }}
+{% if request.user.is_authenticated %}
+    Login as {{ request.user.username }}
+    <a href="{{ url('logout') }}">Logout</a>
+{% else %}
+    <a href="{{ url('login') }}">Login</a>
+{% endif %}
 {% block body %}
     <div class="container-fluid">
-        <div class="row">{% block bottom_nav %}{% endblock %}</div>
-        <div class="row bg-dark text-white">
-            {% block content %}{% endblock %}
-        </div>
+    <div class="row">{% block bottom_nav %}{% endblock %}</div>
+    <div class="row bg-dark text-white">
+        {% block content %}{% endblock %}
+    </div>
 {% endblock %}
 <script src="{{ static('js/form.js') }}"></script>
 {% block js_tail %}{% endblock %}

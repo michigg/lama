@@ -4,12 +4,11 @@ from .forms import RealmAddForm, RealmUpdateForm
 from account_helper.models import Realm
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.decorators import login_required
+import re
 
 
 def is_realm_admin(view_func):
     def decorator(request, *args, **kwargs):
-        print(args)
-        print(kwargs)
         realm_id = kwargs.get('realm_id', None)
         if realm_id and (request.user.is_superuser or len(
                 Realm.objects.filter(id=realm_id).filter(
@@ -27,7 +26,10 @@ def realm_list(request):
     if not user.is_superuser:
         realms = Realm.objects.filter(admin_group__user__username__contains=user.username)
         if len(realms) == 0:
-            return redirect('user-detail')
+            user = LdapUser.objects.get(username=user.username)
+            realm_base_dn = re.compile('(uid=[a-zA-Z_]*),(ou=[a-zA-Z_]*),(.*)').match(user.dn).group(3)
+            realm = Realm.objects.get(ldap_base_dn=realm_base_dn)
+            return redirect('realm-user-detail', realm.id, user.dn)
         elif len(realms) == 1:
             return redirect('realm-detail', realms[0].id)
         else:
