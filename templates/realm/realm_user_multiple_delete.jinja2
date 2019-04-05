@@ -1,0 +1,10 @@
+{% extends 'realm/realm_detailed.jinja2' %}
+{% block user_content %}
+    <h2>Nutzer</h2>
+    <a href="{{ url('realm-user-list', args=[realm.id]) }}">Abrechen</a>
+    <form action="{{ url('realm-multiple-user-delete', args=[realm.id]) }}" method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <input type="submit" value="Ausführen">
+        {{ form.as_p() }}
+    </form>
+{% endblock %}

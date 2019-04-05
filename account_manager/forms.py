@@ -7,6 +7,10 @@ class AddLDAPUserForm(forms.Form):
     email = forms.EmailField(label='E-Mail', required=False)
 
 
+class UserDeleteListForm(forms.Form):
+    ldap_users = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=LdapUser.objects.all())
+
+
 class AddLDAPGroupForm(forms.Form):
     name = forms.CharField(label='name', max_length=400)
     # TODO show only allowed user

@@ -18,8 +18,10 @@ urlpatterns = [
          name='realm-user-detail'),
     path('realm/<int:realm_id>/user/<str:user_dn>/update/', account_manager.views.user_views.realm_user_update,
          name='realm-user-update'),
-    path('realm/<int:realm_id>/user/<str:user_dn>/delete/', account_manager.views.user_views.realm_user_delete,
+    path('realm/<int:realm_id>/user/delete/s/<str:user_dn>/', account_manager.views.user_views.realm_user_delete,
          name='realm-user-delete'),
+    path('realm/<int:realm_id>/user/delete/multiple', account_manager.views.user_views.realm_multiple_user_delete,
+         name='realm-multiple-user-delete'),
 
     # Realm Group
     path('realm/<int:realm_id>/groups/', account_manager.views.group_views.realm_groups, name='realm-group-list'),

@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
 from account_helper.models import Realm
-from account_manager.forms import AddLDAPUserForm
+from account_manager.forms import AddLDAPUserForm, UserDeleteListForm
 from account_manager.models import LdapUser, LdapGroup
 from django.contrib.auth.models import User
 from account_manager.main_views import is_realm_admin
@@ -79,7 +79,23 @@ def realm_user_delete(request, realm_id, user_dn):
     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
     LdapGroup.base_dn = f'ou=groups,{realm_obj.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
-    return user_delete_controller(request, ldap_user, realm_id, 'realm-user-list')
+    user_delete_controller(ldap_user)
+    return redirect('realm-user-list', realm_id)
+
+
+def realm_multiple_user_delete(request, realm_id):
+    realm = Realm.objects.get(id=realm_id)
+    if request.method == 'POST':
+        form = UserDeleteListForm(request.POST)
+        if form.is_valid():
+            ldap_users = form.cleaned_data['ldap_users']
+            for ldap_user in ldap_users:
+                # TODO: Failure catchup
+                user_delete_controller(ldap_user)
+            return redirect('realm-user-list', realm_id)
+    # TODO: Form not valid
+    form = UserDeleteListForm()
+    return render(request, 'realm/realm_user_multiple_delete.jinja2', {'form': form, 'realm': realm})
 
 
 @login_required
@@ -101,7 +117,8 @@ def user_delete(request, realm_id, user_dn):
     LdapGroup.base_dn = f'ou=groups,{realm_obj.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
     if request.user.username == ldap_user.username:
-        return user_delete_controller(request, ldap_user, realm_id, 'account-deleted')
+        user_delete_controller(ldap_user)
+        return redirect('account-deleted', realm_id)
     else:
         return redirect('permission-denied')
 
@@ -131,7 +148,7 @@ def user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, red
     return render(request, detail_page, {'form': form, 'realm': realm_obj})
 
 
-def user_delete_controller(request, ldap_user, realm_id, redirect_name):
+def user_delete_controller(ldap_user):
     user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
 
     for group in user_groups:
@@ -143,14 +160,12 @@ def user_delete_controller(request, ldap_user, realm_id, redirect_name):
         django_user.delete()
     except ObjectDoesNotExist:
         pass
-    return redirect(redirect_name, realm_id)
+    return
 
 
 class LdapPasswordResetConfirmView(PasswordResetConfirmView):
-
     def form_valid(self, form):
         user = form.save()
         password = form.cleaned_data['new_password1']
-        print(password)
         LdapUser.password_reset(user, password)
         return super().form_valid(form)
