@@ -14,15 +14,15 @@
     <meta name="author" content="Michael Götz"/>
     {% block js_extra %}{% endblock %}
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="{{ static('libs/font-awesome-4.7.0/css/font-awesome.css') }}">
-    <link rel="stylesheet" href="{{ static('libs/bootstrap-4.0.0-beta-dist/css/bootstrap.css') }}">
-    <link rel="stylesheet" href="{{ static('home/form.css') }}">
-    <link rel="stylesheet" href="{{ static('home/main.css') }}">
-    <script src="{{ static('libs/jquery-3.3.1.min.js') }}"></script>
-    <script src="{{ static('libs/handlebars-379172e.js') }}"></script>
-    <script src="{{ static('js/main.js') }}"></script>
-    <script src="{{ static('libs/popper.js-1.14.4/dist/umd/popper.js') }}"></script>
-    <script src="{{ static('libs/bootstrap-4.0.0-beta-dist/js/bootstrap.js') }}"></script>
+{#    <link rel="stylesheet" href="{{ static('libs/font-awesome-4.7.0/css/font-awesome.css') }}">#}
+{#    <link rel="stylesheet" href="{{ static('libs/bootstrap-4.0.0-beta-dist/css/bootstrap.css') }}">#}
+{#    <link rel="stylesheet" href="{{ static('home/form.css') }}">#}
+{#    <link rel="stylesheet" href="{{ static('home/main.css') }}">#}
+{#    <script src="{{ static('libs/jquery-3.3.1.min.js') }}"></script>#}
+{#    <script src="{{ static('libs/handlebars-379172e.js') }}"></script>#}
+{#    <script src="{{ static('js/main.js') }}"></script>#}
+{#    <script src="{{ static('libs/popper.js-1.14.4/dist/umd/popper.js') }}"></script>#}
+{#    <script src="{{ static('libs/bootstrap-4.0.0-beta-dist/js/bootstrap.js') }}"></script>#}
     {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.js"></script>#}
 
 
@@ -32,16 +32,19 @@
 {# ===== Body ===== #}
 <body class="bg-dark">
 {% if request.user.is_authenticated %}
-    Login as {{ request.user.username }}
-    <a href="{{ url('logout') }}">Logout</a>
+    Hi {{ request.user.username }}!
+    <p><a href="{{ url('logout') }}">Logout</a></p>
+    <p><a href="{{ url('password_reset') }}">Passwort zurücksetzen</a></p>
 {% else %}
+    <p>Du bist nicht eingelogt</p>
     <a href="{{ url('login') }}">Login</a>
 {% endif %}
 {% block body %}
     <div class="container-fluid">
-    <div class="row">{% block bottom_nav %}{% endblock %}</div>
-    <div class="row bg-dark text-white">
-        {% block content %}{% endblock %}
+        <div class="row">{% block bottom_nav %}{% endblock %}</div>
+        <div class="row bg-dark text-white">
+            {% block content %}{% endblock %}
+        </div>
     </div>
 {% endblock %}
 <script src="{{ static('js/form.js') }}"></script>

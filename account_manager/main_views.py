@@ -27,7 +27,7 @@ def realm_list(request):
         realms = Realm.objects.filter(admin_group__user__username__contains=user.username)
         if len(realms) == 0:
             user = LdapUser.objects.get(username=user.username)
-            realm_base_dn = re.compile('(uid=[a-zA-Z_]*),(ou=[a-zA-Z_]*),(.*)').match(user.dn).group(3)
+            realm_base_dn = re.compile('(uid=[a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user.dn).group(3)
             realm = Realm.objects.get(ldap_base_dn=realm_base_dn)
             return redirect('realm-user-detail', realm.id, user.dn)
         elif len(realms) == 1:

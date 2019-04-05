@@ -4,9 +4,6 @@ from .models import LdapUser, LdapGroup
 
 class AddLDAPUserForm(forms.Form):
     username = forms.CharField(label='Nutzername', max_length=400)
-    first_name = forms.CharField(label='Vorname', max_length=400)
-    last_name = forms.CharField(label='Nachname', max_length=400)
-    password = forms.CharField(label='Passwort', widget=forms.PasswordInput, required=False)
     email = forms.EmailField(label='E-Mail', required=False)
 
 

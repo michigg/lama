@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'realm-home'
+PASSWORD_RESET_TIMEOUT_DAYS = 3
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -41,6 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'account_manager',
     'account_helper',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
 ]
 
 MIDDLEWARE = [
@@ -149,16 +153,16 @@ AUTHENTICATION_BACKENDS = [
 AUTH_LDAP_1_SERVER_URI = "ldap://localhost:1389"
 AUTH_LDAP_1_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,ou=fs_wiai,ou=fachschaften,dc=stuve,dc=de"
 AUTH_LDAP_1_GROUP_SEARCH = LDAPSearch("dc=stuve,dc=de",
-                                    ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
-                                    )
+                                      ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
+                                      )
 AUTH_LDAP_1_GROUP_TYPE = GroupOfNamesType(name_attr='cn')
 AUTH_LDAP_1_MIRROR_GROUPS = True
 
 AUTH_LDAP_2_SERVER_URI = "ldap://localhost:1389"
 AUTH_LDAP_2_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,ou=fs_sowi,ou=fachschaften,dc=stuve,dc=de"
 AUTH_LDAP_2_GROUP_SEARCH = LDAPSearch("dc=stuve,dc=de",
-                                    ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
-                                    )
+                                      ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
+                                      )
 AUTH_LDAP_2_GROUP_TYPE = GroupOfNamesType(name_attr='cn')
 AUTH_LDAP_2_MIRROR_GROUPS = True
 
@@ -168,3 +172,14 @@ AUTH_LDAP_USER_ATTR_MAP = {
     'email': 'mail',
 }
 AUTH_PROFILE_MODULE = 'account_manager.UserProfile'
+
+########################################################################################################################
+#                                         EMAIL Config                                                                 #
+########################################################################################################################
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'info.mgserver3@gmail.com'
+# EMAIL_HOST_PASSWORD = 'HaUTQh;tw6Z3"gZNK.UY'
+# EMAIL_USE_TLS = True

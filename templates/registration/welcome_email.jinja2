@@ -1,0 +1,8 @@
+<h1>Willkommen bei den StuVe Services, {{ user.username }}!</h1>
+<p>Es wurde ein Account für dich angelegt.</p>
+<p>Dein Nutzername lautet: {{ user.username }}</p>
+<p>Uns ist folgende E-Mail bekannt: {{ email }}</p>
+<p>Um deinen Account zu aktivieren</p>
+<p>Über den folgenden Link kannst du deinen Account
+    aktivieren: {{ protocol }}://{{ domain }}{{ url('ldap_password_reset_confirm', kwargs={'uidb64':uid, 'token':token}) }}</p>
+

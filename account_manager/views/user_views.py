@@ -6,7 +6,11 @@ from account_manager.forms import AddLDAPUserForm
 from account_manager.models import LdapUser, LdapGroup
 from django.contrib.auth.models import User
 from account_manager.main_views import is_realm_admin
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth import login
 
 
 @login_required
@@ -42,14 +46,14 @@ def user_add(request, realm_id):
         # check whether it's valid:
         if form.is_valid():
             username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
             email = form.cleaned_data['email']
+            current_site = get_current_site(request)
+            protocol = 'http'
+            if request.is_secure():
+                protocol = 'https'
             LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
-            LdapUser.objects.create(username=username,
-                                    password=password, first_name=first_name,
-                                    last_name=last_name, email=email)
+            LdapUser.create_with_django_user_creation_and_welcome_mail(protocol=protocol, domain=current_site.domain,
+                                                                       username=username, email=email)
             return redirect('realm-user-list', realm_id)
 
     # if a GET (or any other method) we'll create a blank form
@@ -140,3 +144,13 @@ def user_delete_controller(request, ldap_user, realm_id, redirect_name):
     except ObjectDoesNotExist:
         pass
     return redirect(redirect_name, realm_id)
+
+
+class LdapPasswordResetConfirmView(PasswordResetConfirmView):
+
+    def form_valid(self, form):
+        user = form.save()
+        password = form.cleaned_data['new_password1']
+        print(password)
+        LdapUser.password_reset(user, password)
+        return super().form_valid(form)

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 import account_manager.views.group_views
 import account_manager.views.user_views
@@ -36,6 +36,8 @@ urlpatterns = [
          name='user-update'),
     path('user/<str:user_dn>/delete/realm/<int:realm_id>/', account_manager.views.user_views.user_delete,
          name='user-delete'),
+    path('reset/<uidb64>/<token>/', account_manager.views.user_views.LdapPasswordResetConfirmView.as_view(),
+         name='ldap_password_reset_confirm'),
 
     # Extra
     path('permission-denied/', main_views.permission_denied, name='permission-denied'),

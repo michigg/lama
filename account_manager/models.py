@@ -1,7 +1,17 @@
 # Create your models here.
-from django.db import models
 from ldapdb.models import fields as ldap_fields
 from ldapdb.models.base import Model
+from django.dispatch import receiver
+from django.db.models.signals import post_save, pre_save
+
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.template.loader import render_to_string
+from core.tokens import account_activation_token
+from django.core.mail import EmailMessage
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+import re
 
 
 class LdapUser(Model):
@@ -29,6 +39,35 @@ class LdapUser(Model):
 
     def __unicode__(self):
         return self.full_name
+
+    @staticmethod
+    def create_with_django_user_creation_and_welcome_mail(protocol, domain, username, email):
+        # current_site = get_current_site(request)
+        ldap_user = LdapUser.objects.create(username=username, email=email, first_name=" ", last_name=" ")
+        user, _ = User.objects.get_or_create(username=username, email=email)
+        # user.save()
+        mail_subject = 'Activate your blog account.'
+        message = render_to_string('registration/welcome_email.jinja2', {
+            'user': user,
+            'domain': domain,
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+            'token': default_token_generator.make_token(user=user),
+            'protocol': protocol,
+            'email': email
+        })
+        email = EmailMessage(
+            mail_subject, message, to=[user.email]
+        )
+        email.send()
+        return ldap_user
+
+    @staticmethod
+    def password_reset(user, raw_password):
+        LdapUser.base_dn = LdapUser.ROOT_DN
+        ldap_user = LdapUser.objects.get(username=user.username)
+        ldap_user.password = raw_password
+        LdapUser.base_dn = re.compile('(uid=[a-zA-Z0-9_]*),(.*)').match(ldap_user.dn).group(2)
+        ldap_user.save()
 
 
 class LdapGroup(Model):
