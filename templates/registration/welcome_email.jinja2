@@ -5,4 +5,5 @@
 <p>Um deinen Account zu aktivieren</p>
 <p>Über den folgenden Link kannst du deinen Account
     aktivieren: {{ protocol }}://{{ domain }}{{ url('ldap_password_reset_confirm', kwargs={'uidb64':uid, 'token':token}) }}</p>
+<p>Der Link ist nur {{ expiration_days }} Tage gültig!</p>
 

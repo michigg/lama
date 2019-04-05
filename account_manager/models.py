@@ -11,6 +11,7 @@ from core.tokens import account_activation_token
 from django.core.mail import EmailMessage
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
+from core.settings import PASSWORD_RESET_TIMEOUT_DAYS
 import re
 
 
@@ -53,7 +54,8 @@ class LdapUser(Model):
             'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
             'token': default_token_generator.make_token(user=user),
             'protocol': protocol,
-            'email': email
+            'email': email,
+            'expiration_days': PASSWORD_RESET_TIMEOUT_DAYS
         })
         email = EmailMessage(
             mail_subject, message, to=[user.email]
