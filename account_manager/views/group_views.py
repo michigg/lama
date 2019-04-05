@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 
 from account_helper.models import Realm
 from account_manager.forms import AddLDAPGroupForm
-from account_manager.models import LdapGroup
+from account_manager.models import LdapGroup, LdapUser
 from account_manager.main_views import is_realm_admin
 
 
@@ -29,6 +29,7 @@ def group_detail(request, realm_id, group_dn):
 @is_realm_admin
 def group_add(request, realm_id):
     realm_obj = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = LdapUser.ROOT_DN
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -55,7 +56,7 @@ def group_update(request, realm_id, group_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     group = LdapGroup.objects.get(dn=group_dn)
-
+    LdapUser.base_dn = LdapUser.ROOT_DN
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = AddLDAPGroupForm(request.POST)
