@@ -147,7 +147,7 @@ def user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, red
         form_data = {'username': ldap_user.username, 'first_name': ldap_user.first_name,
                      'last_name': ldap_user.last_name, 'email': ldap_user.email}
         form = UpdateLDAPUserForm(initial=form_data)
-    return render(request, detail_page, {'form': form, 'realm': realm_obj})
+    return render(request, detail_page, {'form': form, 'realm': realm_obj, 'user': ldap_user})
 
 
 def user_delete_controller(ldap_user):

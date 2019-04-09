@@ -17,7 +17,31 @@
             Bestehende Bilder (Zum Löschen selektieren)
         </label>
         {{ forms.image_deletion_input(existing_images=item.images.all()) }}
-         <a class="btn btn-primary" href="{{ url('accounts:order-images', args=[item.id]) }}">Bilder manuell sortieren</a>
+        <a class="btn btn-primary" href="{{ url('accounts:order-images', args=[item.id]) }}">Bilder manuell
+            sortieren</a>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro user_update_form(form, form_utils, item) %}
+    <input type="hidden" name="type" value="{{ form.type.value() }}">
+    {% for error in  item_base_form.non_field_errors() %}
+        <p class="alert alert-danger" role="alert">
+            {{ error }}
+        </p>
+    {% endfor %}
+    {{ form_utils.text_input(form.title) }}
+    {{ form_utils.textarea_input(form.description) }}
+    {{ form_utils.select_input(form.categories, multiple=True) }}
+    {{ form_utils.file_input(form.loan_agreement_file) }}
+    {{ form_utils.file_input(form.images, multiple=True) }}
+    {% if item and item.images.count() > 0 %}
+        <label>
+            Bestehende Bilder (Zum Löschen selektieren)
+        </label>
+        {{ forms.image_deletion_input(existing_images=item.images.all()) }}
+        <a class="btn btn-primary" href="{{ url('accounts:order-images', args=[item.id]) }}">Bilder manuell
+            sortieren</a>
     {% endif %}
 {% endmacro %}
 

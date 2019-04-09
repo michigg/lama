@@ -16,7 +16,7 @@
     <!-- Bootstrap CSS -->
     {#    <link rel="stylesheet" href="{{ static('libs/font-awesome-4.7.0/css/font-awesome.css') }}">#}
     <link rel="stylesheet" href="{{ static('libs/bootstrap-4.3.1-dist/css/bootstrap.css') }}">
-    {#    <link rel="stylesheet" href="{{ static('home/form.css') }}">#}
+    <link rel="stylesheet" href="{{ static('css/floating_labels.css') }}">
     {#    <link rel="stylesheet" href="{{ static('home/main.css') }}">#}
     {#    <script src="{{ static('libs/jquery-3.3.1.min.js') }}"></script>#}
     {#    <script src="{{ static('libs/handlebars-379172e.js') }}"></script>#}
@@ -51,7 +51,7 @@
 {% block body %}
     <div class="container-fluid">
         <div class="row">{% block bottom_nav %}{% endblock %}</div>
-        <div class="row bg-dark text-white">
+        <div class="row">
             {% block content %}{% endblock %}
         </div>
     </div>

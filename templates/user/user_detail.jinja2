@@ -1,9 +1,11 @@
 {% extends 'base.jinja2' %}
+{% import 'macros/form_macros.jinja2' as mform %}
 {% block content %}
     <div class="col-12 ">
         <div class="row justify-content-center justify-content-sm-center">
-            <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3 bg-white text-dark p-3 mt-5">
-                {% if not form %}
+
+            {% if not form %}
+                <div class="col-12 col-sm-8 col-md-7 col-lg-5 col-xl-4 bg-white text-dark p-3 mt-5">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">{{ user.username }}</h5>
@@ -27,29 +29,35 @@
                                 <li class="list-group-item"><span
                                         class="font-weight-bold">Mobiltelefon:</span> {{ user.mobile_phone }}</li>
                             </ul>
-                            <div class="card-footer row">
-                                <div class="col-6 text-left">
-                                    <a href="{{ url('user-update', args = [user.dn, realm.id]) }}"
-                                       class="btn btn-primary">Update
-                                        User</a>
-                                </div>
-                                <div class="col-6 text-right">
-                                    <a href="{{ url('user-delete', args = [user.dn, realm.id]) }}"
-                                       class="btn btn-danger">Delete
-                                        User</a>
-                                </div>
+                            <div class="card-footer d-flex">
+                                <a href="{{ url('user-update', args = [user.dn, realm.id]) }}"
+                                   class="btn btn-primary mr-auto p-2">Update
+                                    User</a>
+                                <a href="{{ url('user-delete', args = [user.dn, realm.id]) }}"
+                                   class="btn btn-danger p-2">Delete
+                                    User</a>
                             </div>
                         </div>
                     </div>
-                    {#                    <p>DN: {{ user.dn }}</p>#}
-                {% else %}
-                    <form method="post">
+                </div>
+            {% else %}
+                <div class="col-12 col-sm-8 col-md-7 col-lg-5 col-xl-4 bg-white text-dark p-3 mt-5 border">
+                    <h1 class="mb-4">Nutzerdetails anpassen</h1>
+                    <form method="post" class="floating-label-form">
                         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                        {{ form.as_p()|safe }}
-                        <button type="submit">Speichern</button>
+                        {{ mform.email_input(form.email) }}
+                        {{ mform.password_input(form.password) }}
+                        {{ mform.text_input(form.first_name) }}
+                        {{ mform.text_input(form.last_name) }}
+                        <div class="d-flex mt-4">
+                            <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+                            <a href="{{ url('realm-user-detail', args = [realm.id, user.dn]) }}"
+                               class="btn btn-secondary p-2">Abbrechen</a>
+                        </div>
                     </form>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
         </div>
+    </div>
     </div>
 {% endblock %}

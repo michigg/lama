@@ -20,6 +20,7 @@
             <datalist id="{{ list }}">
             </datalist>
         {% endif %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
         <small id="{{ field.id_for_label }}_help" class="form-text text-muted">
             {% if field.errors %}
                 <ul>
@@ -111,17 +112,17 @@
 
 {% macro image_deletion_input(existing_images) -%}
     <div class="card-group">
-    {% for image in existing_images %}
-        <div class="col-12 col-xs-12 col-md-6 col-lg-6 col-xl-3 p-1">
-            <div class="card w-100" style="width: 18rem;" >
-                <input type="checkbox" id="image{{ image.id }}" name="deleteImages"
-                    value="{{ image.id }}">
-                 <label for="image{{ image.id }}">
-                    <img class="img-fluid" src="{{ image.file.url }}" alt="Item default image">
-                </label>
+        {% for image in existing_images %}
+            <div class="col-12 col-xs-12 col-md-6 col-lg-6 col-xl-3 p-1">
+                <div class="card w-100" style="width: 18rem;">
+                    <input type="checkbox" id="image{{ image.id }}" name="deleteImages"
+                           value="{{ image.id }}">
+                    <label for="image{{ image.id }}">
+                        <img class="img-fluid" src="{{ image.file.url }}" alt="Item default image">
+                    </label>
+                </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
     </div>
 {% endmacro %}
 
@@ -179,6 +180,7 @@
             <datalist id="{{ list }}">
             </datalist>
         {% endif %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
         <small id="{{ field.id_for_label }}_help" class="form-text text-muted">
             {% if field.errors %}
                 <ul>
@@ -207,6 +209,7 @@
                id="{{ field.id_for_label }}"
                {% if field.value() != None %}value="{{ field.value() }}"{% endif %}
                {% if field.field.required %}required{% endif %}>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
         <small id="{{ field.id_for_label }}_help" class="form-text text-muted">
             {% if type %}
                 {{ field.label }} in {{ type }}
@@ -220,6 +223,44 @@
             {% endif %}
             {% if field.help_text %}
                 <br/>{{ field.help_text() }}
+            {% endif %}
+        </small>
+    </div>
+{% endmacro %}
+
+{% macro email_input(field, list='', css_classes='') -%}
+    <div class="form-group">
+        <input type="email"
+                {% if css_classes %}
+               class="{{ css_classes }}"
+                {% else %}
+               class="form-control"
+                {% endif %}
+               placeholder="{{ field.label }}"
+                {% if list %}
+               list="{{ list }}"
+                {% endif %}
+               aria-describedby="{{ field.id_for_label }}_help"
+               name="{{ field.html_name }}"
+               id="{{ field.id_for_label }}"
+               {% if field.value() != None %}value="{{ field.value() }}"{% endif %}
+               maxlength="{{ field.field.max_length }}"
+               {% if field.field.required %}required{% endif %}>
+        {% if list %}
+            <datalist id="{{ list }}">
+            </datalist>
+        {% endif %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <small id="{{ field.id_for_label }}_help" class="form-text text-muted">
+            {% if field.errors %}
+                <ul>
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if field.help_text %}
+                <br/>
             {% endif %}
         </small>
     </div>
