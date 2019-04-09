@@ -30,15 +30,24 @@
 </head>
 
 {# ===== Body ===== #}
-<body class="bg-light">
-{% if request.user.is_authenticated %}
-    Hi {{ request.user.username }}!
-    <p><a href="{{ url('logout') }}">Logout</a></p>
-    <p><a href="{{ url('password_reset') }}">Passwort zurücksetzen</a></p>
-{% else %}
-    <p>Du bist nicht eingelogt</p>
-    <a href="{{ url('login') }}">Login</a>
-{% endif %}
+<body>
+<nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="{{ url('realm-home') }}">
+        {#      TODO: Icon#}
+        <img src="/docs/4.0/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top"
+             alt="">
+        LAMa
+    </a>
+    {% if request.user.is_authenticated %}
+        <span class="navbar-text">
+        Hi {{ request.user.username }}!
+        <a href="{{ url('logout') }}">Logout</a>
+    {% else %}
+        <a href="{{ url('login') }}">Login</a>
+    {% endif %}
+    </span>
+</nav>
+
 {% block body %}
     <div class="container-fluid">
         <div class="row">{% block bottom_nav %}{% endblock %}</div>

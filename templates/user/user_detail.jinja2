@@ -1,21 +1,55 @@
 {% extends 'base.jinja2' %}
 {% block content %}
-    {% if not form %}
-        <p>DN: {{ user.dn }}</p>
-        <p>Nutzername: {{ user.username }}</p>
-        <p>Vorname: {{ user.first_name }}</p>
-        <p>Nachname: {{ user.last_name }}</p>
-        <p>Email: {{ user.email }}</p>
-        <p>Passwort: {{ user.password }}</p>
-        <p>Telefon: {{ user.phone }}</p>
-        <p>Mobiltelefon: {{ user.mobile_phone }}</p>
-        <a href="{{ url('user-update', args = [user.dn, realm.id]) }}">Update User</a>
-        <a href="{{ url('user-delete', args = [user.dn, realm.id]) }}">Delete User</a>
-    {% else %}
-        <form method="post">
-            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-            {{ form.as_p()|safe }}
-            <button type="submit">Speichern</button>
-        </form>
-    {% endif %}
+    <div class="col-12 ">
+        <div class="row justify-content-center justify-content-sm-center">
+            <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3 bg-white text-dark p-3 mt-5">
+                {% if not form %}
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ user.username }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ user.first_name }}, {{ user.last_name }}</h6>
+                            <ul class="list-group list-group-flush">
+                                {% if groups %}
+                                    <li class="list-group-item">
+                                        <span class="font-weight-bold">Gruppen:</span>
+                                        {% for group in groups %}
+                                            {{ group.name }}
+                                        {% endfor %}
+                                    </li>
+                                {% endif %}
+                                <li class="list-group-item"><span
+                                        class="font-weight-bold">Email:</span> {{ user.email }}</li>
+                                <li class="list-group-item"><span
+                                        class="font-weight-bold">Passwort:</span> {{ user.password }}
+                                </li>
+                                <li class="list-group-item"><span
+                                        class="font-weight-bold">Telefon:</span> {{ user.phone }}</li>
+                                <li class="list-group-item"><span
+                                        class="font-weight-bold">Mobiltelefon:</span> {{ user.mobile_phone }}</li>
+                            </ul>
+                            <div class="card-footer row">
+                                <div class="col-6 text-left">
+                                    <a href="{{ url('user-update', args = [user.dn, realm.id]) }}"
+                                       class="btn btn-primary">Update
+                                        User</a>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <a href="{{ url('user-delete', args = [user.dn, realm.id]) }}"
+                                       class="btn btn-danger">Delete
+                                        User</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {#                    <p>DN: {{ user.dn }}</p>#}
+                {% else %}
+                    <form method="post">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        {{ form.as_p()|safe }}
+                        <button type="submit">Speichern</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock %}

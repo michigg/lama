@@ -25,12 +25,13 @@ def realm_user_detail(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm.ldap_base_dn
     user = LdapUser.objects.get(dn=user_dn)
+    groups = LdapGroup.objects.filter(members=user.dn)
     if realm_id and (request.user.is_superuser or len(
             Realm.objects.filter(id=realm_id).filter(
                 admin_group__user__username__contains=request.user.username)) > 0):
         return render(request, 'user/realm_user_detail.jinja2', {'user': user, 'realm': realm})
     else:
-        return render(request, 'user/user_detail.jinja2', {'user': user, 'realm': realm})
+        return render(request, 'user/user_detail.jinja2', {'user': user, 'groups': groups, 'realm': realm})
 
 
 @login_required
