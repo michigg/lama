@@ -113,6 +113,18 @@ def user_update(request, realm_id, user_dn):
 
 
 @login_required
+def user_delete_confirm(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    if request.user.username == ldap_user.username:
+        return render(request, 'user/user_confirm_delete.jinja2', {'realm': realm, 'user': ldap_user})
+    else:
+        return redirect('permission-denied')
+
+
+@login_required
 def user_delete(request, realm_id, user_dn):
     realm_obj = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
@@ -126,7 +138,7 @@ def user_delete(request, realm_id, user_dn):
 
 
 def user_deleted(request, realm_id):
-    return render(request, 'account_deleted.jinja2', {'realm': Realm.objects.get(id=realm_id)})
+    return render(request, 'user/account_deleted.jinja2', {'realm': Realm.objects.get(id=realm_id)})
 
 
 def user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, redirect_name, detail_page):

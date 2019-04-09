@@ -38,6 +38,9 @@ urlpatterns = [
     # User
     path('user/<str:user_dn>/update/realm/<int:realm_id>/', account_manager.views.user_views.user_update,
          name='user-update'),
+    path('user/<str:user_dn>/delete/realm/<int:realm_id>/confirm/',
+         account_manager.views.user_views.user_delete_confirm,
+         name='user-delete-confirm'),
     path('user/<str:user_dn>/delete/realm/<int:realm_id>/', account_manager.views.user_views.user_delete,
          name='user-delete'),
     path('reset/<uidb64>/<token>/', account_manager.views.user_views.LdapPasswordResetConfirmView.as_view(),
