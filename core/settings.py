@@ -173,10 +173,54 @@ AUTH_PROFILE_MODULE = 'account_manager.UserProfile'
 ########################################################################################################################
 #                                         EMAIL Config                                                                 #
 ########################################################################################################################
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'info.mgserver3@gmail.com'
-# EMAIL_HOST_PASSWORD = 'HaUTQh;tw6Z3"gZNK.UY'
-# EMAIL_USE_TLS = True
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_TIMEOUT = 15
+EMAIL_HOST = 'smtp.uni-bamberg.de'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
+
+########################################################################################################################
+#                                         Logging Config                                                               #
+########################################################################################################################
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '%(asctime)s %(module)s [%(levelname)s]: %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': './logs/import_food.log',
+            'formatter': 'default',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+        'mail_admins_image_upload': {
+            'level': 'INFO',
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+    },
+    'loggers': {
+        'account_manager': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+        'account_helper': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+    },
+}

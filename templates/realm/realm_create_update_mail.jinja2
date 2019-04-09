@@ -1,0 +1,11 @@
+{% extends 'realm/realm_detailed.jinja2' %}
+{% block realm_form %}
+    <h2>Email Account erstellen oder updaten</h2>
+    {% if form %}
+        <form method="post">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            {{ form.as_p()|safe }}
+            <button type="submit">Speichern</button>
+        </form>
+    {% endif %}
+{% endblock %}

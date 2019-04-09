@@ -2,15 +2,31 @@
 {% block content %}
     <a href="{{ url('realm-home') }}">Zurück zur Realmübersicht</a>
     <h1>Bereich {{ realm.name }}</h1>
+    {% if notice %}
+        <p style="color: green">{{ notice }}</p>
+    {% endif %}
+    {% if error %}
+        <p style="color: darkred">{{ error }}</p>
+    {% endif %}
     <h2>Bereich Info</h2>
     <p>LDAP OU: {{ realm.ldap_base_dn }}</p>
-    <p>Email: {{ realm.email }}</p>
+    {% if realm.email %}
+        <p>Email: {{ realm.email }}</p>
+    {% else %}
+        <p>Noch ausstehend</p>
+    {% endif %}
     <p>Admin Gruppe: {{ realm.admin_group }}</p>
     {% if request.user.is_superuser %}
         {% block realm_form %}
             <h2><a href="{{ url('realm-update', args=[realm.id]) }}">Bereichsinformationen anpassen</a></h2>
         {% endblock %}
     {% endif %}
+    <h2>
+        <a href="{{ url('realm-mail-add-update', args=[realm.id]) }}">E-Mail Einstellungen</a> |
+        {% if realm.email %}
+            <a href="{{ url('realm-mail-test', args=[realm.id]) }}">Test Mail</a>
+        {% endif %}
+    </h2>
 
     <h2><a href="{{ url('realm-user-add', args=[realm.id]) }}">Nutzer hinzufügen</a></h2>
     {% block user_content %}

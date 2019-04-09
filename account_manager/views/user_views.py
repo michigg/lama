@@ -52,8 +52,11 @@ def user_add(request, realm_id):
             if request.is_secure():
                 protocol = 'https'
             LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
-            LdapUser.create_with_django_user_creation_and_welcome_mail(protocol=protocol, domain=current_site.domain,
-                                                                       username=username, email=email)
+            LdapUser.create_with_django_user_creation_and_welcome_mail(realm=realm_obj,
+                                                                       protocol=protocol,
+                                                                       domain=current_site.domain,
+                                                                       username=username,
+                                                                       email=email)
             return redirect('realm-user-list', realm_id)
 
     # if a GET (or any other method) we'll create a blank form
