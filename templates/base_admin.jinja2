@@ -1,0 +1,29 @@
+{% extends 'base.jinja2' %}
+
+{% block body %}
+    <div class="d-flex wrapper">
+        <div class="bg-light border-right sidebar-wrapper">
+            <h2 class="sidebar-heading">Realms</h2>
+            <div class="list-group list-group-flush">
+                {% for realm_item in realms %}
+                    <a href="{{ url('realm-detail', args=[realm_item.id]) }}"
+                       class="list-group-item list-group-item-action bg-light">{{ realm_item.name }} </a>
+                    {#                    {% if request.user.is_superuser %}#}
+                    {#                        <a href="{{ url('realm-delete', args=[realm_item.id]) }}">Delete</a>#}
+                    {#                    {% endif %}#}
+                {% endfor %}
+                {% if realm %}
+                    <h2 class="sidebar-heading">{{ realm.name }}</h2>
+                    {#                <a href="{{ }}">Users</a>#}
+                    {#                <a href="{{ }}">Groups</a>#}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="page-content-wrapper">
+            <div class="container-fluid">
+                {% block admin_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
