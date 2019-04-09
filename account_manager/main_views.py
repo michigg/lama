@@ -1,15 +1,19 @@
+import logging
 import re
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPException
 from socket import timeout
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
-from django.shortcuts import render, redirect
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render, redirect, HttpResponse
 
 from account_helper.models import Realm
 from account_manager.utils.mail_utils import realm_send_mail
 from .forms import RealmAddForm, RealmUpdateForm, EmailSettingsForm
 from .models import LdapGroup, LdapUser
+
+logger = logging.getLogger(__name__)
 
 
 def is_realm_admin(view_func):
@@ -31,10 +35,14 @@ def realm_list(request):
     if not user.is_superuser:
         realms = Realm.objects.filter(admin_group__user__username__contains=user.username)
         if len(realms) == 0:
-            user = LdapUser.objects.get(username=user.username)
-            realm_base_dn = re.compile('(uid=[a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user.dn).group(3)
-            realm = Realm.objects.get(ldap_base_dn=realm_base_dn)
-            return redirect('realm-user-detail', realm.id, user.dn)
+            try:
+                user = LdapUser.objects.get(username=user.username)
+                realm_base_dn = re.compile('(uid=[a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user.dn).group(3)
+                realm = Realm.objects.get(ldap_base_dn=realm_base_dn)
+                return redirect('realm-user-detail', realm.id, user.dn)
+            except ObjectDoesNotExist as err:
+                logger.info('Anmeldung fehlgeschlagen', err)
+                return HttpResponse("Invalid login. Please try again.")
         elif len(realms) == 1:
             return redirect('realm-detail', realms[0].id)
         else:

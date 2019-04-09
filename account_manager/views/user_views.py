@@ -1,16 +1,14 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 
 from account_helper.models import Realm
-from account_manager.forms import AddLDAPUserForm, UserDeleteListForm
-from account_manager.models import LdapUser, LdapGroup
-from django.contrib.auth.models import User
+from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm
 from account_manager.main_views import is_realm_admin
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.views import PasswordResetConfirmView
-from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.auth import login
+from account_manager.models import LdapUser, LdapGroup
 
 
 @login_required
@@ -132,9 +130,9 @@ def user_deleted(request, realm_id):
 
 def user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, redirect_name, detail_page):
     if request.method == 'POST':
-        form = AddLDAPUserForm(request.POST)
+        form = UpdateLDAPUserForm(request.POST)
         if form.is_valid():
-            ldap_user.username = form.cleaned_data['username']
+            # ldap_user.username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             if password:
                 ldap_user.password = password
@@ -147,7 +145,7 @@ def user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, red
     else:
         form_data = {'username': ldap_user.username, 'first_name': ldap_user.first_name,
                      'last_name': ldap_user.last_name, 'email': ldap_user.email}
-        form = AddLDAPUserForm(initial=form_data)
+        form = UpdateLDAPUserForm(initial=form_data)
     return render(request, detail_page, {'form': form, 'realm': realm_obj})
 
 

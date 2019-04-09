@@ -6,7 +6,7 @@ from . import main_views
 
 urlpatterns = [
     # Realm
-    path('realm/', main_views.realm_list, name='realm-home'),
+    path('', main_views.realm_list, name='realm-home'),
     path('realm/<int:realm_id>/', main_views.realm_detail, name='realm-detail'),
     path('realm/<int:realm_id>/update/', main_views.realm_update, name='realm-update'),
     path('realm/<int:realm_id>/delete/', main_views.realm_delete, name='realm-delete'),

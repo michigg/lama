@@ -8,6 +8,17 @@ class AddLDAPUserForm(forms.Form):
     email = forms.EmailField(label='E-Mail', required=False)
 
 
+class UpdateLDAPUserForm(forms.Form):
+    # username = forms.CharField(label='Nutzername', max_length=400)
+    email = forms.EmailField(label='E-Mail')
+    password = forms.CharField(label='Passwort', widget=forms.PasswordInput, required=False)
+    first_name = forms.CharField(label='Vorname', required=True)
+    last_name = forms.CharField(label='Nachname', required=True)
+    # phone = forms.(db_column='telephoneNumber', blank=True)
+    # mobile_phone = forms.CharField(db_column='mobile', blank=True)
+    # photo = forms.ImageField(label='Profilfoto', required=False)
+
+
 class UserDeleteListForm(forms.Form):
     ldap_users = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=LdapUser.objects.all())
 
