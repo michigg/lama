@@ -6,6 +6,11 @@
         <div class="row justify-content-center justify-content-sm-center">
             <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3 bg-white text-dark text-center p-3 mt-5">
                 <h1>Login</h1>
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors() %}
+                        <div class="alert-warning mb-2">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
                 <form method="post" class="mb-3">
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                     {{ mform.text_input(form.username) }}
