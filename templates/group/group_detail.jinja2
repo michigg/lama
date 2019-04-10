@@ -24,17 +24,9 @@
     {% else %}
         <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-            {{ form.as_p()|safe }}
             {{ mform.text_input(form.name) }}
-            {% for choice_value, choice_label in form.members.field.choices %}
-                <p>{{ form.members.html_name }} | {{ choice_value }} | {{ choice_label }} | {{ form.members.value.value }}</p>
-                {#                {{ mform.checkbox_input_for_choice_fields(choice_id, choice_label ) }}#}
-            {% endfor %}
-{#            {% for value in form.members.value %}#}
-            {#                <p>{{ value }}</p>#}
-            {#                {{ mform.checkbox_input_for_choice_fields(choice_id, choice_label ) }}#}
-            {#            {% endfor %}#}
-
+            {{ form.members.label }}
+            {{ mform.checkbox_input_for_choice_fields(form.members) }}
             <div class="d-flex mt-4">
                 <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
                 <a href="{{ url('realm-group-detail', args = [realm.id, group.dn]) }}"

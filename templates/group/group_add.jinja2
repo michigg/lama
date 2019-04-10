@@ -5,8 +5,8 @@
     <form action="{{ url('realm-group-add', args=[realm.id]) }}" method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         {{ mform.text_input(form.name) }}
-        <p>Mitglieder</p>
-        {{ form.members }}
+        {{ form.members.label }}
+        {{ mform.checkbox_input_for_choice_fields(form.members) }}
         <div class="d-flex mt-4">
             <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
             <a href="{{ url('realm-group-list', args = [realm.id]) }}"

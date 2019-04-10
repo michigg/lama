@@ -1,10 +1,13 @@
+import re
+
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import render, redirect
 
 from account_helper.models import Realm
 from account_manager.forms import AddLDAPGroupForm
-from account_manager.models import LdapGroup, LdapUser
 from account_manager.main_views import is_realm_admin
+from account_manager.models import LdapGroup, LdapUser
 
 
 @login_required
@@ -58,6 +61,10 @@ def group_update(request, realm_id, group_dn):
     group = LdapGroup.objects.get(dn=group_dn)
     LdapUser.base_dn = LdapUser.ROOT_DN
     if request.method == 'POST':
+        # user_ids = list(map(int, request.POST.getlist('members')))
+        # user_formset = UserFormset(request.POST)
+        # if user_formset and user_formset.is_valid():
+        #     print(user_formset)
         # create a form instance and populate it with data from the request:
         form = AddLDAPGroupForm(request.POST)
         # check whether it's valid:
@@ -71,10 +78,19 @@ def group_update(request, realm_id, group_dn):
     # if a GET (or any other method) we'll create a blank form
     else:
         # TODO: Automatic checkbox selection
-        data = {'name': group.name, 'members': group.members}
+        members = LdapUser.objects.none()
+        if group.members:
+            group_members = [re.compile('uid=([a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(member).group(1) for member in
+                             group.members]
+            query = Q(username=group_members.pop())
+            for member in group_members:
+                query = query | Q(username=member)
+            members = LdapUser.objects.filter(query)
+        data = {'name': group.name, 'members': members}
         form = AddLDAPGroupForm(initial=data)
 
-    return render(request, 'group/group_detail.jinja2', {'form': form, 'realm': realm, 'group': group})
+    return render(request, 'group/group_detail.jinja2',
+                  {'form': form, 'realm': realm, 'group': group})
 
 
 def group_delete(request, realm_id, group_dn):

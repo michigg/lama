@@ -1,6 +1,7 @@
 from django import forms
 
 from .models import LdapUser, LdapGroup
+from django.forms import modelformset_factory
 
 
 class AddLDAPUserForm(forms.Form):
@@ -24,9 +25,10 @@ class UserDeleteListForm(forms.Form):
 
 
 class AddLDAPGroupForm(forms.Form):
-    name = forms.CharField(label='name', max_length=400)
+    name = forms.CharField(label='Name', max_length=400)
     # TODO show only allowed user
-    members = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, queryset=LdapUser.objects.all())
+    members = forms.ModelMultipleChoiceField(label='Mitglieder', widget=forms.CheckboxSelectMultiple,
+                                             queryset=LdapUser.objects.all(), )
 
 
 class RealmAddForm(forms.Form):
@@ -45,3 +47,10 @@ class RealmUpdateForm(forms.Form):
     admin_group = forms.ModelChoiceField(label='Admin Gruppe',
                                          help_text="Die Mitglieder dieser Gruppe darf den Bereich administieren",
                                          queryset=LdapGroup.objects.all())
+
+
+UserFormset = modelformset_factory(
+    LdapUser,
+    fields=('dn',),
+    extra=1
+)
