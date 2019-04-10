@@ -13,12 +13,24 @@
             <li class="list-group-item">Passwort: {{ user.password }}</li>
             <li class="list-group-item">Telefon: {{ user.phone }}</li>
             <li class="list-group-item">Mobiltelefon: {{ user.mobile_phone }}</li>
+            <li class="list-group-item">Gruppen:
+                {% if groups %}
+                    {% for group in groups %}
+                        {{ group.name }}
+                    {% endfor %}
+                {% else %}
+                    <span class="text-warning">Keine zugewiesen</span>
+                {% endif %}
+                <a href="#" class="float-right">Gruppen zuweisen</a>
+            </li>
         </ul>
         <div class="d-flex mt-3">
-            <a href="{{ url('realm-user-update', args = [realm.id, user.dn]) }}" class="btn btn-primary mr-auto p-2">Update
-                User</a>
-            <a href="{{ url('realm-user-delete', args = [realm.id, user.dn]) }}" class="btn btn-danger p-2">Delete
-                User</a>
+            <a href="{{ url('realm-user-update', args = [realm.id, user.dn]) }}" class="btn btn-primary mr-auto p-2">
+                Update User
+            </a>
+            <a href="{{ url('realm-user-delete', args = [realm.id, user.dn]) }}" class="btn btn-danger p-2">
+                Delete User
+            </a>
         </div>
     {% else %}
         <form method="post">
