@@ -33,7 +33,7 @@ def is_realm_admin(view_func):
 def realm_list(request):
     user = request.user
     if not user.is_superuser:
-        realms = Realm.objects.filter(admin_group__user__username__contains=user.username)
+        realms = Realm.objects.filter(admin_group__user__username__contains=user.username).order_by('name')
         if len(realms) == 0:
             try:
                 user = LdapUser.objects.get(username=user.username)
@@ -48,7 +48,7 @@ def realm_list(request):
         else:
             return render(request, 'realm/realm_home.jinja2', {'realms': realms})
     else:
-        realms = Realm.objects.all()
+        realms = Realm.objects.all().order_by('name')
         if request.method == 'POST':
             form = RealmAddForm(request.POST)
             if form.is_valid():
