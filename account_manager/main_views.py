@@ -6,12 +6,14 @@ from socket import timeout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 from django.shortcuts import render, redirect, HttpResponse
 
 from account_helper.models import Realm
 from account_manager.utils.mail_utils import realm_send_mail
 from .forms import RealmAddForm, RealmUpdateForm
 from .models import LdapGroup, LdapUser
+from ldap import LDAPError
 
 logger = logging.getLogger(__name__)
 
@@ -54,12 +56,27 @@ def realm_list(request):
             if form.is_valid():
                 name = form.cleaned_data['name']
                 ldap_base_dn = form.cleaned_data['ldap_base_dn']
-                realm_obj = Realm.objects.create(name=name, ldap_base_dn=ldap_base_dn)
-                realm_obj.save()
-                return redirect('realm-detail', realm_obj.id)
+                try:
+                    base_dn_available(ldap_base_dn)
+
+                    realm_obj = Realm.objects.create(name=name, ldap_base_dn=ldap_base_dn)
+                    realm_obj.save()
+                    return redirect('realm-detail', realm_obj.id)
+                except IntegrityError as err:
+                    return render(request, 'realm/realm_add_failed.jinja2',
+                                  {'realm_name': name, 'error': err})
+                except LDAPError as err:
+                    return render(request, 'realm/realm_add_failed.jinja2',
+                                  {'realm_name': name})
         else:
             form = RealmAddForm()
         return render(request, 'realm/realm_home.jinja2', {'realms': realms, 'form': form})
+
+
+def base_dn_available(base_dn):
+    LdapUser.base_dn = f'ou=people,{base_dn}'
+    user = LdapUser.objects.create(username='dummy', first_name=' ', last_name=' ')
+    user.delete()
 
 
 @login_required
@@ -117,20 +134,24 @@ def realm_delete(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm.ldap_base_dn
     LdapGroup.base_dn = realm.ldap_base_dn
-    ldap_users = LdapUser.objects.all()
-    ldap_usernames = [user.username for user in ldap_users]
-    ldap_groups = LdapGroup.objects.all()
-    ldap_groupnames = [group.name for group in ldap_groups]
-    django_user = User.objects.filter(username__contains=ldap_usernames)
-    django_groups = Group.objects.filter(name__contains=ldap_groupnames)
-    for user in django_user:
-        user.delete()
-    for group in django_groups:
-        group.delete()
-    for user in ldap_users:
-        user.delete()
-    for group in ldap_groups:
-        group.delete()
+    try:
+        ldap_users = LdapUser.objects.all()
+        ldap_usernames = [user.username for user in ldap_users]
+        ldap_groups = LdapGroup.objects.all()
+        ldap_groupnames = [group.name for group in ldap_groups]
+        django_user = User.objects.filter(username__contains=ldap_usernames)
+        django_groups = Group.objects.filter(name__contains=ldap_groupnames)
+        for user in django_user:
+            user.delete()
+        for group in django_groups:
+            group.delete()
+        for user in ldap_users:
+            user.delete()
+        for group in ldap_groups:
+            group.delete()
+    except LDAPError:
+        # TODO: Save delete
+        pass
     realm.delete()
     return redirect('realm-home')
 

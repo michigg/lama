@@ -15,15 +15,17 @@
                 <h2 class="sidebar-heading">Bereich</h2>
                 <a href="{{ url('realm-home') }}" class="list-group-item list-group-item-action bg-light">
                     Bereichsübersicht</a>
-                <h2 class="sidebar-heading">{{ realm.name }}</h2>
-                <div class="list-group list-group-flush">
-                    <a href="{{ url('realm-detail', args=[realm.id]) }}"
-                       class="list-group-item list-group-item-action bg-light">Bereichsinformationen</a>
-                    <a href="{{ url('realm-user-list', args=[realm.id]) }}"
-                       class="list-group-item list-group-item-action bg-light">Nutzer</a>
-                    <a href="{{ url('realm-group-list', args=[realm.id]) }}"
-                       class="list-group-item list-group-item-action bg-light">Gruppen</a>
-                </div>
+                {% if realm %}
+                    <h2 class="sidebar-heading">{{ realm.name }}</h2>
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url('realm-detail', args=[realm.id]) }}"
+                           class="list-group-item list-group-item-action bg-light">Bereichsinformationen</a>
+                        <a href="{{ url('realm-user-list', args=[realm.id]) }}"
+                           class="list-group-item list-group-item-action bg-light">Nutzer</a>
+                        <a href="{{ url('realm-group-list', args=[realm.id]) }}"
+                           class="list-group-item list-group-item-action bg-light">Gruppen</a>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
 
