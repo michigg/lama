@@ -22,7 +22,7 @@ class LdapUser(Model):
     ROOT_DN = "dc=stuve,dc=de"
     base_dn = "dc=stuve,dc=de"
     object_classes = ['inetOrgPerson']
-    last_modified = ldap_fields.DateTimeField(db_column='modifyTimestamp', blank=True)
+    # last_modified = ldap_fields.DateTimeField(db_column='modifyTimestamp', blank=True)
 
     # inetOrgPerson
     username = ldap_fields.CharField(db_column='uid', primary_key=True)

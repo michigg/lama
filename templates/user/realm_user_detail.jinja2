@@ -23,6 +23,7 @@
     {% else %}
         <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            {{ mform.text_input(form.username) }}
             {{ mform.email_input(form.email) }}
             {{ mform.password_input(form.password) }}
             {{ mform.text_input(form.first_name) }}

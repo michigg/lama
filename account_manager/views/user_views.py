@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 
 from account_helper.models import Realm
-from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm
+from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
 
@@ -70,8 +70,18 @@ def realm_user_update(request, realm_id, user_dn):
     realm_obj = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
-    return user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, 'realm-user-detail',
-                                  'user/realm_user_detail.jinja2')
+    return user_update_controller(request=request,
+                                  realm=realm_obj,
+                                  ldap_user=ldap_user,
+                                  redirect_name='realm-user-detail',
+                                  update_view='user/realm_user_detail.jinja2',
+                                  form_class=AdminUpdateLDAPUserForm,
+                                  form_attrs=[
+                                      {'model_field': 'username', 'form_field': 'username'},
+                                      {'model_field': 'password', 'form_field': 'password'},
+                                      {'model_field': 'first_name', 'form_field': 'first_name'},
+                                      {'model_field': 'last_name', 'form_field': 'last_name'},
+                                      {'model_field': 'email', 'form_field': 'email'}, ])
 
 
 @login_required
@@ -108,11 +118,22 @@ def user_update(request, realm_id, user_dn):
     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
     if request.user.username == ldap_user.username:
-        return user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, 'realm-user-detail',
-                                      'user/user_detail.jinja2')
+        return user_update_controller(request=request,
+                                      realm=realm_obj,
+                                      ldap_user=ldap_user,
+                                      redirect_name='realm-user-detail',
+                                      update_view='user/user_detail.jinja2',
+                                      form_class=UpdateLDAPUserForm,
+                                      form_attrs=[
+                                          {'model_field': 'password', 'form_field': 'password'},
+                                          {'model_field': 'first_name', 'form_field': 'first_name'},
+                                          {'model_field': 'last_name', 'form_field': 'last_name'},
+                                          {'model_field': 'email', 'form_field': 'email'}, ])
     else:
         return redirect('permission-denied')
 
+
+# # ldap_user.username = form.cleaned_data['username']
 
 @login_required
 def user_delete_confirm(request, realm_id, user_dn):
@@ -143,25 +164,20 @@ def user_deleted(request, realm_id):
     return render(request, 'user/account_deleted.jinja2', {'realm': Realm.objects.get(id=realm_id)})
 
 
-def user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, redirect_name, detail_page):
+def user_update_controller(request, realm, ldap_user, redirect_name, update_view, form_class, form_attrs):
     if request.method == 'POST':
-        form = UpdateLDAPUserForm(request.POST)
+        form = form_class(request.POST)
         if form.is_valid():
-            # ldap_user.username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            if password:
-                ldap_user.password = password
-            ldap_user.first_name = form.cleaned_data['first_name']
-            ldap_user.last_name = form.cleaned_data['last_name']
-            ldap_user.email = form.cleaned_data['email']
-            ldap_user.save()
-
-            return redirect(redirect_name, realm_id, user_dn)
+            for form_attr in form_attrs:
+                if form.cleaned_data[form_attr['form_field']]:
+                    ldap_user.__setattr__(form_attr['model_field'], form.cleaned_data[form_attr['form_field']])
+                ldap_user.save()
+            return redirect(redirect_name, realm.id, ldap_user.dn)
     else:
         form_data = {'username': ldap_user.username, 'first_name': ldap_user.first_name,
                      'last_name': ldap_user.last_name, 'email': ldap_user.email}
-        form = UpdateLDAPUserForm(initial=form_data)
-    return render(request, detail_page, {'form': form, 'realm': realm_obj, 'user': ldap_user})
+        form = form_class(initial=form_data)
+    return render(request, update_view, {'form': form, 'realm': realm, 'user': ldap_user})
 
 
 def user_delete_controller(ldap_user, realm):

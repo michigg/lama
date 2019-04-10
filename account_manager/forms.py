@@ -9,6 +9,14 @@ class AddLDAPUserForm(forms.Form):
     email = forms.EmailField(label='E-Mail', required=False)
 
 
+class AdminUpdateLDAPUserForm(forms.Form):
+    username = forms.CharField(label='Nutzername', max_length=400)
+    email = forms.EmailField(label='E-Mail')
+    password = forms.CharField(label='Passwort', widget=forms.PasswordInput, required=False)
+    first_name = forms.CharField(label='Vorname', required=True)
+    last_name = forms.CharField(label='Nachname', required=True)
+
+
 class UpdateLDAPUserForm(forms.Form):
     # username = forms.CharField(label='Nutzername', max_length=400)
     email = forms.EmailField(label='E-Mail')
