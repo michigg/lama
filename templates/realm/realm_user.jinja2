@@ -19,13 +19,10 @@
         <tbody>
         {% for user in realm_user %}
             <tr>
-                <td>{{ user.username }}</td>
+                <td><a href="{{ url('realm-user-detail', args=[realm.id, user.dn]) }}">{{ user.username }}</a></td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.first_name }}</td>
                 <td>{{ user.last_name }}</td>
-                {#                <td>#}
-                {#                    <a href="{{ url('realm-user-detail', args=[realm.id, user.dn]) }}">{{ user.dn }}</a>#}
-                {#                </td>#}
             </tr>
         {% endfor %}
         </tbody>
