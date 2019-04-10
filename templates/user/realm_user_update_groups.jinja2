@@ -2,18 +2,47 @@
 {% import 'macros/form_macros.jinja2' as mform %}
 
 {% block detail_content %}
-    <h3><span class="text-uppercase">{{ user.username }}</span> - Gruppen Zuweisung ändern</h3>
-    <form method="post">
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        {#    {{ mform.text_input(form.username) }}#}
-        {#    {{ mform.email_input(form.email) }}#}
-        {#    {{ mform.password_input(form.password) }}#}
-        {#    {{ mform.text_input(form.first_name) }}#}
-        {#    {{ mform.text_input(form.last_name) }}#}
-        <div class="d-flex mt-4">
-            <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
-            <a href="{{ url('realm-user-detail', args = [realm.id, user.dn]) }}"
-               class="btn btn-secondary p-2">Abbrechen</a>
+    <h3><span class="text-uppercase">{{ user.username }}</span> - Gruppenzuweisung ändern</h3>
+    <div class="row">
+        <div class="col-6">
+            <form method="post" action="{{ url('realm-user-group-update-delete', args = [realm.id, user.dn]) }}">
+                <button type="submit" class="btn btn-warning w-100 mb-2">Entfernen</button>
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                <ul>
+
+                    {% for user_group in user_groups %}
+                        <li><input type="checkbox"
+                                   class="custom-control-input"
+                                   id="user_group_{{ loop.index }}"
+                                   value="{{ user_group.name }}"
+                                   name="groups"
+                        ><label class="custom-control-label"
+                                for="user_group_{{ loop.index }}">{{ user_group.name }}</label></li>
+                    {% endfor %}
+                </ul>
+            </form>
         </div>
-    </form>
+        <div class="col-6">
+            <form method="post" action="{{ url('realm-user-group-update-add', args = [realm.id, user.dn]) }}">
+                <button type="submit" class="btn btn-success w-100 mb-2">Hinzufügen</button>
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                <ul>
+                    {% for realm_group in realm_groups %}
+                        <li><input type="checkbox"
+                                   class="custom-control-input"
+                                   id="realm_group_{{ loop.index }}"
+                                   value="{{ realm_group.name }}"
+                                   name="groups"
+                        ><label class="custom-control-label"
+                                for="realm_group_{{ loop.index }}">{{ realm_group.name }}</label></li>
+                    {% endfor %}
+                </ul>
+            </form>
+
+        </div>
+    </div>
+    <div class="mt-4">
+        <a href="{{ url('realm-user-detail', args = [realm.id, user.dn]) }}"
+           class="btn btn-primary p-2 float-right w-25">Fertig</a>
+    </div>
 {% endblock %}

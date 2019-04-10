@@ -6,7 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 
 from account_helper.models import Realm
-from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm
+from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
+    UserGroupListForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
 
@@ -164,8 +165,55 @@ def user_delete(request, realm_id, user_dn):
 def realm_user_group_update(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+
     ldap_user = LdapUser.objects.get(dn=user_dn)
-    return render(request, 'user/realm_user_update_groups.jinja2', {'realm': realm, 'user': ldap_user})
+    user_groups = LdapGroup.objects.filter(members=ldap_user.dn)
+    realm_groups = LdapGroup.objects.all()
+    realm_groups_available = []
+    for realm_group in realm_groups:
+        if realm_group not in user_groups:
+            realm_groups_available.append(realm_group)
+
+    return render(request, 'user/realm_user_update_groups.jinja2',
+                  {'realm': realm, 'user': ldap_user, 'user_groups': user_groups,
+                   'realm_groups': realm_groups_available})
+
+
+@login_required
+@is_realm_admin
+def realm_user_group_update_add(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+
+    if request.method == 'POST':
+        form = UserGroupListForm(request.POST)
+        if form.is_valid():
+            group_names = form.cleaned_data['groups']
+            groups = []
+            for group_name in group_names:
+                groups.append(LdapGroup.objects.get(name=group_name))
+            ldap_add_user_to_groups(user_dn, groups)
+    return redirect('realm-user-group-update', realm.id, user_dn)
+
+
+@login_required
+@is_realm_admin
+def realm_user_group_update_delete(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+
+    if request.method == 'POST':
+        form = UserGroupListForm(request.POST)
+        if form.is_valid():
+            group_names = form.cleaned_data['groups']
+            groups = []
+            for group_name in group_names:
+                groups.append(LdapGroup.objects.get(name=group_name))
+            ldap_remove_user_from_groups(user_dn, groups)
+    return redirect('realm-user-group-update', realm.id, user_dn)
 
 
 def user_deleted(request, realm_id):
@@ -191,9 +239,7 @@ def user_update_controller(request, realm, ldap_user, redirect_name, update_view
 def user_delete_controller(ldap_user, realm):
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
-    for group in user_groups:
-        group.members.remove(ldap_user.dn)
-        group.save()
+    ldap_remove_user_from_groups(ldap_user.dn, user_groups)
     ldap_user.delete()
     try:
         django_user = User.objects.get(username=ldap_user.username)
@@ -201,6 +247,18 @@ def user_delete_controller(ldap_user, realm):
     except ObjectDoesNotExist:
         pass
     return
+
+
+def ldap_remove_user_from_groups(ldap_user, user_groups):
+    for group in user_groups:
+        group.members.remove(ldap_user)
+        group.save()
+
+
+def ldap_add_user_to_groups(ldap_user, user_groups):
+    for group in user_groups:
+        group.members.append(ldap_user)
+        group.save()
 
 
 class LdapPasswordResetConfirmView(PasswordResetConfirmView):
