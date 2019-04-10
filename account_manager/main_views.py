@@ -73,26 +73,44 @@ def realm_detail(request, realm_id):
 @is_realm_admin
 def realm_update(request, realm_id):
     if request.user.is_superuser:
-        realm_obj = Realm.objects.get(id=realm_id)
-        data = {'id': realm_obj.id, 'ldap_base_dn': realm_obj.ldap_base_dn, 'name': realm_obj.name,
-                'email': realm_obj.email,
-                'admin_group': realm_obj.admin_group}
+        realm = Realm.objects.get(id=realm_id)
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+        ldap_admin_group = None
+        if realm.admin_group:
+            ldap_admin_group = LdapGroup.objects.get(name=realm.admin_group.name)
+        ldap_default_group = None
+        if realm.default_group:
+            ldap_default_group = LdapGroup.objects.get(name=realm.default_group.name)
+        data = {'id': realm.id,
+                'ldap_base_dn': realm.ldap_base_dn,
+                'name': realm.name,
+                'email': realm.email,
+                'admin_group': ldap_admin_group,
+                'default_group': ldap_default_group}
         if request.method == 'POST':
             form = RealmUpdateForm(request.POST)
             if form.is_valid():
-                realm_obj.name = form.cleaned_data['name']
-                realm_obj.ldap_base_dn = form.cleaned_data['ldap_base_dn']
-                realm_obj.email = form.cleaned_data['email']
+                realm.name = form.cleaned_data['name']
+                realm.ldap_base_dn = form.cleaned_data['ldap_base_dn']
+                realm.email = form.cleaned_data['email']
                 admin_ldap_group = form.cleaned_data['admin_group']
-                realm_obj.admin_group, _ = Group.objects.get_or_create(name=admin_ldap_group.name)
-                realm_obj.save()
-                return redirect('realm-detail', realm_obj.id)
+                if admin_ldap_group:
+                    realm.admin_group, _ = Group.objects.get_or_create(name=admin_ldap_group.name)
+                else:
+                    realm.admin_group = None
+                default_ldap_group = form.cleaned_data['default_group']
+                if default_ldap_group:
+                    realm.default_group, _ = Group.objects.get_or_create(name=default_ldap_group.name)
+                else:
+                    realm.default_group = None
+                realm.save()
+                return redirect('realm-detail', realm.id)
         else:
             form = RealmUpdateForm(initial=data)
-        return render(request, 'realm/realm_update.jinja2', {'realm': realm_obj, 'form': form})
+        return render(request, 'realm/realm_update.jinja2', {'realm': realm, 'form': form})
     else:
-        realm_obj = Realm.objects.get(id=realm_id)
-        return render(request, 'realm/realm_update.jinja2', {'realm': realm_obj})
+        realm = Realm.objects.get(id=realm_id)
+        return render(request, 'realm/realm_update.jinja2', {'realm': realm})
 
 
 def realm_delete(request, realm_id):

@@ -6,7 +6,8 @@ from django.db import models
 class Realm(models.Model):
     name = models.CharField(max_length=200, unique=True)
     email = models.CharField(max_length=200)
-    admin_group = models.ForeignKey(Group, models.PROTECT, blank=True, null=True)
+    admin_group = models.ForeignKey(Group, models.PROTECT, blank=True, null=True, related_name='admin_groups')
+    default_group = models.ForeignKey(Group, models.PROTECT, blank=True, null=True, related_name='default_groups')
     ldap_base_dn = models.CharField(max_length=400, unique=True)
 
     def __str__(self):

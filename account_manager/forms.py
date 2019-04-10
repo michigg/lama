@@ -6,7 +6,7 @@ from django.forms import modelformset_factory
 
 class AddLDAPUserForm(forms.Form):
     username = forms.CharField(label='Nutzername', max_length=400)
-    email = forms.EmailField(label='E-Mail', required=False)
+    email = forms.EmailField(label='E-Mail')
 
 
 class AdminUpdateLDAPUserForm(forms.Form):
@@ -58,7 +58,10 @@ class RealmUpdateForm(forms.Form):
     name = forms.CharField(label='Bereichsname', max_length=200)
     admin_group = forms.ModelChoiceField(label='Admin Gruppe',
                                          help_text="Die Mitglieder dieser Gruppe darf den Bereich administieren",
-                                         queryset=LdapGroup.objects.all())
+                                         queryset=LdapGroup.objects.all(), required=False)
+    default_group = forms.ModelChoiceField(label='Default Gruppe',
+                                           help_text="Diese Gruppe wird jedem User der neu erstellt wird hinzugefügt werden",
+                                           queryset=LdapGroup.objects.all(), required=False)
 
 
 UserFormset = modelformset_factory(

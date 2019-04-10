@@ -39,7 +39,7 @@ def realm_user_detail(request, realm_id, user_dn):
 @login_required
 @is_realm_admin
 def user_add(request, realm_id):
-    realm_obj = Realm.objects.get(id=realm_id)
+    realm = Realm.objects.get(id=realm_id)
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -52,18 +52,22 @@ def user_add(request, realm_id):
             protocol = 'http'
             if request.is_secure():
                 protocol = 'https'
-            LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
-            LdapUser.create_with_django_user_creation_and_welcome_mail(realm=realm_obj,
+            LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+            LdapUser.create_with_django_user_creation_and_welcome_mail(realm=realm,
                                                                        protocol=protocol,
                                                                        domain=current_site.domain,
                                                                        username=username,
                                                                        email=email)
+            user = LdapUser.objects.get(username=username)
+            LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+            default_ldap_group = LdapGroup.objects.get(name=realm.default_group.name)
+            ldap_add_user_to_groups(ldap_user=user.dn, user_groups=[default_ldap_group, ])
             return redirect('realm-user-list', realm_id)
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = AddLDAPUserForm()
-    return render(request, 'user/realm_user_add.jinja2', {'form': form, 'realm': realm_obj})
+    return render(request, 'user/realm_user_add.jinja2', {'form': form, 'realm': realm})
 
 
 @login_required

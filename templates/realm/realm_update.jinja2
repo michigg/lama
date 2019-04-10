@@ -8,7 +8,8 @@
             {{ mform.text_input(form.ldap_base_dn) }}
             {{ mform.text_input(form.name) }}
             {{ mform.email_input(form.email) }}
-            {{ mform.text_input(form.admin_group) }}
+            {{ mform.select_input(form.admin_group) }}
+            {{ mform.select_input(form.default_group) }}
             <div class="d-flex mt-4">
                 <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
                 <a href="{{ url('realm-detail', args = [realm.id]) }}"
