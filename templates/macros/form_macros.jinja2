@@ -181,6 +181,9 @@
 {% endmacro %}
 
 {% macro password_input(field, list='', css_classes='') -%}
+    {% if field.help_text %}
+        <br/>
+    {% endif %}
     <div class="form-group">
         <input type="password"
                 {% if css_classes %}
@@ -210,9 +213,6 @@
                         <li>{{ error }}</li>
                     {% endfor %}
                 </ul>
-            {% endif %}
-            {% if field.help_text %}
-                <br/>
             {% endif %}
         </small>
     </div>

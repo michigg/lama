@@ -22,7 +22,8 @@
                                 <li class="list-group-item"><span
                                         class="font-weight-bold">Email:</span> {{ user.email }}</li>
                                 <li class="list-group-item"><span
-                                        class="font-weight-bold">Passwort:</span> {{ user.password }}
+                                        class="font-weight-bold">Passwort:</span> {{ user.password }} <a
+                                        href="{{ url('password_change') }}">Passwort ändern</a>
                                 </li>
                                 <li class="list-group-item"><span
                                         class="font-weight-bold">Telefon:</span> {{ user.phone }}</li>
