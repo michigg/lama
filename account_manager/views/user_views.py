@@ -25,8 +25,8 @@ def realm_user_detail(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm.ldap_base_dn
     user = LdapUser.objects.get(dn=user_dn)
+    LdapGroup.base_dn = LdapGroup.ROOT_DN
     groups = LdapGroup.objects.filter(members=user.dn)
-    print("GROUPS", groups)
     if realm_id and (request.user.is_superuser or len(
             Realm.objects.filter(id=realm_id).filter(
                 admin_group__user__username__contains=request.user.username)) > 0):
@@ -134,8 +134,6 @@ def user_update(request, realm_id, user_dn):
         return redirect('permission-denied')
 
 
-# # ldap_user.username = form.cleaned_data['username']
-
 @login_required
 def user_delete_confirm(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
@@ -193,10 +191,7 @@ def user_update_controller(request, realm, ldap_user, redirect_name, update_view
 def user_delete_controller(ldap_user, realm):
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
-    print(user_groups)
     for group in user_groups:
-        print(group)
-        # LdapGroup.base_dn = group.base_dn
         group.members.remove(ldap_user.dn)
         group.save()
     ldap_user.delete()
