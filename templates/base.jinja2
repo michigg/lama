@@ -14,16 +14,11 @@
     <meta name="author" content="Michael Götz"/>
     {% block js_extra %}{% endblock %}
     <!-- Bootstrap CSS -->
-    {#    <link rel="stylesheet" href="{{ static('libs/font-awesome-4.7.0/css/font-awesome.css') }}">#}
     <link rel="stylesheet" href="{{ static('libs/bootstrap-4.3.1-dist/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+          integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ static('css/floating_labels.css') }}">
-    {#    <link rel="stylesheet" href="{{ static('home/main.css') }}">#}
-    {#    <script src="{{ static('libs/jquery-3.3.1.min.js') }}"></script>#}
-    {#    <script src="{{ static('libs/handlebars-379172e.js') }}"></script>#}
-    {#    <script src="{{ static('js/main.js') }}"></script>#}
-    {#    <script src="{{ static('libs/popper.js-1.14.4/dist/umd/popper.js') }}"></script>#}
-    {#    <script src="{{ static('libs/bootstrap-4.0.0-beta-dist/js/bootstrap.js') }}"></script>#}
-    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.js"></script>#}
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.14.2/dist/bootstrap-table.min.css">
 
 
     {% block css_extra %}{% endblock %}
@@ -49,14 +44,13 @@
 </nav>
 
 {% block body %}
-    {#    <div class="container-fluid">#}
-    {#        <div class="row">{% block bottom_nav %}{% endblock %}</div>#}
-    {#        <div class="row">#}
     {% block content %}{% endblock %}
-    {#        </div>#}
-    {#    </div>#}
 {% endblock %}
-<script src="{{ static('js/form.js') }}"></script>
+
 {% block js_tail %}{% endblock %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/jquery.dataTables.min.js"></script>
+<script src="{{ static('js/main.js') }}"></script>
+
 </body>
 </html>

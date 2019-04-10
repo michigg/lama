@@ -81,7 +81,7 @@ def realm_user_delete(request, realm_id, user_dn):
     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
     LdapGroup.base_dn = f'ou=groups,{realm_obj.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
-    user_delete_controller(ldap_user)
+    user_delete_controller(ldap_user, realm_obj)
     return redirect('realm-user-list', realm_id)
 
 
@@ -93,11 +93,13 @@ def realm_multiple_user_delete(request, realm_id):
             ldap_users = form.cleaned_data['ldap_users']
             for ldap_user in ldap_users:
                 # TODO: Failure catchup
-                user_delete_controller(ldap_user)
+                user_delete_controller(ldap_user, realm)
             return redirect('realm-user-list', realm_id)
     # TODO: Form not valid
     form = UserDeleteListForm()
-    return render(request, 'realm/realm_user_multiple_delete.jinja2', {'form': form, 'realm': realm})
+    LdapUser.base_dn = realm.ldap_base_dn
+    users = LdapUser.objects.all()
+    return render(request, 'realm/realm_user_multiple_delete.jinja2', {'form': form, 'realm': realm, 'users': users})
 
 
 @login_required
@@ -131,7 +133,7 @@ def user_delete(request, realm_id, user_dn):
     LdapGroup.base_dn = f'ou=groups,{realm_obj.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
     if request.user.username == ldap_user.username:
-        user_delete_controller(ldap_user)
+        user_delete_controller(ldap_user, realm_obj)
         return redirect('account-deleted', realm_id)
     else:
         return redirect('permission-denied')
@@ -162,10 +164,13 @@ def user_update_controller(ldap_user, realm_id, realm_obj, request, user_dn, red
     return render(request, detail_page, {'form': form, 'realm': realm_obj, 'user': ldap_user})
 
 
-def user_delete_controller(ldap_user):
+def user_delete_controller(ldap_user, realm):
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
-
+    print(user_groups)
     for group in user_groups:
+        print(group)
+        # LdapGroup.base_dn = group.base_dn
         group.members.remove(ldap_user.dn)
         group.save()
     ldap_user.delete()

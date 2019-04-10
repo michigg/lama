@@ -1,24 +1,36 @@
 {% extends 'realm/realm_detailed.jinja2' %}
 {% block detail_content %}
     <h2>Nutzer</h2>
-    <a href="{{ url('realm-multiple-user-delete', args=[realm.id]) }}" class="text-right"> Mehrere Nutzer Löschen</a>
-    <table class="table">
+    <div class="form-group w-25 float-right">
+        <input type="text"
+               class="form-control"
+               id="data-table-search-input">
+        <label for="data-table-search-input">Suche</label>
+    </div>
+    <table class="table table-hover table-striped table-inverse table-bordered data-table">
         <thead>
         <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Ldap Domain</th>
+            <th scope="col">Nutzername</th>
+            <th scope="col">E-Mail</th>
+            <th scope="col">Vorname</th>
+            <th scope="col">Nachname</th>
         </tr>
         </thead>
         <tbody>
         {% for user in realm_user %}
             <tr>
                 <td>{{ user.username }}</td>
-                <td>
-                    <a href="{{ url('realm-user-detail', args=[realm.id, user.dn]) }}">{{ user.dn }}</a>
-                </td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                {#                <td>#}
+                {#                    <a href="{{ url('realm-user-detail', args=[realm.id, user.dn]) }}">{{ user.dn }}</a>#}
+                {#                </td>#}
             </tr>
         {% endfor %}
         </tbody>
     </table>
     <a href="{{ url('realm-user-add', args=[realm.id]) }}" class="btn btn-primary">Nutzer hinzufügen</a>
+    <a href="{{ url('realm-multiple-user-delete', args=[realm.id]) }}" class="btn btn-danger"> Mehrere Nutzer
+        Löschen</a>
 {% endblock %}
