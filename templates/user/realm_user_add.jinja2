@@ -1,6 +1,17 @@
-<h1>Einen Nutzer für den Bereich {{ realm.name }} anlegen</h1>
-<form action="{{ url('realm-user-add', args=[realm.id]) }}" method="post">
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    {{ form.as_p() }}
-    <input type="submit" value="Submit">
-</form>
+{% extends 'realm/realm_detailed.jinja2' %}
+{% import 'macros/form_macros.jinja2' as mform %}
+
+{% block detail_content %}
+    <h2>Nutzer anlegen</h2>
+    <form action="{{ url('realm-user-add', args=[realm.id]) }}" method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+{#        {{ form.as_p() }}#}
+        {{ mform.text_input(form.username) }}
+        {{ mform.email_input(form.email) }}
+        <div class="d-flex mt-4">
+            <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+            <a href="{{ url('realm-user-list', args = [realm.id]) }}"
+               class="btn btn-secondary p-2">Abbrechen</a>
+        </div>
+    </form>
+{% endblock %}

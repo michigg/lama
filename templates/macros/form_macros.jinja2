@@ -143,6 +143,37 @@
     </div>
 {% endmacro %}
 
+{% macro checkbox_input_for_choice_fields(label, value, id) -%}
+    <div class="form-check">
+{#    <label class="{{ type }}{% if display == "inline" or field.field.widget.attrs.inline %} inline{% endif %}">#}
+{#        <input#}
+{#            type="checkbox"#}
+{#            name="{{ field.html_name }}"#}
+{#            value="{{ choice_id }}"#}
+{#            {% if field.field.widget.allow_multiple_selected %}#}
+{#                {% if choice_id|safe in field.value|safeseq %}checked{% endif %}#}
+{#            {% else %}#}
+{#                {% if field.value|safe == choice_id|safe %}checked{% endif %}#}
+{#            {% endif %}#}
+{#            {{ field.field.widget.attrs|html_attrs }}#}
+{#        />#}
+{#        {{ choice_label }}#}
+{#    </label>#}
+        <input type="checkbox"
+               class="form-check-input"
+               placeholder="{{ field.label }}"
+               aria-describedby="{{ field.id_for_label }}_help"
+               name="{{ field.html_name }}"
+               id="{{ field.id_for_label }}"
+               {% if field.value() != None %}value="{{ field.value() }}"{% endif %}
+               maxlength="{{ field.field.max_length }}"
+               {% if field.field.required %}required{% endif %}>
+        <label id="{{ field.id_for_label }}" class="form-check-label" for="{{ field.id_for_label }}">
+            {{ field.label }}
+        </label>
+    </div>
+{% endmacro %}
+
 {% macro select_input(field, multiple=False) -%}
     <div class="form-group">
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>

@@ -1,10 +1,15 @@
 {% extends 'realm/realm_detailed.jinja2' %}
-{% block user_content %}
-    <h2>Nutzer</h2>
-    <a href="{{ url('realm-user-list', args=[realm.id]) }}">Abrechen</a>
+{% import 'macros/form_macros.jinja2' as mform %}
+
+{% block detail_content %}
+    <h2>Nutzer löschen</h2>
     <form action="{{ url('realm-multiple-user-delete', args=[realm.id]) }}" method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        <input type="submit" value="Ausführen">
         {{ form.as_p() }}
+        <div class="d-flex mt-4">
+            <button type="submit" class="btn btn-danger mr-auto p-2">Ausführen</button>
+            <a href="{{ url('realm-user-list', args = [realm.id]) }}"
+               class="btn btn-secondary p-2">Abbrechen</a>
+        </div>
     </form>
 {% endblock %}

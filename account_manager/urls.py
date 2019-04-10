@@ -10,7 +10,7 @@ urlpatterns = [
     path('realm/<int:realm_id>/', main_views.realm_detail, name='realm-detail'),
     path('realm/<int:realm_id>/update/', main_views.realm_update, name='realm-update'),
     path('realm/<int:realm_id>/delete/', main_views.realm_delete, name='realm-delete'),
-    path('realm/<int:realm_id>/mail/', main_views.realm_email_update, name='realm-mail-add-update'),
+    # path('realm/<int:realm_id>/mail/', main_views.realm_email_update, name='realm-mail-add-update'),
     path('realm/<int:realm_id>/mail/test/', main_views.realm_email_test, name='realm-mail-test'),
 
     # Realm User

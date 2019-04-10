@@ -1,5 +1,16 @@
-<form action="{{ url('realm-group-add', args=[realm.id]) }}" method="post">
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    {{ form.as_p() }}
-    <input type="submit" value="Submit">
-</form>
+{% extends 'realm/realm_detailed.jinja2' %}
+{% import 'macros/form_macros.jinja2' as mform %}
+
+{% block detail_content %}
+    <form action="{{ url('realm-group-add', args=[realm.id]) }}" method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        {{ mform.text_input(form.name) }}
+        <p>Mitglieder</p>
+        {{ form.members }}
+        <div class="d-flex mt-4">
+            <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+            <a href="{{ url('realm-group-list', args = [realm.id]) }}"
+               class="btn btn-secondary p-2">Abbrechen</a>
+        </div>
+    </form>
+{% endblock %}

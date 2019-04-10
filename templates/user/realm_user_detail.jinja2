@@ -1,23 +1,37 @@
 {% extends 'realm/realm_detailed.jinja2' %}
-{% block extra_content %}
-    <div class="col-6">
-        {% if not form %}
-            <p>DN: {{ user.dn }}</p>
-            <p>Nutzername: {{ user.username }}</p>
-            <p>Vorname: {{ user.first_name }}</p>
-            <p>Nachname: {{ user.last_name }}</p>
-            <p>Email: {{ user.email }}</p>
-            <p>Passwort: {{ user.password }}</p>
-            <p>Telefon: {{ user.phone }}</p>
-            <p>Mobiltelefon: {{ user.mobile_phone }}</p>
-            <a href="{{ url('realm-user-update', args = [realm.id, user.dn]) }}">Update User</a>
-            <a href="{{ url('realm-user-delete', args = [realm.id, user.dn]) }}">Delete User</a>
-        {% else %}
-            <form method="post">
-                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                {{ form.as_p()|safe }}
-                <button type="submit">Speichern</button>
-            </form>
-        {% endif %}
-    </div>
+{% import 'macros/form_macros.jinja2' as mform %}
+
+{% block detail_content %}
+    <h3>{{ user.username }}</h3>
+    {% if not form %}
+        <ul class="list-group list-group-flush w-100">
+            <li class="list-group-item">Ldap Domain: {{ user.dn }}</li>
+            {#            <li class="list-group-item">Nutzername: {{ user.username }}</li>#}
+            <li class="list-group-item">Vorname: {{ user.first_name }}</li>
+            <li class="list-group-item">Nachname: {{ user.last_name }}</li>
+            <li class="list-group-item">Email: {{ user.email }}</li>
+            <li class="list-group-item">Passwort: {{ user.password }}</li>
+            <li class="list-group-item">Telefon: {{ user.phone }}</li>
+            <li class="list-group-item">Mobiltelefon: {{ user.mobile_phone }}</li>
+        </ul>
+        <div class="d-flex mt-3">
+            <a href="{{ url('realm-user-update', args = [realm.id, user.dn]) }}" class="btn btn-primary mr-auto p-2">Update
+                User</a>
+            <a href="{{ url('realm-user-delete', args = [realm.id, user.dn]) }}" class="btn btn-danger p-2">Delete
+                User</a>
+        </div>
+    {% else %}
+        <form method="post">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            {{ mform.email_input(form.email) }}
+            {{ mform.password_input(form.password) }}
+            {{ mform.text_input(form.first_name) }}
+            {{ mform.text_input(form.last_name) }}
+            <div class="d-flex mt-4">
+                <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+                <a href="{{ url('realm-user-detail', args = [realm.id, user.dn]) }}"
+                   class="btn btn-secondary p-2">Abbrechen</a>
+            </div>
+        </form>
+    {% endif %}
 {% endblock %}

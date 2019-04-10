@@ -1,10 +1,24 @@
 {% extends 'realm/realm_detailed.jinja2' %}
-{% block user_content %}
+{% block detail_content %}
     <h2>Nutzer</h2>
-    <a href="{{ url('realm-multiple-user-delete', args=[realm.id]) }}"> Mehrere Nutzer Löschen</a>
-    {% for user in realm_user %}
-        <p>
-            {{ user.username }} - <a href="{{ url('realm-user-detail', args=[realm.id, user.dn]) }}">{{ user.dn }}</a>
-        </p>
-    {% endfor %}
+    <a href="{{ url('realm-multiple-user-delete', args=[realm.id]) }}" class="text-right"> Mehrere Nutzer Löschen</a>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Ldap Domain</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in realm_user %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>
+                    <a href="{{ url('realm-user-detail', args=[realm.id, user.dn]) }}">{{ user.dn }}</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url('realm-user-add', args=[realm.id]) }}" class="btn btn-primary">Nutzer hinzufügen</a>
 {% endblock %}

@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect, HttpResponse
 
 from account_helper.models import Realm
 from account_manager.utils.mail_utils import realm_send_mail
-from .forms import RealmAddForm, RealmUpdateForm, EmailSettingsForm
+from .forms import RealmAddForm, RealmUpdateForm
 from .models import LdapGroup, LdapUser
 
 logger = logging.getLogger(__name__)
@@ -75,12 +75,14 @@ def realm_update(request, realm_id):
     if request.user.is_superuser:
         realm_obj = Realm.objects.get(id=realm_id)
         data = {'id': realm_obj.id, 'ldap_base_dn': realm_obj.ldap_base_dn, 'name': realm_obj.name,
+                'email': realm_obj.email,
                 'admin_group': realm_obj.admin_group}
         if request.method == 'POST':
             form = RealmUpdateForm(request.POST)
             if form.is_valid():
                 realm_obj.name = form.cleaned_data['name']
                 realm_obj.ldap_base_dn = form.cleaned_data['ldap_base_dn']
+                realm_obj.email = form.cleaned_data['email']
                 admin_ldap_group = form.cleaned_data['admin_group']
                 realm_obj.admin_group, _ = Group.objects.get_or_create(name=admin_ldap_group.name)
                 realm_obj.save()
@@ -119,23 +121,23 @@ def permission_denied(request):
     return render(request, 'permission_denied.jinja2', {})
 
 
-@login_required
-@is_realm_admin
-def realm_email_update(request, realm_id):
-    realm = Realm.objects.get(id=realm_id)
-
-    if request.method == 'POST':
-        form = EmailSettingsForm(request.POST)
-        if form.is_valid():
-            realm.email = form.cleaned_data['email']
-            realm.save()
-            return redirect('realm-detail', realm.id)
-    else:
-        data = {}
-        if realm.email:
-            data = {'email': realm.email, }
-        form = EmailSettingsForm(initial=data)
-    return render(request, 'realm/realm_create_update_mail.jinja2', {'realm': realm, 'form': form})
+# @login_required
+# @is_realm_admin
+# def realm_email_update(request, realm_id):
+#     realm = Realm.objects.get(id=realm_id)
+#
+#     if request.method == 'POST':
+#         form = EmailSettingsForm(request.POST)
+#         if form.is_valid():
+#             realm.email = form.cleaned_data['email']
+#             realm.save()
+#             return redirect('realm-detail', realm.id)
+#     else:
+#         data = {}
+#         if realm.email:
+#             data = {'email': realm.email, }
+#         form = EmailSettingsForm(initial=data)
+#     return render(request, 'realm/realm_create_update_mail.jinja2', {'realm': realm, 'form': form})
 
 
 def realm_email_test(request, realm_id):

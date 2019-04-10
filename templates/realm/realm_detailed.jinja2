@@ -1,41 +1,66 @@
-{% extends 'base.jinja2' %}
-{% block content %}
-    <a href="{{ url('realm-home') }}">Zurück zur Realmübersicht</a>
-    <h1>Bereich {{ realm.name }}</h1>
-    {% if notice %}
-        <p style="color: green">{{ notice }}</p>
-    {% endif %}
-    {% if error %}
-        <p style="color: darkred">{{ error }}</p>
-    {% endif %}
-    <h2>Bereich Info</h2>
-    <p>LDAP OU: {{ realm.ldap_base_dn }}</p>
-    {% if realm.email %}
-        <p>Email: {{ realm.email }}</p>
-    {% else %}
-        <p>Noch ausstehend</p>
-    {% endif %}
-    <p>Admin Gruppe: {{ realm.admin_group }}</p>
-    {% if request.user.is_superuser %}
-        {% block realm_form %}
-            <h2><a href="{{ url('realm-update', args=[realm.id]) }}">Bereichsinformationen anpassen</a></h2>
-        {% endblock %}
-    {% endif %}
-    <h2>
-        <a href="{{ url('realm-mail-add-update', args=[realm.id]) }}">E-Mail Einstellungen</a> |
-        {% if realm.email %}
-            <a href="{{ url('realm-mail-test', args=[realm.id]) }}">Test Mail</a>
-        {% endif %}
-    </h2>
+{% extends 'base_admin.jinja2' %}
+{% block admin_content %}
+    <div class="row ">
+        <div class="col-12 p-3">
+            <h1>Bereich <span style="text-transform: uppercase">{{ realm.name }}</span>
+                <small>
+                    {% if request.user.is_superuser %}
+                        <a href="{{ url('realm-delete', args=[realm.id]) }}">Delete</a>
+                    {% endif %}
+                </small>
+            </h1>
+            {% if notice %}
+                <p style="color: green">{{ notice }}</p>
+            {% endif %}
+            {% if error %}
+                <p style="color: darkred">{{ error }}</p>
+            {% endif %}
+            {% block detail_content %}
+                <ul class="list-group list-group-flush w-100">
+                    <li class="list-group-item">LDAP Organisationseinheit: {{ realm.ldap_base_dn }}</li>
+                    {% if realm.email %}
+                        <li class="list-group-item">Email: {{ realm.email }}</li>
+                    {% else %}
+                        <li class="list-group-item">Email: <span class="text-danger">Noch ausstehend</span></li>
+                    {% endif %}
+                    {% if realm.admin_group %}
+                        <li class="list-group-item">Admin Gruppe: {{ realm.admin_group }}</li>
+                    {% else %}
+                        <li class="list-group-item">Admin Gruppe: <span class="text-warning">Noch ausstehend</span></li>
+                    {% endif %}
+                    {% if realm.default_group %}
+                        <li class="list-group-item">Default Gruppe: {{ realm.admin_group }}</li>
+                    {% else %}
+                        <li class="list-group-item">Default Gruppe: <span class="text-warning">Noch ausstehend</span>
+                        </li>
+                    {% endif %}
+                </ul>
+                <div class="d-flex mt-3">
+                    {% if request.user.is_superuser %}
+                        <a href="{{ url('realm-update', args=[realm.id]) }}" class="btn btn-primary mr-auto p-2">Bereichsinformationen
+                            anpassen</a>
+                    {% endif %}
+                    {#                    <a href="{{ url('realm-mail-add-update', args=[realm.id]) }}" class="btn btn-primary p-2">E-Mail#}
+                    {#                        Einstellungen</a>#}
+                    {% if realm.email %}
+                        <a href="{{ url('realm-mail-test', args=[realm.id]) }}" class="btn btn-secondary p-2">Test
+                            Mail</a>
+                    {% endif %}
+                </div>
+                {% block realm_form %}
+                {% endblock %}
+            {% endblock %}
 
-    <h2><a href="{{ url('realm-user-add', args=[realm.id]) }}">Nutzer hinzufügen</a></h2>
-    {% block user_content %}
-        <h2><a href="{{ url('realm-user-list', args=[realm.id]) }}">Nutzer</a></h2>
-    {% endblock %}
-    <h2><a href="{{ url('realm-group-add', args=[realm.id]) }}">Gruppen hinzufügen</a></h2>
-    {% block groups_content %}
-        <h2><a href="{{ url('realm-group-list', args=[realm.id]) }}">Gruppen</a></h2>
-    {% endblock %}
-    {% block extra_content %}
-    {% endblock %}
+            {#            <h2><a href="{{ url('realm-user-add', args=[realm.id]) }}">Nutzer hinzufügen</a></h2>#}
+            {#            {% block user_content %}#}
+            {#                <h2><a href="{{ url('realm-user-list', args=[realm.id]) }}">Nutzer</a></h2>#}
+            {#            {% endblock %}#}
+            {#            <h2><a href="{{ url('realm-group-add', args=[realm.id]) }}">Gruppen hinzufügen</a></h2>#}
+            {#            {% block groups_content %}#}
+            {#                <h2><a href="{{ url('realm-group-list', args=[realm.id]) }}">Gruppen</a></h2>#}
+            {#            {% endblock %}#}
+            {#            {% block extra_content %}#}
+            {#            {% endblock %}#}
+        </div>
+    </div>
 {% endblock %}

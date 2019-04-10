@@ -40,11 +40,8 @@ class RealmUpdateForm(forms.Form):
     ldap_base_dn = forms.CharField(label='LDAP Base DN',
                                    help_text='TODO',
                                    max_length=200)
+    email = forms.EmailField(label='Bereichs E-Mail Adresse')
     name = forms.CharField(label='Bereichsname', max_length=200)
-    admin_group = forms.ModelChoiceField(label='Admin Grouppe',
+    admin_group = forms.ModelChoiceField(label='Admin Gruppe',
                                          help_text="Die Mitglieder dieser Gruppe darf den Bereich administieren",
                                          queryset=LdapGroup.objects.all())
-
-
-class EmailSettingsForm(forms.Form):
-    email = forms.EmailField(label='Eigene E-Mail Adresse')

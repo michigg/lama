@@ -1,21 +1,45 @@
 {% extends 'realm/realm_detailed.jinja2' %}
-{% import 'macros/form_macros.jinja2' as forms %}
-{% block extra_content %}
+{% import 'macros/form_macros.jinja2' as mform %}
+
+{% block detail_content %}
     {% if not form %}
-        <h1>{{ group.name }}</h1>
-        <p>DN: {{ group.dn }}</p>
-        <p>Nutzername: {{ group.name }}</p>
+        <h3>{{ group.name }}</h3>
+        <ul class="list-group list-group-flush w-100 mb-3">
+            <li class="list-group-item">Ldap Domain: {{ group.dn }}</li>
+        </ul>
         <h2>Mitglieder</h2>
-        {% for user in group.members %}
-            <p>{{ user }}</p>
-        {% endfor %}
-        <a href="{{ url('realm-group-update', args = [realm.id, group.dn]) }}">Update Gruppe</a>
-        <a href="{{ url('realm-group-delete', args = [realm.id, group.dn]) }}">Delete Gruppe</a>
+        <ul class="list-group list-group-flush w-100 mb-3">
+            {% for user in group.members %}
+                <li class="list-group-item"><a
+                        href="{{ url('realm-user-detail', args=[realm.id, user]) }}">{{ user }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="d-flex mt-3">
+            <a href="{{ url('realm-group-update', args = [realm.id, group.dn]) }}" class="btn btn-primary mr-auto p-2">Update
+                Gruppe</a>
+            <a href="{{ url('realm-group-delete', args = [realm.id, group.dn]) }}" class="btn btn-danger p-2">Delete
+                Gruppe</a>
+        </div>
     {% else %}
         <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             {{ form.as_p()|safe }}
-            <button type="submit">Speichern</button>
+            {{ mform.text_input(form.name) }}
+            {% for choice_value, choice_label in form.members.field.choices %}
+                <p>{{ form.members.html_name }} | {{ choice_value }} | {{ choice_label }} | {{ form.members.value.value }}</p>
+                {#                {{ mform.checkbox_input_for_choice_fields(choice_id, choice_label ) }}#}
+            {% endfor %}
+{#            {% for value in form.members.value %}#}
+            {#                <p>{{ value }}</p>#}
+            {#                {{ mform.checkbox_input_for_choice_fields(choice_id, choice_label ) }}#}
+            {#            {% endfor %}#}
+
+            <div class="d-flex mt-4">
+                <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+                <a href="{{ url('realm-group-detail', args = [realm.id, group.dn]) }}"
+                   class="btn btn-secondary p-2">Abbrechen</a>
+            </div>
         </form>
     {% endif %}
 {% endblock %}

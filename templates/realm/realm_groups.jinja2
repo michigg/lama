@@ -1,9 +1,24 @@
 {% extends 'realm/realm_detailed.jinja2' %}
 
-{% block groups_content %}
-    <h2>Gruppen</h2>
-    {% for group in realm_groups %}
-        <p>{{ group.name }} - <a href="{{ url('realm-group-detail', args=[realm.id, group.dn]) }}">{{ group.dn }}</a>
-        </p>
-    {% endfor %}
+{% block detail_content %}
+    <h3>Gruppen</h3>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Ldap Domain</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for group in realm_groups %}
+            <tr>
+                <td>{{ group.name }}</td>
+                <td>
+                    <a href="{{ url('realm-group-detail', args=[realm.id, group.dn]) }}">{{ group.dn }}</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url('realm-group-add', args=[realm.id]) }}" class="btn btn-primary">Gruppen hinzufügen</a>
 {% endblock %}

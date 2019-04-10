@@ -74,7 +74,7 @@ def group_update(request, realm_id, group_dn):
         data = {'name': group.name, 'members': group.members}
         form = AddLDAPGroupForm(initial=data)
 
-    return render(request, 'group/group_detail.jinja2', {'form': form, 'realm': realm})
+    return render(request, 'group/group_detail.jinja2', {'form': form, 'realm': realm, 'group': group})
 
 
 def group_delete(request, realm_id, group_dn):
