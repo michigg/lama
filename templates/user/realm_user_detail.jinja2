@@ -16,12 +16,14 @@
             <li class="list-group-item">Gruppen:
                 {% if groups %}
                     {% for group in groups %}
-                        {{ group.name }}
+                        <a href="{{ url('realm-group-detail', args=[realm.id, group.dn]) }}"
+                           class="badge badge-secondary p-1">{{ group.name }}</a>
                     {% endfor %}
                 {% else %}
                     <span class="text-warning">Keine zugewiesen</span>
                 {% endif %}
-                <a href="#" class="float-right">Gruppen zuweisen</a>
+                <a href="{{ url('realm-user-group-update', args=[realm.id, user.dn]) }}" class="float-right">
+                    Gruppen zuweisen</a>
             </li>
         </ul>
         <div class="d-flex mt-3">

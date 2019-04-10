@@ -26,10 +26,11 @@ def realm_user_detail(request, realm_id, user_dn):
     LdapUser.base_dn = realm.ldap_base_dn
     user = LdapUser.objects.get(dn=user_dn)
     groups = LdapGroup.objects.filter(members=user.dn)
+    print("GROUPS", groups)
     if realm_id and (request.user.is_superuser or len(
             Realm.objects.filter(id=realm_id).filter(
                 admin_group__user__username__contains=request.user.username)) > 0):
-        return render(request, 'user/realm_user_detail.jinja2', {'user': user, 'realm': realm})
+        return render(request, 'user/realm_user_detail.jinja2', {'user': user, 'groups': groups, 'realm': realm})
     else:
         return render(request, 'user/user_detail.jinja2', {'user': user, 'groups': groups, 'realm': realm})
 
@@ -158,6 +159,15 @@ def user_delete(request, realm_id, user_dn):
         return redirect('account-deleted', realm_id)
     else:
         return redirect('permission-denied')
+
+
+@login_required
+@is_realm_admin
+def realm_user_group_update(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    return render(request, 'user/realm_user_update_groups.jinja2', {'realm': realm, 'user': ldap_user})
 
 
 def user_deleted(request, realm_id):

@@ -20,6 +20,8 @@ urlpatterns = [
          name='realm-user-detail'),
     path('realm/<int:realm_id>/user/<str:user_dn>/update/', account_manager.views.user_views.realm_user_update,
          name='realm-user-update'),
+    path('realm/<int:realm_id>/user/<str:user_dn>/group/update/', account_manager.views.user_views.realm_user_group_update,
+         name='realm-user-group-update'),
     path('realm/<int:realm_id>/user/delete/s/<str:user_dn>/', account_manager.views.user_views.realm_user_delete,
          name='realm-user-delete'),
     path('realm/<int:realm_id>/user/delete/multiple', account_manager.views.user_views.realm_multiple_user_delete,
