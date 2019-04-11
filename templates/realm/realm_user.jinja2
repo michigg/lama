@@ -1,6 +1,6 @@
 {% extends 'realm/realm_detailed.jinja2' %}
 {% block detail_content %}
-    <h2>Nutzer</h2>
+    <h2>Nutzer </h2>
     <div class="form-group w-25 float-right">
         <input type="text"
                class="form-control"
@@ -20,11 +20,14 @@
         <tbody>
         {% for user in realm_user %}
             <tr>
-                <td><a href="{{ url('realm-user-detail', args=[realm.id, user.user.dn]) }}">{{ user.user.username }}</a></td>
+                <td><a href="{{ url('realm-user-detail', args=[realm.id, user.user.dn]) }}">{{ user.user.username }}</a>
+                </td>
                 <td>{{ user.user.email }}</td>
                 <td>{{ user.user.first_name }}</td>
                 <td>{{ user.user.last_name }}</td>
-                <td>{{ user.active }}</td>
+                <td class="text-center">{% if user.active %}
+                    <i class="fas fa-check-circle text-success"></i>{% else %}
+                    <i class="far fa-times-circle text-warning"></i>{% endif %}</td>
             </tr>
         {% endfor %}
         </tbody>
