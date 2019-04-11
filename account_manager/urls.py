@@ -52,10 +52,12 @@ urlpatterns = [
          name='user-delete-confirm'),
     path('user/<str:user_dn>/delete/realm/<int:realm_id>/', account_manager.views.user_views.user_delete,
          name='user-delete'),
-    path('reset/<uidb64>/<token>/', account_manager.views.user_views.LdapPasswordResetConfirmView.as_view(),
+    path('accounts/reset/<uidb64>/<token>/', account_manager.views.user_views.LdapPasswordResetConfirmView.as_view(),
          name='ldap_password_reset_confirm'),
+    path('accounts/password_change/', account_manager.views.user_views.LdapPasswordChangeView.as_view(),
+         name='password_change'),
 
     # Extra
     path('permission-denied/', main_views.permission_denied, name='permission-denied'),
-    path('account/deleted/<int:realm_id>/', account_manager.views.user_views.user_deleted, name='account-deleted'),
+    path('accounts/deleted/<int:realm_id>/', account_manager.views.user_views.user_deleted, name='account-deleted'),
 ]

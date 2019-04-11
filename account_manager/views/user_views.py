@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.auth.views import PasswordResetConfirmView, PasswordChangeView
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
@@ -269,5 +269,15 @@ class LdapPasswordResetConfirmView(PasswordResetConfirmView):
     def form_valid(self, form):
         user = form.save()
         password = form.cleaned_data['new_password1']
+        LdapUser.base_dn = LdapUser.ROOT_DN
+        LdapUser.password_reset(user, password)
+        return super().form_valid(form)
+
+
+class LdapPasswordChangeView(PasswordChangeView):
+    def form_valid(self, form):
+        user = form.save()
+        password = form.cleaned_data['new_password1']
+        LdapUser.base_dn = LdapUser.ROOT_DN
         LdapUser.password_reset(user, password)
         return super().form_valid(form)
