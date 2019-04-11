@@ -85,6 +85,7 @@ def realm_detail(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
     ldap_admin_group = None
     ldap_default_group = None
+    print('ADMIN GROUP', realm.admin_group)
     if realm.admin_group:
         LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
         ldap_admin_group = LdapGroup.objects.get(name=realm.admin_group.name)

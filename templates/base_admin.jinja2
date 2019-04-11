@@ -4,7 +4,7 @@
     <div class="d-flex wrapper">
         <div class="bg-light border-right sidebar-wrapper">
             {% if realms %}
-                <h2 class="sidebar-heading">Realms</h2>
+                <h2 class="sidebar-heading">Bereiche</h2>
                 <div class="list-group list-group-flush">
                     {% for realm_item in realms %}
                         <a href="{{ url('realm-detail', args=[realm_item.id]) }}"
@@ -12,11 +12,10 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <h2 class="sidebar-heading">Bereich</h2>
                 <a href="{{ url('realm-home') }}" class="list-group-item list-group-item-action bg-light">
                     <i class="fas fa-list"></i> Bereichsübersicht</a>
                 {% if realm %}
-                    <h2 class="sidebar-heading">{{ realm.name }}</h2>
+                    <h2 class="sidebar-heading">Bereich {{ realm.name }}</h2>
                     <div class="list-group list-group-flush">
                         <a href="{{ url('realm-detail', args=[realm.id]) }}"
                            class="list-group-item list-group-item-action bg-light"><i class="fas fa-cogs"></i>

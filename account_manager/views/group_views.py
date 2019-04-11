@@ -109,6 +109,12 @@ def group_delete(request, realm_id, group_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     group = LdapGroup.objects.get(dn=group_dn)
+    if realm.admin_group and realm.admin_group.name == group.name:
+        realm.admin_group = None
+        realm.save()
+    if realm.default_group and realm.default_group.name == group.name:
+        realm.default_group = None
+        realm.save()
     group.delete()
 
     return redirect('realm-group-list', realm_id)
