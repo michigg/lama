@@ -131,7 +131,6 @@ def user_update(request, realm_id, user_dn):
                                       update_view='user/user_detail.jinja2',
                                       form_class=UpdateLDAPUserForm,
                                       form_attrs=[
-                                          {'model_field': 'password', 'form_field': 'password'},
                                           {'model_field': 'first_name', 'form_field': 'first_name'},
                                           {'model_field': 'last_name', 'form_field': 'last_name'},
                                           {'model_field': 'email', 'form_field': 'email'}, ])

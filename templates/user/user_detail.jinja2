@@ -47,7 +47,6 @@
                     <form method="post" class="floating-label-form">
                         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                         {{ mform.email_input(form.email) }}
-                        {{ mform.password_input(form.password) }}
                         {{ mform.text_input(form.first_name) }}
                         {{ mform.text_input(form.last_name) }}
                         <div class="d-flex mt-4">
