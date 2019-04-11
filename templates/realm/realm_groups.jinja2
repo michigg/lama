@@ -7,15 +7,15 @@
         <tr>
             <th scope="col">Name</th>
             <th scope="col">Ldap Domain</th>
+            <th scope="col">Mitgliederanzahl</th>
         </tr>
         </thead>
         <tbody>
         {% for group in realm_groups %}
             <tr>
-                <td>{{ group.name }}</td>
-                <td>
-                    <a href="{{ url('realm-group-detail', args=[realm.id, group.dn]) }}">{{ group.dn }}</a>
-                </td>
+                <td><a href="{{ url('realm-group-detail', args=[realm.id, group.dn]) }}">{{ group.name }}</a></td>
+                <td>{{ group.dn }}</td>
+                <td>{{ group.members|length }}</td>
             </tr>
         {% endfor %}
         </tbody>
