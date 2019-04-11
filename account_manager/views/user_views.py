@@ -106,6 +106,18 @@ def realm_user_delete(request, realm_id, user_dn):
     return redirect('realm-user-list', realm_id)
 
 
+@login_required
+@is_realm_admin
+def realm_user_delete_confirm(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    deletion_link = {'name': 'realm-user-delete', 'args': [realm.id, ldap_user.dn]}
+    cancel_link = {'name': 'realm-user-detail', 'args': [realm.id, ldap_user.dn]}
+    return render(request, 'user/user_confirm_delete.jinja2',
+                  {'realm': realm, 'user': ldap_user, 'deletion_link': deletion_link, 'cancel_link': cancel_link})
+
+
 def realm_multiple_user_delete(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
     if request.method == 'POST':
@@ -150,7 +162,10 @@ def user_delete_confirm(request, realm_id, user_dn):
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
     if request.user.username == ldap_user.username:
-        return render(request, 'user/user_confirm_delete.jinja2', {'realm': realm, 'user': ldap_user})
+        deletion_link = {'name': 'user-delete', 'args': [ldap_user.dn, realm.id]}
+        cancel_link = {'name': 'realm-user-detail', 'args': [realm.id, ldap_user.dn]}
+        return render(request, 'user/user_confirm_delete.jinja2',
+                      {'realm': realm, 'user': ldap_user, 'deletion_link': deletion_link, 'cancel_link': cancel_link})
     else:
         return redirect('permission-denied')
 
