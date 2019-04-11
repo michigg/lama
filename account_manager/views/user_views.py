@@ -93,11 +93,11 @@ def realm_user_update(request, realm_id, user_dn):
 @login_required
 @is_realm_admin
 def realm_user_delete(request, realm_id, user_dn):
-    realm_obj = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
-    LdapGroup.base_dn = f'ou=groups,{realm_obj.ldap_base_dn}'
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
-    user_delete_controller(ldap_user, realm_obj)
+    user_delete_controller(ldap_user, realm)
     return redirect('realm-user-list', realm_id)
 
 

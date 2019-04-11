@@ -140,6 +140,15 @@ def realm_update(request, realm_id):
         return render(request, 'realm/realm_update.jinja2', {'realm': realm})
 
 
+@login_required
+@is_realm_admin
+def realm_delete_confirm(request, realm_id):
+    realm = Realm.objects.get(id=realm_id)
+    return render(request, 'realm/realm_confirm_delete.jinja2', {'realm': realm})
+
+
+@login_required
+@is_realm_admin
 def realm_delete(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm.ldap_base_dn

@@ -5,10 +5,12 @@
             <h1>Bereich <span style="text-transform: uppercase">{{ realm.name }}</span>
                 <small>
                     {% if request.user.is_superuser %}
-                        <a href="{{ url('realm-delete', args=[realm.id]) }}">Delete</a>
+                        <a href="{{ url('realm-delete-confirm', args=[realm.id]) }}"
+                           class="float-right h5 realm-delete-link">Delete</a>
                     {% endif %}
                 </small>
             </h1>
+
             {% if notice %}
                 <p style="color: green">{{ notice }}</p>
             {% endif %}

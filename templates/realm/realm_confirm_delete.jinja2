@@ -1,0 +1,30 @@
+{% extends 'base.jinja2' %}
+{% block content %}
+    <div class="col-12 ">
+        <div class="row justify-content-center justify-content-sm-center">
+            <div class="col-12 col-sm-8 col-md-7 col-lg-5 col-xl-4 bg-white text-dark p-3 mt-5">
+                <h1>Löschen des Bereichs
+                    <span class="text-uppercase font-weight-bold">{{ realm.name }}</span></h1>
+                <div class="alert alert-warning" role="alert">
+                    <p>Achtung! Sie sind gerade dabei den Bereich <span
+                            class="text-uppercase font-weight-bold">{{ realm.name }}</span> zu löschen.</p>
+                    <p>Falls Sie sich sicher sind, dass Sie diesen Bereich löschen wollen, klicken Sie bitte auf
+                        "Bereich löschen".
+                    <p>Hierdurch werden <strong>Alle</strong> Nutzer und Gruppen gelöscht, die unter der Ldap Basis
+                        DN {{ realm.ldap_base_dn }} eingetragen sind. Die Ldap Basis DN mit Ihren Organisationseinheiten
+                        "groups" und "people" bleiben bestehen.</p>
+                    <p>Bitte beachten Sie, dass die Daten der Nutzer, die in den
+                        Diensten hochgeladen wurden, weiterhin bestehen bleiben. Diese Daten müssen vom
+                        Systemadministrator seperat gelöscht werden. </p>
+                    <p>Möchten Sie das Löschen der Accountdaten verhindern, klicken Sie auf "Abbrechen"</p>
+                </div>
+                <div class="d-flex">
+                    <a href="{{ url('realm-detail', args = [realm.id]) }}"
+                       class="btn btn-secondary mr-auto p-2">Abbrechen</a>
+                    <a href="{{ url('realm-delete', args = [realm.id]) }}"
+                       class="btn btn-danger p-2">Bereich löschen</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
