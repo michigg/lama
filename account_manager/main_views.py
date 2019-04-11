@@ -82,8 +82,18 @@ def base_dn_available(base_dn):
 @login_required
 @is_realm_admin
 def realm_detail(request, realm_id):
-    realm_obj = Realm.objects.get(id=realm_id)
-    return render(request, 'realm/realm_detailed.jinja2', {'realm': realm_obj})
+    realm = Realm.objects.get(id=realm_id)
+    ldap_admin_group = None
+    ldap_default_group = None
+    if realm.admin_group:
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+        ldap_admin_group = LdapGroup.objects.get(name=realm.admin_group.name)
+    if realm.default_group:
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+        ldap_default_group = LdapGroup.objects.get(name=realm.default_group.name)
+
+    return render(request, 'realm/realm_detailed.jinja2',
+                  {'realm': realm, 'ldap_admin_group': ldap_admin_group, 'ldap_default_group': ldap_default_group})
 
 
 @login_required
