@@ -74,7 +74,7 @@ def group_update(request, realm_id, group_dn):
     LdapUser.base_dn = LdapUser.ROOT_DN
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
 
-    group = LdapGroup.objects.get(name=group_dn)
+    group = LdapGroup.objects.get(dn=group_dn)
 
     if request.method == 'POST':
         form = AddLDAPGroupForm(request.POST)
