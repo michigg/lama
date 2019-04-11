@@ -2,6 +2,9 @@
 {% import 'macros/form_macros.jinja2' as mform %}
 
 {% block detail_content %}
+    {% if extra_error %}
+        <div class="alert alert-warning">{{ extra_error }}</div>
+    {% endif %}
     <form action="{{ url('realm-group-add', args=[realm.id]) }}" method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         {{ mform.text_input(form.name) }}
