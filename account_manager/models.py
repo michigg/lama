@@ -95,6 +95,12 @@ class LdapGroup(Model):
     name = ldap_fields.CharField(db_column='cn', max_length=200, primary_key=True)
     members = ldap_fields.ListField(db_column='member')
 
+    @staticmethod
+    def get_user_groups(realm, user, group_base_dn):
+        LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+        LdapGroup.base_dn = group_base_dn
+        return LdapGroup.objects.filter(members=user.dn)
+
     def __str__(self):
         return self.name
 

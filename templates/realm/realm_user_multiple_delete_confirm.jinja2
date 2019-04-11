@@ -3,18 +3,6 @@
 
 {% block detail_content %}
     <h2>Nutzer löschen</h2>
-    {% if blocked_users %}
-        <div class="alert alert-warning">
-            <h3>Admin User festgestellt</h3>
-            <p>Die folgenden Nutzer können nicht gelöscht werden, da Sie noch Mitglieder von ein oder mehreren Admin
-                Gruppen sind. Bitte tragen Sie diese vorher aus den Admin Gruppen.</p>
-            <ul>
-                {% for blocked_user in blocked_users %}
-                    <li>{{ blocked_user.username }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
     <div class="form-group w-25 float-right">
         <input type="text"
                class="form-control"
@@ -22,12 +10,18 @@
                id="data-table-search-input">
         <label for="data-table-search-input">Suche</label>
     </div>
-    <form action="{{ url('realm-multiple-user-delete', args=[realm.id]) }}" method="post">
+    <form action="{{ url('realm-multiple-user-delete-confirm', args=[realm.id]) }}" method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+{#        {{ form.as_p() }}#}
         <table class="table table-hover table-striped table-inverse table-bordered data-table">
             <thead>
             <tr>
-                <th scope="col" class="text-center"></th>
+                <th scope="col" class="text-center">
+                    <input type="checkbox"
+                           class="table-checkbox-control-input"
+                           id="delete-all-checkbox"
+                    ><label class="table-checkbox-control-label" for="delete-all-checkbox"></label>
+                </th>
                 <th scope="col">Nutzername</th>
                 <th scope="col">E-Mail</th>
                 <th scope="col">Vorname</th>
@@ -35,7 +29,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for user in deletable_users %}
+            {% for user in users %}
                 <tr>
                     <td class="text-center">
                         <input type="checkbox"
@@ -43,26 +37,6 @@
                                id="user_{{ loop.index }}"
                                value="{{ user.username }}"
                                name="ldap_users"
-                               checked
-                               disabled
-                        ><label class="table-checkbox-control-label" for="user_{{ loop.index }}"></label>
-                    </td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.first_name }}</td>
-                    <td>{{ user.last_name }}</td>
-                </tr>
-                <input type="checkbox" value="{{ user.username }}" name="ldap_users" checked hidden>
-            {% endfor %}
-            {% for user in blocked_users %}
-                <tr>
-                    <td class="text-center">
-                        <input type="checkbox"
-                               class="table-checkbox-control-input delete-checkbox"
-                               id="user_{{ loop.index }}"
-                               value="{{ user.username }}"
-                               name="ldap_users"
-                               disabled
                         ><label class="table-checkbox-control-label" for="user_{{ loop.index }}"></label>
                     </td>
                     <td>{{ user.username }}</td>

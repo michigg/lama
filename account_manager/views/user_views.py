@@ -118,6 +118,8 @@ def realm_user_delete_confirm(request, realm_id, user_dn):
                   {'realm': realm, 'user': ldap_user, 'deletion_link': deletion_link, 'cancel_link': cancel_link})
 
 
+@login_required
+@is_realm_admin
 def realm_multiple_user_delete(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
     if request.method == 'POST':
@@ -125,14 +127,44 @@ def realm_multiple_user_delete(request, realm_id):
         if form.is_valid():
             ldap_users = form.cleaned_data['ldap_users']
             for ldap_user in ldap_users:
-                # TODO: Failure catchup
-                user_delete_controller(ldap_user, realm)
+                if _is_deleteable_user(realm, ldap_user):
+                    user_delete_controller(ldap_user, realm)
             return redirect('realm-user-list', realm_id)
+    return redirect('realm-user-list', realm.id)
+
+
+@login_required
+@is_realm_admin
+def realm_multiple_user_delete_confirm(request, realm_id):
+    realm = Realm.objects.get(id=realm_id)
+    if request.method == 'POST':
+        form = UserDeleteListForm(request.POST)
+        if form.is_valid():
+            ldap_users = form.cleaned_data['ldap_users']
+            deletable_users = []
+            blocked_users = []
+            for ldap_user in ldap_users:
+                if _is_deleteable_user(realm, ldap_user):
+                    deletable_users.append(ldap_user)
+                else:
+                    blocked_users.append(ldap_user)
+            return render(request, 'realm/realm_user_multiple_delete.jinja2',
+                          {'form': form, 'realm': realm, 'deletable_users': deletable_users,
+                           'blocked_users': blocked_users,
+                           'confirm': True})
     # TODO: Form not valid
     form = UserDeleteListForm()
     LdapUser.base_dn = realm.ldap_base_dn
     users = LdapUser.objects.all()
-    return render(request, 'realm/realm_user_multiple_delete.jinja2', {'form': form, 'realm': realm, 'users': users})
+    return render(request, 'realm/realm_user_multiple_delete_confirm.jinja2',
+                  {'form': form, 'realm': realm, 'users': users})
+
+
+def _is_deleteable_user(realm, user):
+    user_groups = LdapGroup.get_user_groups(realm, user, LdapGroup.ROOT_DN)
+    user_group_names = [group.name for group in user_groups]
+    user_admin_realms = Realm.objects.filter(id=realm.id).filter(admin_group__name__in=user_group_names)
+    return not len(user_admin_realms) > 0
 
 
 @login_required
