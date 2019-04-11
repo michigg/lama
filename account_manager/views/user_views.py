@@ -61,7 +61,8 @@ def user_add(request, realm_id):
             user = LdapUser.objects.get(username=username)
             LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
             default_ldap_group = LdapGroup.objects.get(name=realm.default_group.name)
-            ldap_add_user_to_groups(ldap_user=user.dn, user_groups=[default_ldap_group, ])
+            if default_ldap_group:
+                ldap_add_user_to_groups(ldap_user=user.dn, user_groups=[default_ldap_group, ])
             return redirect('realm-user-list', realm_id)
 
     # if a GET (or any other method) we'll create a blank form
