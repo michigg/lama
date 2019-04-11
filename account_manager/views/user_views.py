@@ -102,8 +102,11 @@ def realm_user_delete(request, realm_id, user_dn):
     LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
-    user_delete_controller(ldap_user, realm)
-    return redirect('realm-user-list', realm_id)
+    if _is_deleteable_user(realm, ldap_user):
+        user_delete_controller(ldap_user, realm)
+        return redirect('realm-user-list', realm_id)
+    else:
+        return redirect('permission-denied')
 
 
 @login_required

@@ -1,4 +1,11 @@
 {% extends 'base.jinja2' %}
 {% block content %}
-    <p>Leider hast du keine Rechte :´(</p>
+    <div class="col-12 ">
+        <div class="row justify-content-center justify-content-sm-center">
+            <div class="col-12 col-sm-8 col-md-7 col-lg-5 col-xl-4 bg-white text-dark text-center p-3 mt-5">
+                <p>Leider hast du keine Rechte :´(</p>
+                <a href="{{ url('realm-home') }}">Zurück zur Startseite</a>
+            </div>
+        </div>
+    </div>
 {% endblock %}
