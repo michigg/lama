@@ -1,10 +1,13 @@
 <h1>Willkommen bei den StuVe Services, {{ user.username }}!</h1>
 <p>Es wurde ein Account für dich angelegt.</p>
-<p>Dein Nutzername lautet: {{ user.username }}</p>
-<p>Uns ist folgende E-Mail bekannt: {{ email }}</p>
-<p>Um deinen Account zu aktivieren</p>
-<p>Über den folgenden Link kannst du deinen Account
-    aktivieren: {{ protocol }}://{{ domain }}{{ url('ldap_password_reset_confirm', kwargs={'uidb64':uid, 'token':token}) }}</p>
-<p>Der Link ist nur {{ expiration_days }} Tage gültig!</p>
-<p>Und so erreichst du deinen Account: {{ protocol }}://{{ domain }}{{ url('login') }}</p>
+<p><strong>Dein Nutzername lautet:</strong> {{ user.username }}</p>
+<p><strong>Uns ist folgende E-Mail bekannt:</strong> {{ email }}</p>
+<p>Über den folgenden Link kannst du deinen Account aktivieren:
+    <a href="{{ protocol }}://
+            {{ domain }}{{ url('ldap_password_reset_confirm', kwargs={'uidb64':uid, 'token':token}) }}">
+        {{ protocol }}://{{ domain }}{{ url('ldap_password_reset_confirm', kwargs={'uidb64':uid, 'token':token}) }}#
+    </a>
+</p>
+<p>Der Link ist nur <strong>{{ expiration_days }} Tage</strong> gültig!</p>
+<p>Und so gehts zum <a href="{{ protocol }}://{{ domain }}{{ url('login') }}">Login</a></p>
 
