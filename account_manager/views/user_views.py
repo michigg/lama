@@ -18,7 +18,17 @@ def realm_user(request, realm_id):
     realm_obj = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm_obj.ldap_base_dn
     realm_users = LdapUser.objects.all()
-    return render(request, 'realm/realm_user.jinja2', {'realm': realm_obj, 'realm_user': realm_users})
+    user_wrappers = []
+    for user in realm_users:
+        try:
+            django_user = User.objects.get(username=user.username)
+            if django_user.last_login:
+                user_wrappers.append({'user': user, 'active': True})
+            else:
+                user_wrappers.append({'user': user, 'active': False})
+        except ObjectDoesNotExist:
+            user_wrappers.append({'user': user, 'active': False})
+    return render(request, 'realm/realm_user.jinja2', {'realm': realm_obj, 'realm_user': user_wrappers})
 
 
 @login_required

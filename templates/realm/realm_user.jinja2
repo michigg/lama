@@ -14,15 +14,17 @@
             <th scope="col">E-Mail</th>
             <th scope="col">Vorname</th>
             <th scope="col">Nachname</th>
+            <th scope="col">Aktiv</th>
         </tr>
         </thead>
         <tbody>
         {% for user in realm_user %}
             <tr>
-                <td><a href="{{ url('realm-user-detail', args=[realm.id, user.dn]) }}">{{ user.username }}</a></td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.first_name }}</td>
-                <td>{{ user.last_name }}</td>
+                <td><a href="{{ url('realm-user-detail', args=[realm.id, user.user.dn]) }}">{{ user.user.username }}</a></td>
+                <td>{{ user.user.email }}</td>
+                <td>{{ user.user.first_name }}</td>
+                <td>{{ user.user.last_name }}</td>
+                <td>{{ user.active }}</td>
             </tr>
         {% endfor %}
         </tbody>
