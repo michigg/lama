@@ -23,6 +23,6 @@ login_forbidden = user_passes_test(lambda u: u.is_anonymous(), '/')
 urlpatterns = [
     path('', include('account_manager.urls')),
     path('admin/', admin.site.urls),
-    path('accounts/login/', auth_views.LoginView.as_view(), {'redirect_if_logged_in': '/'}, name='login'),
+    path('accounts/login/', auth_views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
