@@ -4,7 +4,7 @@ from django.contrib.auth.views import PasswordResetConfirmView, PasswordChangeVi
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
-
+from ldap import ALREADY_EXISTS
 from account_helper.models import Realm
 from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
     UserGroupListForm
@@ -53,19 +53,23 @@ def user_add(request, realm_id):
             if request.is_secure():
                 protocol = 'https'
             LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
-            LdapUser.create_with_django_user_creation_and_welcome_mail(realm=realm,
-                                                                       protocol=protocol,
-                                                                       domain=current_site.domain,
-                                                                       username=username,
-                                                                       email=email)
-            user = LdapUser.objects.get(username=username)
-            LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-            default_ldap_group = LdapGroup.objects.get(name=realm.default_group.name)
-            if default_ldap_group:
-                ldap_add_user_to_groups(ldap_user=user.dn, user_groups=[default_ldap_group, ])
-            return redirect('realm-user-list', realm_id)
+            try:
+                LdapUser.create_with_django_user_creation_and_welcome_mail(realm=realm,
+                                                                           protocol=protocol,
+                                                                           domain=current_site.domain,
+                                                                           username=username,
+                                                                           email=email)
+                if realm.default_group:
+                    user = LdapUser.objects.get(username=username)
 
-    # if a GET (or any other method) we'll create a blank form
+                    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+                    default_ldap_group = LdapGroup.objects.get(name=realm.default_group.name)
+                    ldap_add_user_to_groups(ldap_user=user.dn, user_groups=[default_ldap_group, ])
+
+                return redirect('realm-user-list', realm_id)
+            except ALREADY_EXISTS as err:
+                return render(request, 'user/realm_user_add.jinja2', {'form': form, 'realm': realm,
+                                                                      'extra_error': f'Nutzer {username} existiert bereits.'})
     else:
         form = AddLDAPUserForm()
     return render(request, 'user/realm_user_add.jinja2', {'form': form, 'realm': realm})
