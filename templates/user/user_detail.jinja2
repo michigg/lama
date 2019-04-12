@@ -32,11 +32,10 @@
                             </ul>
                             <div class="card-footer d-flex bg-white">
                                 <a href="{{ url('user-update', args = [user.dn, realm.id]) }}"
-                                   class="btn btn-primary mr-auto p-2">Update
-                                    User</a>
+                                   class="btn btn-primary mr-auto p-2"><i class="fas fa-user-edit"></i> Nutzer
+                                    bearbeiten</a>
                                 <a href="{{ url('user-delete-confirm', args = [user.dn, realm.id]) }}"
-                                   class="btn btn-danger p-2">Delete
-                                    User</a>
+                                   class="btn btn-danger p-2"><i class="fas fa-trash"></i> Nutzer löschen</a>
                             </div>
                         </div>
                     </div>
