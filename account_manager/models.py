@@ -48,7 +48,7 @@ class LdapUser(Model):
             LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}'
             ldap_user = LdapUser.objects.create(username=username, email=email, first_name=" ", last_name=" ")
             user, _ = User.objects.get_or_create(username=username, email=email)
-            mail_subject = 'Activate your blog account.'
+            mail_subject = 'Aktiviere deinen StuVe Account'
             message = render_to_string('registration/welcome_email.jinja2', {
                 'user': user,
                 'domain': domain,
