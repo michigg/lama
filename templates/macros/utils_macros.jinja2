@@ -98,12 +98,15 @@
                 </td>
                 <td>{{ realm_wrapper.user_count }}</td>
                 <td>{{ realm_wrapper.group_count }}</td>
-                {#                <td class="text-center">{% if user.active %}#}
-                {#                    <i class="fas fa-check-circle text-success"></i>{% else %}#}
-                {#                    <i class="far fa-times-circle text-warning"></i>{% endif %}</td>#}
             </tr>
         {% endfor %}
         </tbody>
     </table>
+{% endmacro %}
+
+{% macro get_warning_box(error_text) -%}
+    {% if error_text %}
+        <div class="alert alert-warning">{{ error_text }}</div>
+    {% endif %}
 {% endmacro %}
 

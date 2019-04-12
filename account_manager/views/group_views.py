@@ -87,6 +87,10 @@ def group_update(request, realm_id, group_dn):
             group.members = [member.dn for member in members]
             group.save()
             return redirect('realm-group-detail', realm_id, group.dn)
+        elif 'members' not in form.cleaned_data:
+            return render(request, 'group/group_detail.jinja2',
+                          {'form': form, 'realm': realm, 'group': group,
+                           'extra_error': 'Gruppen dürfen nicht leer sein. Wenn du die Gruppe nicht mehr benutzen möchtest, solltest du Sie löschen'})
     else:
         members = LdapUser.objects.none()
         if group.members:

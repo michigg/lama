@@ -17,6 +17,7 @@
                     class="fas fa-trash"></i> <span class="d-sm-none d-md-inline-block">Gruppe löschen</span></a>
         </div>
     {% else %}
+        {{ mutils.get_warning_box(extra_error) }}
         <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             {{ mform.text_input(form.name) }}

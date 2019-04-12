@@ -4,7 +4,7 @@ from django.contrib.auth.views import PasswordResetConfirmView, PasswordChangeVi
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
-from ldap import ALREADY_EXISTS
+from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
 from account_helper.models import Realm
 from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
     UserGroupListForm
@@ -230,11 +230,18 @@ def user_delete(request, realm_id, user_dn):
 
 @login_required
 @is_realm_admin
-def realm_user_group_update(request, realm_id, user_dn):
+def realm_user_group_update(request, realm_id, user_dn, error=None):
     realm = Realm.objects.get(id=realm_id)
+    ldap_user, realm_groups_available, user_groups = get_available_given_groups(realm, user_dn)
+
+    return render(request, 'user/realm_user_update_groups.jinja2',
+                  {'realm': realm, 'user': ldap_user, 'user_groups': user_groups,
+                   'realm_groups': realm_groups_available, 'extra_error': error})
+
+
+def get_available_given_groups(realm, user_dn):
     LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-
     ldap_user = LdapUser.objects.get(dn=user_dn)
     user_groups = LdapGroup.objects.filter(members=ldap_user.dn)
     realm_groups = LdapGroup.objects.all()
@@ -242,10 +249,7 @@ def realm_user_group_update(request, realm_id, user_dn):
     for realm_group in realm_groups:
         if realm_group not in user_groups:
             realm_groups_available.append(realm_group)
-
-    return render(request, 'user/realm_user_update_groups.jinja2',
-                  {'realm': realm, 'user': ldap_user, 'user_groups': user_groups,
-                   'realm_groups': realm_groups_available})
+    return ldap_user, realm_groups_available, user_groups
 
 
 @login_required
@@ -280,7 +284,14 @@ def realm_user_group_update_delete(request, realm_id, user_dn):
             groups = []
             for group_name in group_names:
                 groups.append(LdapGroup.objects.get(name=group_name))
-            ldap_remove_user_from_groups(user_dn, groups)
+            try:
+                ldap_remove_user_from_groups(user_dn, groups)
+            except OBJECT_CLASS_VIOLATION as err:
+                ldap_user, realm_groups_available, user_groups = get_available_given_groups(realm, user_dn)
+                return render(request, 'user/realm_user_update_groups.jinja2',
+                              {'realm': realm, 'user': ldap_user, 'user_groups': user_groups,
+                               'realm_groups': realm_groups_available,
+                               'extra_error': 'Bearbeiten fehlgeschlagen. Der Nutzer scheint der letzte in einer Gruppe zu sein. Bitte löschen Sie die Gruppe zuerst.'})
     return redirect('realm-user-group-update', realm.id, user_dn)
 
 
