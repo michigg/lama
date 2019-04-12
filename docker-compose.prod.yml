@@ -11,6 +11,7 @@ services:
       context: .
       dockerfile: Dockerfile
     networks:
+      - default
       - pg_db
     env_file:
       - production.env

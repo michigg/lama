@@ -5,7 +5,7 @@ RUN apk upgrade --update && \
 	pip3 install -r /requirements.txt && rm /requirements.txt
 WORKDIR /lama
 EXPOSE 80
-ADD ["src", "/lama"]
 
 ENTRYPOINT ["python3", "manage.py"]
+ADD ["src", "/lama"]
 CMD ["runserver", "0.0.0.0:80"]

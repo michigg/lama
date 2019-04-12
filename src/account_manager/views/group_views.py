@@ -4,10 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from src.account_helper import Realm
-from src.account_manager import AddLDAPGroupForm
-from src.account_manager.main_views import is_realm_admin
-from src.account_manager import LdapGroup, LdapUser
+from account_helper.models import Realm
+from account_manager.forms import AddLDAPGroupForm
+from account_manager.main_views import is_realm_admin
+from account_manager.models import LdapGroup, LdapUser
 
 
 def protect_cross_realm_group_access(view_func):

@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'src.core.urls'
+ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
@@ -96,7 +96,7 @@ DATABASES = {
     },
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, '../../db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 DATABASE_ROUTERS = ['ldapdb.router.Router']
@@ -137,7 +137,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 # STATIC_ROOT = 'static'
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, '../../static/'),
+    os.path.join(BASE_DIR, 'static/'),
 )
 
 ########################################################################################################################
@@ -190,42 +190,42 @@ SERVER_EMAIL = 'fachschaft-wiai.stuve@uni-bamberg.de'
 ########################################################################################################################
 #                                         Logging Config                                                               #
 ########################################################################################################################
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'default': {
-            'format': '%(asctime)s %(module)s [%(levelname)s]: %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-        }
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'default',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': '../logs/import_food.log',
-            'formatter': 'default',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-        },
-        'mail_admins_image_upload': {
-            'level': 'INFO',
-            'class': 'django.utils.log.AdminEmailHandler',
-        },
-    },
-    'loggers': {
-        'account_manager': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-        },
-        'account_helper': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'default': {
+#             'format': '%(asctime)s %(module)s [%(levelname)s]: %(message)s',
+#             'datefmt': '%Y-%m-%d %H:%M:%S',
+#         }
+#     },
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'default',
+#         },
+#         'file': {
+#             'class': 'logging.FileHandler',
+#             'filename': '../logs/import_food.log',
+#             'formatter': 'default',
+#         },
+#         'mail_admins': {
+#             'level': 'ERROR',
+#             'class': 'django.utils.log.AdminEmailHandler',
+#         },
+#         'mail_admins_image_upload': {
+#             'level': 'INFO',
+#             'class': 'django.utils.log.AdminEmailHandler',
+#         },
+#     },
+#     'loggers': {
+#         'account_manager': {
+#             'handlers': ['console', 'file'],
+#             'level': 'INFO',
+#         },
+#         'account_helper': {
+#             'handlers': ['console', 'file'],
+#             'level': 'INFO',
+#         },
+#     },
+# }

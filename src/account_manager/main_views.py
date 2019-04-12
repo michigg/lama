@@ -9,8 +9,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.shortcuts import render, redirect, HttpResponse
 
-from src.account_helper import Realm
-from src.account_manager import realm_send_mail
+from account_helper.models import Realm
+from account_manager.utils.mail_utils import realm_send_mail
 from .forms import RealmAddForm, RealmUpdateForm
 from .models import LdapGroup, LdapUser
 from ldap import LDAPError
