@@ -41,9 +41,11 @@ def realm_list(request):
 
     if len(realms) == 0 and not user.is_superuser:
         try:
+            LdapUser.base_dn = LdapUser.ROOT_DN
             user = LdapUser.objects.get(username=user.username)
             realm_base_dn = re.compile('(uid=[a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user.dn).group(3)
             realm = Realm.objects.get(ldap_base_dn=realm_base_dn)
+
             return redirect('realm-user-detail', realm.id, user.dn)
         except ObjectDoesNotExist as err:
             logger.info('Anmeldung fehlgeschlagen', err)
@@ -103,7 +105,6 @@ def realm_detail(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
     ldap_admin_group = None
     ldap_default_group = None
-    print('ADMIN GROUP', realm.admin_group)
     if realm.admin_group:
         LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
         ldap_admin_group = LdapGroup.objects.get(name=realm.admin_group.name)
