@@ -139,8 +139,7 @@ STATICFILES_DIRS = (
 ########################################################################################################################
 
 AUTHENTICATION_BACKENDS = [
-    'multiple_ldap_backends.ldap.LDAPBackend1',
-    'multiple_ldap_backends.ldap.LDAPBackend2',
+    'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
