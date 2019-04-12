@@ -176,15 +176,16 @@ AUTH_PROFILE_MODULE = 'account_manager.UserProfile'
 ########################################################################################################################
 #                                         EMAIL Config                                                                 #
 ########################################################################################################################
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_TIMEOUT = 15
 EMAIL_HOST = 'smtp.uni-bamberg.de'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'vergesslich@uni-bamberg.de'
+DEFAULT_FROM_EMAIL = 'vergesslich@uni-bamberg.de'
+SERVER_EMAIL = 'fachschaft-wiai.stuve@uni-bamberg.de'
 
 ########################################################################################################################
 #                                         Logging Config                                                               #
