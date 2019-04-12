@@ -71,8 +71,15 @@
 }
 
 /*SIDEBAR*/
+
+.sidebar-bottom {
+    position: fixed;
+    width: 15rem;
+    bottom: 0;
+}
+
 .sidebar-wrapper {
-    min-height: 100vh;
+    min-height: calc(100vh - 56px);
     margin-left: -15rem;
     -webkit-transition: margin .25s ease-out;
     -moz-transition: margin .25s ease-out;
@@ -82,6 +89,7 @@
 
 .sidebar-wrapper .sidebar-heading {
     padding: 0.875rem 1.25rem;
+    margin-bottom: 0;
     font-size: 1.2rem;
 }
 
@@ -169,6 +177,10 @@
     position: absolute;
     z-index: -1;
     opacity: 0;
+}
+
+.table th, .table td {
+    padding: 0.5rem;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------ */

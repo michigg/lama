@@ -84,6 +84,7 @@ class LdapUser(Model):
         query = Q(username=users.pop())
         for user in users:
             query = query | Q(username=user)
+        LdapUser.base_dn = LdapUser.ROOT_DN
         return LdapUser.objects.filter(query)
 
     @staticmethod

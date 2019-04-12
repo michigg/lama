@@ -8,7 +8,7 @@
         <ul class="list-group list-group-flush w-100 mb-3">
             <li class="list-group-item">Ldap Domain: {{ group.dn }}</li>
         </ul>
-        <h2>Mitglieder</h2>
+        <h3>Mitglieder</h3>
         {{ mutils.get_user_table(realm, users) }}
         <div class="d-flex mt-3">
             <a href="{{ url('realm-group-update', args = [realm.id, group.dn]) }}" class="btn btn-primary mr-auto p-2">
