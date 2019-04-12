@@ -1,25 +1,20 @@
 {% extends 'realm/realm_detailed.jinja2' %}
 {% import 'macros/form_macros.jinja2' as mform %}
+{% import 'macros/utils_macros.jinja2' as mutils %}
 
 {% block detail_content %}
     {% if not form %}
-        <h3>{{ group.name }}</h3>
+        <h3>Gruppe {{ group.name }}</h3>
         <ul class="list-group list-group-flush w-100 mb-3">
             <li class="list-group-item">Ldap Domain: {{ group.dn }}</li>
         </ul>
         <h2>Mitglieder</h2>
-        <ul class="list-group list-group-flush w-100 mb-3">
-            {% for user in group.members %}
-                <li class="list-group-item"><a
-                        href="{{ url('realm-user-detail', args=[realm.id, user]) }}">{{ user }}</a>
-                </li>
-            {% endfor %}
-        </ul>
+        {{ mutils.get_user_table(realm, users) }}
         <div class="d-flex mt-3">
-            <a href="{{ url('realm-group-update', args = [realm.id, group.dn]) }}" class="btn btn-primary mr-auto p-2">Update
-                Gruppe</a>
-            <a href="{{ url('realm-group-delete', args = [realm.id, group.dn]) }}" class="btn btn-danger p-2">Delete
-                Gruppe</a>
+            <a href="{{ url('realm-group-update', args = [realm.id, group.dn]) }}" class="btn btn-primary mr-auto p-2">
+                <i class="fas fa-pen-square"></i> Gruppe bearbeiten</a>
+            <a href="{{ url('realm-group-delete', args = [realm.id, group.dn]) }}" class="btn btn-danger p-2"><i
+                    class="fas fa-trash"></i> <span class="d-sm-none d-md-inline-block">Gruppe löschen</span></a>
         </div>
     {% else %}
         <form method="post">

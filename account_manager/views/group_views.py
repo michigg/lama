@@ -38,7 +38,9 @@ def group_detail(request, realm_id, group_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     group = LdapGroup.objects.get(dn=group_dn)
-    return render(request, 'group/group_detail.jinja2', {'group': group, 'realm': realm})
+    users = LdapUser.get_users_by_dn(realm, group.members)
+    user_wrapper = LdapUser.get_user_active_marked(users)
+    return render(request, 'group/group_detail.jinja2', {'group': group, 'realm': realm, 'users': user_wrapper})
 
 
 @login_required

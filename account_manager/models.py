@@ -6,6 +6,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.db.models import Q
 from ldapdb.models import fields as ldap_fields
 from ldapdb.models.base import Model
 
@@ -14,6 +15,7 @@ from account_manager.utils.mail_utils import realm_send_mail
 from multiprocessing import Process
 from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
 from django.core.exceptions import ObjectDoesNotExist
+from account_manager.utils.dbldap import get_filterstr
 
 
 class LdapUser(Model):
@@ -74,6 +76,17 @@ class LdapUser(Model):
         ldap_user.save()
 
     @staticmethod
+    def get_users_by_dn(realm, users):
+        print(users)
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+        users = [re.compile('uid=([a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user).group(1) for
+                 user in users]
+        query = Q(username=users.pop())
+        for user in users:
+            query = query | Q(username=user)
+        return LdapUser.objects.filter(query)
+
+    @staticmethod
     def is_user_duplicate(username):
         LdapUser.base_dn = LdapUser.ROOT_DN
         try:
@@ -81,6 +94,24 @@ class LdapUser(Model):
             return True
         except (NO_SUCH_OBJECT, ObjectDoesNotExist) as err:
             return False
+
+    @staticmethod
+    def is_active_user(ldap_user):
+        try:
+            django_user = User.objects.get(username=ldap_user.username)
+            return django_user.last_login
+        except ObjectDoesNotExist:
+            return False
+
+    @staticmethod
+    def get_user_active_marked(ldap_users):
+        user_wrappers = []
+        for user in ldap_users:
+            if LdapUser.is_active_user(user):
+                user_wrappers.append({'user': user, 'active': True})
+            else:
+                user_wrappers.append({'user': user, 'active': False})
+        return user_wrappers
 
 
 class LdapGroup(Model):
