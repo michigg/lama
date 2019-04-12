@@ -13,7 +13,7 @@
         <div class="d-flex mt-3">
             <a href="{{ url('realm-group-update', args = [realm.id, group.dn]) }}" class="btn btn-primary mr-auto p-2">
                 <i class="fas fa-pen-square"></i> Gruppe bearbeiten</a>
-            <a href="{{ url('realm-group-delete', args = [realm.id, group.dn]) }}" class="btn btn-danger p-2"><i
+            <a href="{{ url('realm-group-delete-confirm', args = [realm.id, group.dn]) }}" class="btn btn-danger p-2"><i
                     class="fas fa-trash"></i> <span class="d-sm-none d-md-inline-block">Gruppe löschen</span></a>
         </div>
     {% else %}

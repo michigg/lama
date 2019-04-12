@@ -49,6 +49,8 @@ urlpatterns = [
          name='realm-group-detail'),
     path('realm/<int:realm_id>/group/<str:group_dn>/update/', account_manager.views.group_views.group_update,
          name='realm-group-update'),
+    path('realm/<int:realm_id>/group/<str:group_dn>/delete/confirm/', account_manager.views.group_views.group_delete_confirm,
+         name='realm-group-delete-confirm'),
     path('realm/<int:realm_id>/group/<str:group_dn>/delete/', account_manager.views.group_views.group_delete,
          name='realm-group-delete'),
 

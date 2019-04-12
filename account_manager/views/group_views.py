@@ -124,3 +124,14 @@ def group_delete(request, realm_id, group_dn):
     group.delete()
 
     return redirect('realm-group-list', realm_id)
+
+
+@login_required
+@is_realm_admin
+@protect_cross_realm_group_access
+def group_delete_confirm(request, realm_id, group_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+    group = LdapGroup.objects.get(dn=group_dn)
+    return render(request, 'group/group_confirm_delete.jinja2',
+                  {'realm': realm, 'group': group})
