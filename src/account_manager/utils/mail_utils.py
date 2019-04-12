@@ -3,7 +3,7 @@ import logging
 from django.core.mail import get_connection, send_mail
 from django.utils.html import strip_tags
 
-from core.settings import EMAIL_HOST, EMAIL_PORT, EMAIL_USE_SSL, EMAIL_USE_TLS
+from src.core import EMAIL_HOST, EMAIL_PORT, EMAIL_USE_SSL, EMAIL_USE_TLS
 
 logger = logging.getLogger(__name__)
 

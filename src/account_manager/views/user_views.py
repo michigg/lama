@@ -5,11 +5,11 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
-from account_helper.models import Realm
-from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
+from src.account_helper import Realm
+from src.account_manager import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
     UserGroupListForm
-from account_manager.main_views import is_realm_admin
-from account_manager.models import LdapUser, LdapGroup
+from src.account_manager.main_views import is_realm_admin
+from src.account_manager import LdapUser, LdapGroup
 
 
 @login_required

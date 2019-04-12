@@ -10,12 +10,11 @@ from django.db.models import Q
 from ldapdb.models import fields as ldap_fields
 from ldapdb.models.base import Model
 
-from core.settings import PASSWORD_RESET_TIMEOUT_DAYS
-from account_manager.utils.mail_utils import realm_send_mail
+from src.core.settings import PASSWORD_RESET_TIMEOUT_DAYS
+from src.account_manager.utils.mail_utils import realm_send_mail
 from multiprocessing import Process
 from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
 from django.core.exceptions import ObjectDoesNotExist
-from account_manager.utils.dbldap import get_filterstr
 
 
 class LdapUser(Model):

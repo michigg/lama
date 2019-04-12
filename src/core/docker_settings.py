@@ -14,25 +14,14 @@ import os
 import ldap
 from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'r$_n!+7(w&jo3obu!1f#pu3nfs0s56@58y((6c9*tr(r2u*3vd'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DOMAIN = os.environ['DOMAIN']
+SITE_NAME = os.environ['SITE_NAME']
+SECRET_KEY = os.environ['SECRET_KEY']
+DEBUG = bool(os.environ.get('DEBUG', False))
+ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS'].split()
 
 # Application definition
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'realm-home'
-PASSWORD_RESET_TIMEOUT_DAYS = 3
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,7 +43,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'core.urls'
+ROOT_URLCONF = 'src.core.urls'
 
 TEMPLATES = [
     {
@@ -90,15 +79,20 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'ldap': {
         'ENGINE': 'ldapdb.backends.ldap',
-        'NAME': 'ldap://localhost:1389',
-        'USER': 'cn=admin,dc=stuve,dc=de',
-        'PASSWORD': 'secret',
+        'NAME': os.environ['LDAP_SERVER_URI'],
+        'USER': os.environ.get('LDAP_ADMIN_USER_NAME', ''),
+        'PASSWORD': os.environ.get('LDAP_ADMIN_USER_PASSWORD', ''),
     },
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_USER', ''),
+        'USER': os.environ.get('POSTGRES_USER', ''),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+        'HOST': os.environ.get('DATABASE_HOST', ''),
+        'PORT': os.environ.get('DATABASE_PORT', ''),
     }
 }
+
 DATABASE_ROUTERS = ['ldapdb.router.Router']
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -137,7 +131,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 # STATIC_ROOT = 'static'
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static/'),
+    os.path.join(BASE_DIR, '../../static/'),
 )
 
 ########################################################################################################################
@@ -150,21 +144,17 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-AUTH_LDAP_1_SERVER_URI = "ldap://localhost:1389"
-AUTH_LDAP_1_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,ou=fs_wiai,ou=fachschaften,dc=stuve,dc=de"
-AUTH_LDAP_1_GROUP_SEARCH = LDAPSearch("dc=stuve,dc=de",
-                                      ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
-                                      )
-AUTH_LDAP_1_GROUP_TYPE = GroupOfNamesType(name_attr='cn')
-AUTH_LDAP_1_MIRROR_GROUPS = True
-
-AUTH_LDAP_2_SERVER_URI = "ldap://localhost:1389"
-AUTH_LDAP_2_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,ou=fs_sowi,ou=fachschaften,dc=stuve,dc=de"
-AUTH_LDAP_2_GROUP_SEARCH = LDAPSearch("dc=stuve,dc=de",
-                                      ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
-                                      )
-AUTH_LDAP_2_GROUP_TYPE = GroupOfNamesType(name_attr='cn')
-AUTH_LDAP_2_MIRROR_GROUPS = True
+AUTH_LDAP_SERVER_URI = os.environ['LDAP_SERVER_URI']
+# AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,ou=fs_wiai,ou=fachschaften,dc=stuve,dc=de"
+AUTH_LDAP_USER_SEARCH = LDAPSearch(os.environ['LDAP_USER_ENTRY'], ldap.SCOPE_SUBTREE,
+                                   os.environ['LDAP_USER_SELECTOR'])
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+    os.environ['LDAP_GROUP_ENTRY'],
+    ldap.SCOPE_SUBTREE,
+    os.environ['LDAP_GROUP_SELECTOR'],
+)
+AUTH_LDAP_GROUP_TYPE = GroupOfNamesType(name_attr=os.environ['LDAP_GROUP_NAME_ATTR'])
+AUTH_LDAP_MIRROR_GROUPS = True
 
 AUTH_LDAP_USER_ATTR_MAP = {
     'first_name': 'cn',
@@ -180,52 +170,16 @@ AUTH_PROFILE_MODULE = 'account_manager.UserProfile'
 # EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_TIMEOUT = 15
-EMAIL_HOST = 'smtp.uni-bamberg.de'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = False
-DEFAULT_FROM_EMAIL = 'vergesslich@uni-bamberg.de'
-SERVER_EMAIL = 'fachschaft-wiai.stuve@uni-bamberg.de'
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_PORT = os.environ['EMAIL_PORT']
+EMAIL_USE_TLS = bool(os.environ.get('EMAIL_USE_TLS', False))
+EMAIL_USE_SSL = bool(os.environ.get('EMAIL_USE_SSL', False))
+DEFAULT_FROM_EMAIL = os.environ['DEFAULT_FROM_EMAIL']
+SERVER_EMAIL = os.environ['SERVER_EMAIL']
 
 ########################################################################################################################
 #                                         Logging Config                                                               #
 ########################################################################################################################
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'default': {
-            'format': '%(asctime)s %(module)s [%(levelname)s]: %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-        }
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'default',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': './logs/import_food.log',
-            'formatter': 'default',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-        },
-        'mail_admins_image_upload': {
-            'level': 'INFO',
-            'class': 'django.utils.log.AdminEmailHandler',
-        },
-    },
-    'loggers': {
-        'account_manager': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-        },
-        'account_helper': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-        },
-    },
-}
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'realm-home'
+PASSWORD_RESET_TIMEOUT_DAYS = 3

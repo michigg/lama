@@ -1,8 +1,7 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from account_manager.models import UserProfile
 import ldap
-import core.settings as settings
+from src import core as settings
 
 LDAP_CONFIGS = [(settings.AUTH_LDAP_1_SERVER_URI, settings.AUTH_LDAP_1_USER_DN_TEMPLATE),
                 (settings.AUTH_LDAP_2_SERVER_URI, settings.AUTH_LDAP_2_USER_DN_TEMPLATE)]

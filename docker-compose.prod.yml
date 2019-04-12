@@ -1,0 +1,27 @@
+version: "3"
+
+networks:
+  pg_db:
+    internal: true
+
+services:
+  lama:
+    image: lama:0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - pg_db
+    env_file:
+      - production.env
+    ports:
+      - 8888:80
+
+  dblama:
+    image: postgres:11.2-alpine
+    networks:
+      - pg_db
+    volumes:
+      - ./data/pgdata/:/var/lib/postgresql/data/
+    env_file:
+      - production.env
