@@ -55,3 +55,55 @@
     </table>
 {% endmacro %}
 
+{% macro get_realm_table(realms) -%}
+    <div class="form-group w-25 float-right">
+        <input type="text"
+               class="form-control"
+               id="data-table-search-input">
+        <label for="data-table-search-input">Suche</label>
+    </div>
+    <table class="table table-hover table-striped table-inverse table-bordered data-table text-center">
+        <thead>
+        <tr>
+            <th scope="col">Bereichsname</th>
+            <th scope="col">Ldap Basis DN</th>
+            <th scope="col">Mailadresse</th>
+            <th scope="col">Admingruppe</th>
+            <th scope="col">Defaultgruppe</th>
+            <th scope="col">Nutzer anzahl</th>
+            <th scope="col">Gruppen anzahl</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for realm_wrapper in realms %}
+            <tr>
+                <td>
+                    <a href="{{ url('realm-detail', args=[realm_wrapper.realm.id]) }}">{{ realm_wrapper.realm.name }}</a>
+                </td>
+                <td>{{ realm_wrapper.realm.ldap_base_dn }}</td>
+                <td>{{ realm_wrapper.realm.email }}</td>
+                <td>
+                    {% if realm_wrapper.realm.admin_group %}
+                        {{ realm_wrapper.realm.admin_group }}
+                    {% else %}
+                        <span class="text-warning"><i class="fas fa-exclamation-circle"></i></span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if realm_wrapper.realm.default_group %}
+                        {{ realm_wrapper.realm.default_group }}
+                    {% else %}
+                        <span class="text-warning"><i class="fas fa-exclamation-circle align-middle"></i></span>
+                    {% endif %}
+                </td>
+                <td>{{ realm_wrapper.user_count }}</td>
+                <td>{{ realm_wrapper.group_count }}</td>
+                {#                <td class="text-center">{% if user.active %}#}
+                {#                    <i class="fas fa-check-circle text-success"></i>{% else %}#}
+                {#                    <i class="far fa-times-circle text-warning"></i>{% endif %}</td>#}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+

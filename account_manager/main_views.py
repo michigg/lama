@@ -34,22 +34,38 @@ def is_realm_admin(view_func):
 @login_required
 def realm_list(request):
     user = request.user
-    if not user.is_superuser:
-        realms = Realm.objects.filter(admin_group__user__username__contains=user.username).order_by('name')
-        if len(realms) == 0:
-            try:
-                user = LdapUser.objects.get(username=user.username)
-                realm_base_dn = re.compile('(uid=[a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user.dn).group(3)
-                realm = Realm.objects.get(ldap_base_dn=realm_base_dn)
-                return redirect('realm-user-detail', realm.id, user.dn)
-            except ObjectDoesNotExist as err:
-                logger.info('Anmeldung fehlgeschlagen', err)
-                return HttpResponse("Invalid login. Please try again.")
-        elif len(realms) == 1:
-            return redirect('realm-detail', realms[0].id)
-        else:
-            return render(request, 'realm/realm_home.jinja2', {'realms': realms})
+    if user.is_superuser:
+        realms = Realm.objects.all()
     else:
+        realms = Realm.objects.filter(admin_group__user__username__contains=user.username).order_by('name')
+
+    if len(realms) == 0 and not user.is_superuser:
+        try:
+            user = LdapUser.objects.get(username=user.username)
+            realm_base_dn = re.compile('(uid=[a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user.dn).group(3)
+            realm = Realm.objects.get(ldap_base_dn=realm_base_dn)
+            return redirect('realm-user-detail', realm.id, user.dn)
+        except ObjectDoesNotExist as err:
+            logger.info('Anmeldung fehlgeschlagen', err)
+            return HttpResponse("Invalid login. Please try again.")
+    elif len(realms) == 1:
+        return redirect('realm-detail', realms[0].id)
+    else:
+        realm_wrappers = []
+        for realm in realms:
+            realm_wrappers.append(_get_group_user_count_wrapper(realm))
+        return render(request, 'realm/realm_home.jinja2', {'realms': realms, 'realm_wrappers': realm_wrappers})
+
+
+def _get_group_user_count_wrapper(realm):
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+    return {'realm': realm, 'group_count': LdapGroup.objects.count(), 'user_count': LdapUser.objects.count()}
+
+
+@login_required
+def realm_add(request):
+    if request.user.is_superuser:
         realms = Realm.objects.all().order_by('name')
         if request.method == 'POST':
             form = RealmAddForm(request.POST)
@@ -70,7 +86,9 @@ def realm_list(request):
                                   {'realm_name': name})
         else:
             form = RealmAddForm()
-        return render(request, 'realm/realm_home.jinja2', {'realms': realms, 'form': form})
+        return render(request, 'realm/realm_add.jinja2', {'realms': realms, 'form': form})
+    else:
+        redirect('permission-denied')
 
 
 def base_dn_available(base_dn):
