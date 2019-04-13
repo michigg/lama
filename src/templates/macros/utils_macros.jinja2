@@ -81,7 +81,13 @@
                     <a href="{{ url('realm-detail', args=[realm_wrapper.realm.id]) }}">{{ realm_wrapper.realm.name }}</a>
                 </td>
                 <td>{{ realm_wrapper.realm.ldap_base_dn }}</td>
-                <td>{{ realm_wrapper.realm.email }}</td>
+                <td>
+ 										{% if realm_wrapper.realm.email %}
+                        {{ realm_wrapper.realm.email }}
+                    {% else %}
+                        <span class="text-danger"><i class="fas fa-exclamation-circle"></i></span>
+                    {% endif %}
+								</td>
                 <td>
                     {% if realm_wrapper.realm.admin_group %}
                         {{ realm_wrapper.realm.admin_group }}
