@@ -117,3 +117,5 @@ dmypy.json
 .idea/
 migrations/
 logs/
+db/
+docker/ldap/data/var/
