@@ -6,7 +6,7 @@
                 <small>
                     {% if request.user.is_superuser %}
                         <a href="{{ url('realm-delete-confirm', args=[realm.id]) }}"
-                           class="float-right h5 realm-delete-link"><i class="fas fa-dumpster"></i> <span
+                           class="h5 realm-delete-link"><i class="fas fa-dumpster"></i> <span
                                 class="d-none d-md-inline-block">Bereich löschen</span></a>
                     {% endif %}
                 </small>
