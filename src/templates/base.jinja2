@@ -27,12 +27,15 @@
 {# ===== Body ===== #}
 <body>
 <nav class="navbar navbar-light bg-light">
+    {% block extra_nav %}
+    {% endblock %}
     <a class="navbar-brand" href="{{ url('realm-home') }}">
         {#      TODO: Icon#}
         <img src="{{ static('images/lama.svg') }}" width="30" height="30" class="d-inline-block align-top"
              alt="">
         LAMa
     </a>
+
     {% if request.user.is_authenticated %}
         <span class="navbar-text">
         Hi {{ request.user.username }}!
@@ -49,13 +52,13 @@
 
 {% if not realms and not realm %}
 
-<footer class="bg-light footer mt-auto py-3 text-center">
-  <div class="container">
+    <footer class="bg-light footer mt-auto py-3 text-center">
+        <div class="container">
     <span class="text-muted">
         <a href="{{ url('about') }}">Über</a>
     </span>
-  </div>
-</footer>
+        </div>
+    </footer>
 
 {% endif %}
 

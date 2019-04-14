@@ -19,4 +19,8 @@ $(document).ready(function () {
             $('.multiple-select-checkbox').prop("checked", false);
         }
     });
+
+    $(".menu-toggle").click(function () {
+        $(".wrapper").toggleClass("toggled");
+    })
 });
