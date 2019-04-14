@@ -1,0 +1,22 @@
+FROM alpine:3.7
+
+WORKDIR /
+
+ENV dc=stuve
+ENV dcr=test
+COPY entrypoint.sh /
+
+RUN apk add --update --no-cache openldap openldap-back-mdb openldap-overlay-ppolicy
+RUN sed -i 's!/run/openldap/slapd.pid!/tmp/openladp.pid!' /etc/openldap/slapd.conf
+RUN sed -i 's!/run/openldap/slapd.args!/tmp/openladp.args!' /etc/openldap/slapd.conf
+
+ADD start.ldif /etc/openldap/start.ldif
+RUN sed -i s/dc=$dc/dc=$dcr/g /etc/openldap/start.ldif
+RUN sed -i s/dc:\ $dc/dc:\ $dcr/g /etc/openldap/start.ldif
+ADD slapd.conf /etc/openldap/slapd.conf
+RUN chown ldap:ldap -R /etc/openldap
+RUN chown ldap:ldap -R /var/lib/openldap
+
+EXPOSE 389
+
+CMD ["/entrypoint.sh"]

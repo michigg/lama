@@ -1,0 +1,37 @@
+version: "3"
+
+networks:
+ frontend_net:
+  external: false
+ ldap_net:
+  external: false
+
+services:
+ ldap:
+  image: docker.clkl.de/ldap/ldap:0.1
+  build: 
+   context: .
+   dockerfile: Dockerfile.ldap
+  env_file: ldap.env
+  volumes:
+#   - ./data/etc/:/etc/openldap/
+   - ./data/var/:/var/lib/openldap/
+  ports:
+   - 1389:389
+  networks:
+   - ldap_net
+
+ admin:
+  image: docker.clkl.de/ldap/admin:0.1
+  build: 
+   context: .
+   dockerfile: Dockerfile.admin
+  ports:
+   - 8080:80
+  networks:
+#   - frontend_net
+   - ldap_net
+#  labels:
+#     - "traefik.enable=true"
+#     - "traefik.frontend.rule=Host:ldap.stuve-bamberg.de,ldap.stuve.cafe.wie-ei.de"
+#     - "traefik.docker.network=frontend_net"

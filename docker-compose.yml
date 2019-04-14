@@ -1,0 +1,79 @@
+version: "3"
+
+networks:
+  pg_db:
+    internal: true
+  ldap_net:
+    internal: true
+  frontend_net:
+    external: false
+
+
+services:
+  lama:
+    image: lama:0.1
+    build:
+      context: docker/lama
+      dockerfile: Dockerfile.dev
+    networks:
+      - frontend_net
+      - ldap_net
+      - pg_db
+    env_file:
+      - docker/lama/dev.env
+    volumes:
+      - ./src:/lama
+    labels:
+      - "traefik.port=80"
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:lama.localhost"
+      - "traefik.docker.network=frontend_net"
+
+  dblama:
+    image: postgres:11.2-alpine
+    networks:
+      - pg_db
+    volumes:
+      - ./db/pgdata/:/var/lib/postgresql/data/
+    env_file:
+      - docker/lama/dev.env
+
+  ldap:
+    image: docker.clkl.de/ldap/ladap:0.1
+    build:
+      context: docker/ldap
+      dockerfile: Dockerfile.ldap
+    env_file: docker/ldap/ldap.env
+    volumes:
+      - ./docker/ldap/data/var/:/var/lib/openldap/
+    networks:
+      - ldap_net
+
+  ldap_admin:
+    image: docker.clkl.de/ldap/admin:0.1
+    build:
+      context: docker/ldap
+      dockerfile: Dockerfile.admin
+    networks:
+      - ldap_net
+      - frontend_net
+    labels:
+      - "traefik.port=80"
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:ldap.localhost"
+      - "traefik.docker.network=frontend_net"
+
+  traefik:
+    image: traefik:v1.7.9-alpine
+    command: --api --docker --docker.watch --docker.exposedByDefault=false
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - frontend_net
+    labels:
+      - "traefik.port=8080"
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:traefik.localhost"
+      - "traefik.docker.network=frontend_net"
