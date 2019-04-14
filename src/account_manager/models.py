@@ -15,6 +15,7 @@ from account_manager.utils.mail_utils import realm_send_mail
 from multiprocessing import Process
 from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
 from django.core.exceptions import ObjectDoesNotExist
+import os
 
 
 class LdapUser(Model):
@@ -22,8 +23,8 @@ class LdapUser(Model):
     Class for representing an LDAP user entry.
     """
     # LDAP meta-data
-    ROOT_DN = "dc=stuve,dc=de"
-    base_dn = "dc=stuve,dc=de"
+    ROOT_DN = os.environ.get('LDAP_USER_ENTRY', 'dc=test,dc=de')
+    base_dn = ROOT_DN
     object_classes = ['inetOrgPerson']
     # last_modified = ldap_fields.DateTimeField(db_column='modifyTimestamp', blank=True)
 
@@ -119,8 +120,8 @@ class LdapGroup(Model):
     Class for representing an LDAP group entry.
     """
     # LDAP meta-data
-    ROOT_DN = "dc=stuve,dc=de"
-    base_dn = "dc=stuve,dc=de"
+    ROOT_DN = os.environ.get('LDAP_USER_ENTRY', 'dc=test,dc=de')
+    base_dn = ROOT_DN
     object_classes = ['groupOfNames']
 
     name = ldap_fields.CharField(db_column='cn', max_length=200, primary_key=True)

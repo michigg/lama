@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOMAIN = os.environ['DOMAIN']
 SITE_NAME = os.environ['SITE_NAME']
 SECRET_KEY = os.environ['SECRET_KEY']
-DEBUG = True #bool(os.environ.get('DEBUG', False))
+DEBUG = True  # bool(os.environ.get('DEBUG', False))
 ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS'].split()
 
 # Application definition
@@ -168,20 +168,50 @@ AUTH_PROFILE_MODULE = 'account_manager.UserProfile'
 ########################################################################################################################
 #                                         EMAIL Config                                                                 #
 ########################################################################################################################
-# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-# EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_TIMEOUT = 15
-EMAIL_HOST = os.environ['EMAIL_HOST']
-EMAIL_PORT = os.environ['EMAIL_PORT']
-EMAIL_USE_TLS = bool(os.environ.get('EMAIL_USE_TLS', False))
-EMAIL_USE_SSL = bool(os.environ.get('EMAIL_USE_SSL', False))
+if 'file' in os.environ['EMAIL_BACKEND']:
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_TIMEOUT = 15
+    EMAIL_HOST = os.environ['EMAIL_HOST']
+    EMAIL_PORT = os.environ['EMAIL_PORT']
+    EMAIL_USE_TLS = bool(os.environ.get('EMAIL_USE_TLS', False))
+    EMAIL_USE_SSL = bool(os.environ.get('EMAIL_USE_SSL', False))
+
 DEFAULT_FROM_EMAIL = os.environ['DEFAULT_FROM_EMAIL']
 SERVER_EMAIL = os.environ['SERVER_EMAIL']
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'realm-home'
+PASSWORD_RESET_TIMEOUT_DAYS = 3
 
 ########################################################################################################################
 #                                         Logging Config                                                               #
 ########################################################################################################################
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'realm-home'
-PASSWORD_RESET_TIMEOUT_DAYS = 3
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '%(asctime)s %(module)s [%(levelname)s]: %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        },
+    },
+    'loggers': {
+        'account_manager': {
+            'handlers': ['console', ],
+            'level': 'DEBUG',
+        },
+        'account_helper': {
+            'handlers': ['console', ],
+            'level': 'DEBUG',
+        },
+    },
+}

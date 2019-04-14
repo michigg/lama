@@ -23,6 +23,10 @@ services:
       - docker/lama/dev.env
     volumes:
       - ./src:/lama
+    depends_on:
+      - dblama
+      - ldap
+      - traefik
     labels:
       - "traefik.port=80"
       - "traefik.enable=true"
@@ -57,6 +61,9 @@ services:
     networks:
       - ldap_net
       - frontend_net
+    depends_on:
+      - traefik
+      - ldap
     labels:
       - "traefik.port=80"
       - "traefik.enable=true"
