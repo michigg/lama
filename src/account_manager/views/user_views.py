@@ -113,7 +113,15 @@ def realm_user_delete(request, realm_id, user_dn):
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
     if _is_deleteable_user(realm, ldap_user):
-        user_delete_controller(ldap_user, realm)
+        try:
+            user_delete_controller(ldap_user, realm)
+        except OBJECT_CLASS_VIOLATION as err:
+            deletion_link = {'name': 'realm-user-delete', 'args': [realm.id, ldap_user.dn]}
+            cancel_link = {'name': 'realm-user-detail', 'args': [realm.id, ldap_user.dn]}
+            return render(request, 'user/user_confirm_delete.jinja2',
+                          {'realm': realm, 'user': ldap_user, 'deletion_link': deletion_link,
+                           'cancel_link': cancel_link,
+                           'extra_errors': f'Der Nutzer {ldap_user.username} konnte nicht gelöscht werden, da er der letzte Nutzer einer Gruppe ist. Bitte lösche die Gruppe zuerst oder trage einen anderen Nutzer in die Gruppe ein.'})
         return redirect('realm-user-list', realm_id)
     else:
         return redirect('permission-denied')
@@ -141,7 +149,15 @@ def realm_multiple_user_delete(request, realm_id):
             ldap_users = form.cleaned_data['ldap_users']
             for ldap_user in ldap_users:
                 if _is_deleteable_user(realm, ldap_user):
-                    user_delete_controller(ldap_user, realm)
+                    try:
+                        user_delete_controller(ldap_user, realm)
+                    except OBJECT_CLASS_VIOLATION as err:
+                        blocked_users, deletable_users = get_deletable_blocked_users(ldap_users, realm)
+                        return render(request, 'realm/realm_user_multiple_delete.jinja2',
+                                      {'form': form, 'realm': realm, 'deletable_users': deletable_users,
+                                       'blocked_users': blocked_users,
+                                       'confirm': True,
+                                       'extra_errors': f'Nutzer {ldap_user} konnte nicht gelöscht werden, da er der letzte Nutzer einer Gruppe ist. Bitte tragen Sie vorher den Nutzer aus der Gruppe aus. Das löschen der restlichen Nutzer wurde unterbrochen.'})
             return redirect('realm-user-list', realm_id)
     return redirect('realm-user-list', realm.id)
 
@@ -154,13 +170,7 @@ def realm_multiple_user_delete_confirm(request, realm_id):
         form = UserDeleteListForm(request.POST)
         if form.is_valid():
             ldap_users = form.cleaned_data['ldap_users']
-            deletable_users = []
-            blocked_users = []
-            for ldap_user in ldap_users:
-                if _is_deleteable_user(realm, ldap_user):
-                    deletable_users.append(ldap_user)
-                else:
-                    blocked_users.append(ldap_user)
+            blocked_users, deletable_users = get_deletable_blocked_users(ldap_users, realm)
             return render(request, 'realm/realm_user_multiple_delete.jinja2',
                           {'form': form, 'realm': realm, 'deletable_users': deletable_users,
                            'blocked_users': blocked_users,
@@ -171,6 +181,17 @@ def realm_multiple_user_delete_confirm(request, realm_id):
     users = LdapUser.objects.all()
     return render(request, 'realm/realm_user_multiple_delete_confirm.jinja2',
                   {'form': form, 'realm': realm, 'users': users})
+
+
+def get_deletable_blocked_users(ldap_users, realm):
+    deletable_users = []
+    blocked_users = []
+    for ldap_user in ldap_users:
+        if _is_deleteable_user(realm, ldap_user):
+            deletable_users.append(ldap_user)
+        else:
+            blocked_users.append(ldap_user)
+    return blocked_users, deletable_users
 
 
 def _is_deleteable_user(realm, user):

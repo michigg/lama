@@ -1,8 +1,10 @@
 {% extends 'realm/realm_detailed.jinja2' %}
 {% import 'macros/form_macros.jinja2' as mform %}
+{% import 'macros/utils_macros.jinja2' as mutils %}
 
 {% block detail_content %}
     <h2>Nutzer löschen</h2>
+    {{ mutils.get_warning_box(extra_errors) }}
     {% if blocked_users %}
         <div class="alert alert-warning">
             <h3>Admin User festgestellt</h3>

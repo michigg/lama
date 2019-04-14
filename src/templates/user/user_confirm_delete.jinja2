@@ -1,6 +1,9 @@
 {% extends 'base.jinja2' %}
+{% import 'macros/utils_macros.jinja2' as mutils %}
+
 {% block content %}
     <div class="col-12 ">
+        {{ mutils.get_warning_box(extra_errors) }}
         <div class="row justify-content-center justify-content-sm-center">
             <div class="col-12 col-sm-8 col-md-7 col-lg-5 col-xl-4 bg-white text-dark p-3 mt-5">
                 <div class="alert alert-warning" role="alert">
