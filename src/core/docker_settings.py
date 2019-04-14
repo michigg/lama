@@ -144,6 +144,9 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AUTH_LDAP_SERVER_URI = os.environ['LDAP_SERVER_URI']
+AUTH_LDAP_BIND_DN = os.environ.get('LDAP_ADMIN_USER_NAME', '')
+AUTH_LDAP_BIND_PASSWORD = os.environ.get('LDAP_ADMIN_USER_PASSWORD', '')
+
 # AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,ou=fs_wiai,ou=fachschaften,dc=stuve,dc=de"
 AUTH_LDAP_USER_SEARCH = LDAPSearch(os.environ['LDAP_USER_ENTRY'], ldap.SCOPE_SUBTREE,
                                    os.environ['LDAP_USER_SELECTOR'])
