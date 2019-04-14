@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOMAIN = os.environ['DOMAIN']
 SITE_NAME = os.environ['SITE_NAME']
 SECRET_KEY = os.environ['SECRET_KEY']
-DEBUG = bool(os.environ.get('DEBUG', False))
+DEBUG = True #bool(os.environ.get('DEBUG', False))
 ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS'].split()
 
 # Application definition
@@ -131,7 +131,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 # STATIC_ROOT = 'static'
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, '../../static/'),
+    os.path.join(BASE_DIR, 'static'),
 )
 
 ########################################################################################################################
