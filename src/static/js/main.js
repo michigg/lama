@@ -14,9 +14,9 @@ $(document).ready(function () {
 
     $("#delete-all-checkbox").change(function () {
         if (document.getElementById('delete-all-checkbox').checked) {
-            $('.delete-checkbox').prop("checked", true);
+            $('.multiple-select-checkbox').prop("checked", true);
         } else {
-            $('.delete-checkbox').prop("checked", false);
+            $('.multiple-select-checkbox').prop("checked", false);
         }
     });
 });

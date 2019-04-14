@@ -156,6 +156,12 @@
     background-color: var(--danger);
 }
 
+.table-checkbox-control-input:checked ~ .table-checkbox-control-label-add::before {
+    color: #fff;
+    border-color: var(--primary);
+    background-color: var(--primary);
+}
+
 .table-checkbox-control-label::after {
     position: absolute;
     top: 0.25rem;

@@ -22,7 +22,7 @@
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             {{ mform.text_input(form.name) }}
             {{ form.members.label }}
-            {{ mform.checkbox_input_for_choice_fields(form.members) }}
+            {{ mform.user_select_table_input(form.members,users) }}
             <div class="d-flex mt-4">
                 <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
                 <a href="{{ url('realm-group-detail', args = [realm.id, group.dn]) }}"

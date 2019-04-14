@@ -65,8 +65,9 @@ def group_add(request, realm_id):
                                                               'extra_error': 'Bitte wähle mindestens ein Mitglied aus. Falls kein Mitglied angezeigt wird, erstelle zuerst einen Nutzer'})
     # if a GET (or any other method) we'll create a blank form
     else:
+        users = LdapUser.objects.all()
         form = AddLDAPGroupForm()
-    return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm})
+    return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm, 'users': users})
 
 
 @login_required
@@ -78,7 +79,7 @@ def group_update(request, realm_id, group_dn):
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
 
     group = LdapGroup.objects.get(dn=group_dn)
-
+    users = LdapUser.objects.all()
     if request.method == 'POST':
         form = AddLDAPGroupForm(request.POST)
         if form.is_valid():
@@ -105,7 +106,7 @@ def group_update(request, realm_id, group_dn):
         form = AddLDAPGroupForm(initial=data)
 
     return render(request, 'group/group_detail.jinja2',
-                  {'form': form, 'realm': realm, 'group': group})
+                  {'form': form, 'realm': realm, 'group': group, 'users': users})
 
 
 @login_required

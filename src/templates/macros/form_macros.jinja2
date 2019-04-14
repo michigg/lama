@@ -287,3 +287,45 @@
         </small>
     </div>
 {% endmacro %}
+
+{% macro user_select_table_input(field, users, css_classes='') -%}
+    <table class="table table-hover table-striped table-inverse table-bordered data-table">
+        <thead>
+        <tr>
+            <th scope="col" class="text-center">
+                <input type="checkbox"
+                       class="table-checkbox-control-input"
+                       id="delete-all-checkbox"
+                ><label class="table-checkbox-control-label table-checkbox-control-label-add" for="delete-all-checkbox"></label>
+            </th>
+            <th scope="col">Nutzername</th>
+            <th scope="col">E-Mail</th>
+            <th scope="col">Vorname</th>
+            <th scope="col">Nachname</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td class="text-center">
+                    <input type="checkbox"
+                           class="table-checkbox-control-input multiple-select-checkbox"
+                           aria-describedby="{{ choice_label }}_help"
+                           name="{{ field.html_name }}"
+                           id="{{ user.username }}_{{ loop.index }}"
+                           value="{{ user.username }}"
+                           {% if field.value() and user.username in field.value() %}checked{% endif %}
+                    >
+                    <label class="table-checkbox-control-label table-checkbox-control-label-add" for="{{ user.username }}_{{ loop.index }}">
+
+                    </label>
+                </td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
