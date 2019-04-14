@@ -5,7 +5,11 @@ $(document).ready(function () {
     // if ($(TABLE_CLASS)) {
     const data_table = $(TABLE_CLASS).DataTable({
         "lengthMenu": [[-1], ["All"]],
-        "dom": 'it'
+        "dom": 'it',
+        rowReorder: {
+            selector: 'td:nth-child(2)'
+        },
+        responsive: true,
     });
     // }
     $('#data-table-search-input').keyup(function () {
