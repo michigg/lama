@@ -1,0 +1,13 @@
+debug = false
+logLevel = "WARN"
+defaultEntryPoints = ["https", "http"]
+
+[api]
+
+[docker]
+ swarmMode = false
+ exposedByDefault = false
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+
