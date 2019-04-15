@@ -35,9 +35,10 @@ def is_realm_admin(view_func):
 def realm_list(request):
     user = request.user
     if user.is_superuser:
-        realms = Realm.objects.all()
+        realms = Realm.objects.order_by('name').all()
     else:
-        realms = Realm.objects.filter(admin_group__user__username__contains=user.username).order_by('name')
+        realms = Realm.objects.filter(admin_group__user__username__contains=user.username).order_by('name').order_by(
+            'name')
 
     if len(realms) == 0 and not user.is_superuser:
         try:
