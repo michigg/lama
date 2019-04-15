@@ -4,12 +4,25 @@ from django.contrib.auth.views import PasswordResetConfirmView, PasswordChangeVi
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
 from account_helper.models import Realm
 from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
     UserGroupListForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
+
+
+def protect_cross_realm_user_access(view_func):
+    def decorator(request, *args, **kwargs):
+        realm_id = kwargs.get('realm_id', None)
+        user_dn = kwargs.get('user_dn', None)
+
+        if realm_id and user_dn and Realm.objects.get(id=realm_id).ldap_base_dn not in user_dn:
+            return HttpResponse("Ressource konnte nicht gefunden werden.", status=404)
+        return view_func(request, *args, **kwargs)
+
+    return decorator
 
 
 @login_required
@@ -32,18 +45,27 @@ def realm_user(request, realm_id):
 
 
 @login_required
+@is_realm_admin
+@protect_cross_realm_user_access
 def realm_user_detail(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm.ldap_base_dn
-    user = LdapUser.objects.get(dn=user_dn)
     LdapGroup.base_dn = LdapGroup.ROOT_DN
+
+    user = LdapUser.objects.get(dn=user_dn)
     groups = LdapGroup.objects.filter(members=user.dn)
-    if realm_id and (request.user.is_superuser or len(
-            Realm.objects.filter(id=realm_id).filter(
-                admin_group__user__username__contains=request.user.username)) > 0):
-        return render(request, 'user/realm_user_detail.jinja2', {'user': user, 'groups': groups, 'realm': realm})
-    else:
-        return render(request, 'user/user_detail.jinja2', {'user': user, 'groups': groups, 'realm': realm})
+    return render(request, 'user/realm_user_detail.jinja2', {'user': user, 'groups': groups, 'realm': realm})
+
+
+@login_required
+def user_detail(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = realm.ldap_base_dn
+    LdapGroup.base_dn = LdapGroup.ROOT_DN
+
+    user = LdapUser.objects.get(dn=user_dn)
+    groups = LdapGroup.objects.filter(members=user.dn)
+    return render(request, 'user/user_detail.jinja2', {'user': user, 'groups': groups, 'realm': realm})
 
 
 @login_required
@@ -87,6 +109,7 @@ def user_add(request, realm_id):
 
 @login_required
 @is_realm_admin
+@protect_cross_realm_user_access
 def realm_user_update(request, realm_id, user_dn):
     realm_obj = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
@@ -107,6 +130,7 @@ def realm_user_update(request, realm_id, user_dn):
 
 @login_required
 @is_realm_admin
+@protect_cross_realm_user_access
 def realm_user_delete(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
@@ -129,6 +153,7 @@ def realm_user_delete(request, realm_id, user_dn):
 
 @login_required
 @is_realm_admin
+@protect_cross_realm_user_access
 def realm_user_delete_confirm(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
