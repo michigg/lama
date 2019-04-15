@@ -38,7 +38,7 @@
 
     {% if request.user.is_authenticated %}
         <span class="navbar-text">
-        Hi {{ request.user.username }}!
+        Hi <a href="{{ url('realm-home') }}?show_user=True">{{ request.user.username }}</a>!
         <a href="{{ url('logout') }}?next=/">Logout <i class="fas fa-sign-out-alt"></i></a>
     {% else %}
         <a href="{{ url('login') }}"><i class="fas fa-sign-in-alt"></i> Login</a>

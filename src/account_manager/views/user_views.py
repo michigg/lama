@@ -276,6 +276,7 @@ def user_delete(request, realm_id, user_dn):
 
 @login_required
 @is_realm_admin
+@protect_cross_realm_user_access
 def realm_user_group_update(request, realm_id, user_dn, error=None):
     realm = Realm.objects.get(id=realm_id)
     ldap_user, realm_groups_available, user_groups = get_available_given_groups(realm, user_dn)
@@ -300,6 +301,7 @@ def get_available_given_groups(realm, user_dn):
 
 @login_required
 @is_realm_admin
+@protect_cross_realm_user_access
 def realm_user_group_update_add(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
@@ -318,6 +320,7 @@ def realm_user_group_update_add(request, realm_id, user_dn):
 
 @login_required
 @is_realm_admin
+@protect_cross_realm_user_access
 def realm_user_group_update_delete(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'

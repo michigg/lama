@@ -39,15 +39,15 @@ def realm_list(request):
     else:
         realms = Realm.objects.filter(admin_group__user__username__contains=user.username).order_by('name').order_by(
             'name')
-
-    if len(realms) == 0 and not user.is_superuser:
+    show_user = request.GET.get('show_user', False)
+    if show_user or (len(realms) == 0 and not user.is_superuser):
         try:
             LdapUser.base_dn = LdapUser.ROOT_DN
             user = LdapUser.objects.get(username=user.username)
             realm_base_dn = re.compile('(uid=[a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user.dn).group(3)
             realm = Realm.objects.get(ldap_base_dn=realm_base_dn)
 
-            return redirect('user-detail', user.dn, realm.id )
+            return redirect('user-detail', user.dn, realm.id)
         except ObjectDoesNotExist as err:
             logger.info('Anmeldung fehlgeschlagen', err)
             return HttpResponse("Invalid login. Please try again.")
