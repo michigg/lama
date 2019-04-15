@@ -6,9 +6,9 @@ LAMa wurde für die Studierendenvertretung der Universität Bamberg entwickelt, 
 2. `docker-compose build`
 3. `docker-compose up -d`
 4. `docker-compose exec lama sh`
-    1. `python manage.py makemigrations account_helper`
-    2. `python manage.py migrate`
-    3. `python manage.py createsuperuser`
+    1. `python3 manage.py makemigrations account_helper`
+    2. `python3 manage.py migrate`
+    3. `python3 manage.py createsuperuser`
 5. `docker-compose logs -f lama` (Anzeige der server logs)  
 
 Für die Verwaltung von LDAP wurde ein phpldapadmin gestartet. Dieses ist unter `ldap.localhost` erreichbar. Das voreingestellte Passwort lautet `secret`.
