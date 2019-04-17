@@ -6,7 +6,7 @@ networks:
   ldap_net:
     internal: true
   frontend_net:
-    external: false
+    external: true
 
 
 services:
@@ -43,7 +43,7 @@ services:
       - docker/lama/dev.env
 
   ldap:
-    image: docker.clkl.de/ldap/ladap:0.1
+    image: docker.clkl.de/ldap/ldap:0.1-lama
     build:
       context: docker/ldap
       dockerfile: Dockerfile.ldap
@@ -54,7 +54,7 @@ services:
       - ldap_net
 
   ldap_admin:
-    image: docker.clkl.de/ldap/admin:0.1
+    image: docker.clkl.de/ldap/admin:0.1-lama
     build:
       context: docker/ldap
       dockerfile: Dockerfile.admin

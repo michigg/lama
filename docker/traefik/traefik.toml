@@ -1,6 +1,6 @@
 debug = false
 logLevel = "WARN"
-defaultEntryPoints = ["https", "http"]
+defaultEntryPoints = ["http"]
 
 [api]
 
