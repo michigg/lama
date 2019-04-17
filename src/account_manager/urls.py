@@ -55,14 +55,14 @@ urlpatterns = [
          name='realm-group-delete'),
 
     # User
-    path('user/<str:user_dn>/update/realm/<int:realm_id>/', user_views.user_detail,
+    path('user/<int:realm_id>/<str:user_dn>/detail/', user_views.user_detail,
          name='user-detail'),
-    path('user/<str:user_dn>/update/realm/<int:realm_id>/', user_views.user_update,
+    path('user/<int:realm_id>/<str:user_dn>/update/', user_views.user_update,
          name='user-update'),
-    path('user/<str:user_dn>/delete/realm/<int:realm_id>/confirm/',
+    path('user/<int:realm_id>/<str:user_dn>/delete/confirm/',
          user_views.user_delete_confirm,
          name='user-delete-confirm'),
-    path('user/<str:user_dn>/delete/realm/<int:realm_id>/', user_views.user_delete,
+    path('user/<int:realm_id>/<str:user_dn>/delete/', user_views.user_delete,
          name='user-delete'),
     path('accounts/reset/<uidb64>/<token>/', user_views.LdapPasswordResetConfirmView.as_view(),
          name='ldap_password_reset_confirm'),

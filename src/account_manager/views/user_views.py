@@ -12,6 +12,10 @@ from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDA
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def protect_cross_realm_user_access(view_func):
     def decorator(request, *args, **kwargs):
@@ -235,7 +239,7 @@ def user_update(request, realm_id, user_dn):
         return user_update_controller(request=request,
                                       realm=realm_obj,
                                       ldap_user=ldap_user,
-                                      redirect_name='realm-user-detail',
+                                      redirect_name='user-detail',
                                       update_view='user/user_detail.jinja2',
                                       form_class=UpdateLDAPUserForm,
                                       form_attrs=[
@@ -253,8 +257,8 @@ def user_delete_confirm(request, realm_id, user_dn):
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
     if request.user.username == ldap_user.username:
-        deletion_link = {'name': 'user-delete', 'args': [ldap_user.dn, realm.id]}
-        cancel_link = {'name': 'realm-user-detail', 'args': [realm.id, ldap_user.dn]}
+        deletion_link = {'name': 'user-delete', 'args': [realm.id, ldap_user.dn]}
+        cancel_link = {'name': 'user-detail', 'args': [realm.id, ldap_user.dn]}
         return render(request, 'user/user_confirm_delete.jinja2',
                       {'realm': realm, 'user': ldap_user, 'deletion_link': deletion_link, 'cancel_link': cancel_link})
     else:
@@ -348,7 +352,8 @@ def user_deleted(request, realm_id):
     return render(request, 'user/account_deleted.jinja2', {'realm': Realm.objects.get(id=realm_id)})
 
 
-def user_update_controller(request, realm, ldap_user, redirect_name, update_view, form_class, form_attrs):
+def user_update_controller(request, realm, ldap_user, redirect_name, update_view, form_class,
+                           form_attrs):
     if request.method == 'POST':
         form = form_class(request.POST)
         if form.is_valid():

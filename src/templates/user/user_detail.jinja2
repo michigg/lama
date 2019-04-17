@@ -31,10 +31,10 @@
                                         class="font-weight-bold">Mobiltelefon:</span> {{ user.mobile_phone }}</li>
                             </ul>
                             <div class="card-footer d-flex bg-white">
-                                <a href="{{ url('user-update', args = [user.dn, realm.id]) }}"
+                                <a href="{{ url('user-update', args = [realm.id, user.dn]) }}"
                                    class="btn btn-primary mr-auto p-2"><i class="fas fa-user-edit"></i> Profil
                                     bearbeiten</a>
-                                <a href="{{ url('user-delete-confirm', args = [user.dn, realm.id]) }}"
+                                <a href="{{ url('user-delete-confirm', args = [realm.id, user.dn]) }}"
                                    class="btn btn-danger p-2"><i class="fas fa-trash"></i> Profil löschen</a>
                             </div>
                         </div>
@@ -50,7 +50,7 @@
                         {{ mform.text_input(form.last_name) }}
                         <div class="d-flex mt-4">
                             <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
-                            <a href="{{ url('realm-user-detail', args = [realm.id, user.dn]) }}"
+                            <a href="{{ url('user-detail', args = [realm.id, user.dn]) }}"
                                class="btn btn-secondary p-2">Abbrechen</a>
                         </div>
                     </form>
