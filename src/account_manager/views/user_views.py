@@ -152,7 +152,8 @@ def realm_user_delete(request, realm_id, user_dn):
                            'extra_errors': f'Der Nutzer {ldap_user.username} konnte nicht gelöscht werden, da er der letzte Nutzer einer Gruppe ist. Bitte lösche die Gruppe zuerst oder trage einen anderen Nutzer in die Gruppe ein.'})
         return redirect('realm-user-list', realm_id)
     else:
-        return redirect('permission-denied')
+        return render(request, 'permission_denied.jinja2', {
+            'extra_errors': f'Der Nutzer, {ldap_user.username}, gehört anscheinend zu den Admins. Solange der Nutzer dieser Gruppe angehört kann dieser nicht gelöscht werden. Bitte trage vorher den Nutzer aus der Admin Gruppe aus.'})
 
 
 @login_required
