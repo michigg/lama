@@ -411,3 +411,5 @@ class LdapPasswordChangeView(PasswordChangeView):
         LdapUser.base_dn = LdapUser.ROOT_DN
         LdapUser.password_reset(user, password)
         return super().form_valid(form)
+
+

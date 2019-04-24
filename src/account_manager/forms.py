@@ -1,7 +1,12 @@
 from django import forms
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import PasswordResetForm
 
 from .models import LdapUser, LdapGroup
 from django.forms import modelformset_factory
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AddLDAPUserForm(forms.Form):
@@ -67,3 +72,21 @@ UserFormset = modelformset_factory(
     fields=('dn',),
     extra=1
 )
+
+UserModel = get_user_model()
+
+
+class LdapPasswordResetForm(PasswordResetForm):
+    def get_users(self, email):
+        """Given an email, return matching user(s) who should receive a reset.
+             This allows subclasses to more easily customize the default policies
+             that prevent inactive users and users with unusable passwords from
+             resetting their password.
+             """
+        logger.debug('Pasword reset get users')
+        active_users = UserModel._default_manager.filter(**{
+            '%s__iexact' % UserModel.get_email_field_name(): email,
+            'is_active': True,
+        })
+        logger.debug((u for u in active_users))
+        return (u for u in active_users)

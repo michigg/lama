@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOMAIN = os.environ['DOMAIN']
 SITE_NAME = os.environ['SITE_NAME']
 SECRET_KEY = os.environ['SECRET_KEY']
-DEBUG = os.environ.get('DEBUG', 'False') =='TRUE' 
+DEBUG = os.environ.get('DEBUG', 'False') =='True'
 ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS'].split()
 
 # Application definition
@@ -176,8 +176,8 @@ else:
     EMAIL_TIMEOUT = 15
     EMAIL_HOST = os.environ['EMAIL_HOST']
     EMAIL_PORT = int(os.environ['EMAIL_PORT'])
-    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'False') == 'TRUE'
-#    EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'TRUE'
+    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'False') == 'True'
+    EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
 
 DEFAULT_FROM_EMAIL = os.environ['DEFAULT_FROM_EMAIL']
 SERVER_EMAIL = os.environ['SERVER_EMAIL']
