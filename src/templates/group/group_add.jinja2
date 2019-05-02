@@ -10,6 +10,12 @@
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         {{ mform.text_input(form.name) }}
         {{ form.members.label }}
+        <div class="form-group w-25 float-right">
+            <input type="text"
+                   class="form-control"
+                   id="data-table-search-input">
+            <label for="data-table-search-input">Suche</label>
+        </div>
         {{ mform.user_select_table_input(form.members, users) }}
         <div class="d-flex mt-4">
             <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
