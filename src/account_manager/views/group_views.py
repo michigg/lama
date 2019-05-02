@@ -8,6 +8,7 @@ from account_helper.models import Realm
 from account_manager.forms import AddLDAPGroupForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapGroup, LdapUser
+from ldap import ALREADY_EXISTS
 
 
 def protect_cross_realm_group_access(view_func):
@@ -52,6 +53,7 @@ def group_detail(request, realm_id, group_dn):
 def group_add(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = LdapUser.ROOT_DN
+    users = LdapUser.objects.all()
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -62,14 +64,17 @@ def group_add(request, realm_id):
             members = form.cleaned_data['members']
             members = [member.dn for member in members]
             LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-            LdapGroup.objects.create(name=name, members=members)
+            try:
+                LdapGroup.objects.create(name=name, members=members)
+            except ALREADY_EXISTS:
+                return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm, 'users': users,
+                                                                  'extra_error': 'Der Gruppenname ist leider schon belegt. Bitte wähle einen anderen.'})
             return redirect('realm-group-list', realm_id)
         elif 'members' not in form.cleaned_data:
-            return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm,
+            return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm, 'users': users,
                                                               'extra_error': 'Bitte wähle mindestens ein Mitglied aus. Falls kein Mitglied angezeigt wird, erstelle zuerst einen Nutzer'})
     # if a GET (or any other method) we'll create a blank form
     else:
-        users = LdapUser.objects.all()
         form = AddLDAPGroupForm()
     return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm, 'users': users})
 
