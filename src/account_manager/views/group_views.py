@@ -16,7 +16,11 @@ def protect_cross_realm_group_access(view_func):
         group_dn = kwargs.get('group_dn', None)
 
         if realm_id and group_dn and Realm.objects.get(id=realm_id).ldap_base_dn not in group_dn:
-            return HttpResponse("Ressource konnte nicht gefunden werden.", status=404)
+            return render(request, 'permission_denied.jinja2',
+                          {
+                              'extra_errors':
+                                  'Die angefragte Gruppe gehört einem anderen Bereich an. Gruppen können nur von dem Bereich bearbeitet werden, in dem sie erstellt wurden.'},
+                          status=404)
         return view_func(request, *args, **kwargs)
 
     return decorator
