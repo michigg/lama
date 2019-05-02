@@ -30,6 +30,7 @@ class LdapUser(Model):
 
     # inetOrgPerson
     username = ldap_fields.CharField(db_column='uid', primary_key=True)
+    display_name = ldap_fields.CharField(db_column='displayName', blank=True)
     password = ldap_fields.CharField(db_column='userPassword')
     first_name = ldap_fields.CharField(db_column='cn', blank=True)
     last_name = ldap_fields.CharField(db_column='sn', blank=True)

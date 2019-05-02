@@ -26,7 +26,8 @@ def protect_cross_realm_user_access(view_func):
         if realm_id and user_dn and Realm.objects.get(id=realm_id).ldap_base_dn not in user_dn:
             return render(request, 'permission_denied.jinja2',
                           {
-                              'extra_errors': _('Der angefragte Nutzer gehört einem anderen Bereich an. Nutzer können nur von dem Bereich bearbeitet werden, in dem sie erstellt wurden.')},
+                              'extra_errors': _(
+                                  'Der angefragte Nutzer gehört einem anderen Bereich an. Nutzer können nur von dem Bereich bearbeitet werden, in dem sie erstellt wurden.')},
                           status=404)
         return view_func(request, *args, **kwargs)
 
@@ -365,7 +366,9 @@ def user_update_controller(request, realm, ldap_user, redirect_name, update_view
             for form_attr in form_attrs:
                 if form.cleaned_data[form_attr['form_field']]:
                     ldap_user.__setattr__(form_attr['model_field'], form.cleaned_data[form_attr['form_field']])
-                ldap_user.save()
+            ldap_user.display_name = f'{form.cleaned_data["first_name"]} {form.cleaned_data["last_name"]}'
+            logger.debug(ldap_user.display_name)
+            ldap_user.save()
             return redirect(redirect_name, realm.id, ldap_user.dn)
     else:
         form_data = {'username': ldap_user.username, 'first_name': ldap_user.first_name,
