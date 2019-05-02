@@ -5,6 +5,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.utils.translation import gettext as _
 from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
 from account_helper.models import Realm
 from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
@@ -23,7 +24,10 @@ def protect_cross_realm_user_access(view_func):
         user_dn = kwargs.get('user_dn', None)
 
         if realm_id and user_dn and Realm.objects.get(id=realm_id).ldap_base_dn not in user_dn:
-            return HttpResponse("Ressource konnte nicht gefunden werden.", status=404)
+            return render(request, 'permission_denied.jinja2',
+                          {
+                              'extra_errors': _('Der angefragte Nutzer gehört einem anderen Bereich an. Nutzer können nur von dem Bereich bearbeitet werden, in dem sie erstellt wurden.')},
+                          status=404)
         return view_func(request, *args, **kwargs)
 
     return decorator
@@ -411,5 +415,3 @@ class LdapPasswordChangeView(PasswordChangeView):
         LdapUser.base_dn = LdapUser.ROOT_DN
         LdapUser.password_reset(user, password)
         return super().form_valid(form)
-
-
