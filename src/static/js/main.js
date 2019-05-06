@@ -7,7 +7,7 @@ $(document).ready(function () {
         "lengthMenu": [[-1], ["All"]],
         "dom": 'it',
         rowReorder: {
-            selector: 'td:nth-child(2)'
+            selector: ':last-child'
         },
         responsive: true,
     });
