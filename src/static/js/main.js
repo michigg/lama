@@ -5,9 +5,16 @@ $(document).ready(function () {
     // if ($(TABLE_CLASS)) {
     const data_table = $(TABLE_CLASS).DataTable({
         "lengthMenu": [[-1], ["All"]],
-        "dom": 'it',
+        "bPaginate": true,
+        "pageLength": 10,
+        // "sPaginationType": "custom",
+        "dom": 'itlp',
+        // "paginate": {
+        //     next: '<i class="fas fa-arrow-alt-circle-right"></i>',
+        //     previous: '<i class="fas fa-arrow-alt-circle-left"></i>'
+        // },
         rowReorder: {
-            selector: 'td:nth-child(2)'
+            selector: true,
         },
         responsive: true,
     });
