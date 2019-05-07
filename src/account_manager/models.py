@@ -2,19 +2,15 @@
 import re
 
 from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
-from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+
 from django.db.models import Q
 from ldapdb.models import fields as ldap_fields
 from ldapdb.models.base import Model
 
-from core.settings import PASSWORD_RESET_TIMEOUT_DAYS
-from account_manager.utils.mail_utils import realm_send_mail
-from multiprocessing import Process
 from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
 from django.core.exceptions import ObjectDoesNotExist
+from account_manager.utils.mail_utils import send_welcome_mail
+
 import os
 
 
@@ -51,19 +47,7 @@ class LdapUser(Model):
             LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}'
             ldap_user = LdapUser.objects.create(username=username, email=email, first_name=" ", last_name=" ")
             user, _ = User.objects.get_or_create(username=username, email=email)
-            mail_subject = 'Aktiviere deinen StuVe Account'
-            message = render_to_string('registration/welcome_email.jinja2', {
-                'user': user,
-                'domain': domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                'token': default_token_generator.make_token(user=user),
-                'protocol': protocol,
-                'email': email,
-                'expiration_days': PASSWORD_RESET_TIMEOUT_DAYS
-            })
-            # TODO failure handling
-            p1 = Process(target=realm_send_mail, args=(realm, user.email, mail_subject, message))
-            p1.start()
+            send_welcome_mail(domain, email, protocol, realm, user)
             return ldap_user
         else:
             raise ALREADY_EXISTS('User already exists')
@@ -78,7 +62,6 @@ class LdapUser(Model):
 
     @staticmethod
     def get_users_by_dn(realm, users):
-        print(users)
         LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
         users = [re.compile('uid=([a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user).group(1) for
                  user in users]

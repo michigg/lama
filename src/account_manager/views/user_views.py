@@ -12,7 +12,7 @@ from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDA
     UserGroupListForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
-
+from account_manager.utils.mail_utils import send_welcome_mail
 import logging
 
 logger = logging.getLogger(__name__)
@@ -135,6 +135,54 @@ def realm_user_update(request, realm_id, user_dn):
                                       {'model_field': 'first_name', 'form_field': 'first_name'},
                                       {'model_field': 'last_name', 'form_field': 'last_name'},
                                       {'model_field': 'email', 'form_field': 'email'}, ])
+
+
+#
+# @login_required
+# @is_realm_admin
+# @protect_cross_realm_user_access
+# def realm_user_password_reset(request, realm_id, user_dn):
+#     realm_obj = Realm.objects.get(id=realm_id)
+#     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
+#     ldap_user = LdapUser.objects.get(dn=user_dn)
+#
+#     password_reset_request = HttpRequest()
+#     password_reset_request.method = 'POST'
+#     password_reset_request.META['HTTP_HOST'] = request.META['HTTP_HOST']
+#     password_reset_request.POST = {'email': ldap_user.email, 'csrfmiddlewaretoken': get_token(HttpRequest())}
+#     PasswordResetView.as_view()(password_reset_request)
+#
+#     realm_obj = Realm.objects.get(id=realm_id)
+#     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
+#     ldap_user = LdapUser.objects.get(dn=user_dn)
+#     return user_update_controller(request=request,
+#                                   realm=realm_obj,
+#                                   ldap_user=ldap_user,
+#                                   redirect_name='realm-user-detail',
+#                                   update_view='user/realm_user_detail.jinja2',
+#                                   form_class=AdminUpdateLDAPUserForm,
+#                                   form_attrs=[
+#                                       {'model_field': 'username', 'form_field': 'username'},
+#                                       {'model_field': 'password', 'form_field': 'password'},
+#                                       {'model_field': 'first_name', 'form_field': 'first_name'},
+#                                       {'model_field': 'last_name', 'form_field': 'last_name'},
+#                                       {'model_field': 'email', 'form_field': 'email'}, ])
+
+
+@login_required
+@is_realm_admin
+@protect_cross_realm_user_access
+def realm_user_resend_welcome_mail(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    current_site = get_current_site(request)
+    protocol = 'http'
+    if request.is_secure():
+        protocol = 'https'
+    send_welcome_mail(domain=current_site.domain, email=ldap_user.email, protocol=protocol, realm=realm,
+                      user=User.objects.get(username=ldap_user.username))
+    return redirect('realm-user-detail', realm_id, user_dn)
 
 
 @login_required

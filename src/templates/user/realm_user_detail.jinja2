@@ -16,7 +16,7 @@
             <li class="list-group-item">Vorname: {{ user.first_name }}</li>
             <li class="list-group-item">Nachname: {{ user.last_name }}</li>
             <li class="list-group-item">Email: {{ user.email }}</li>
-            {#            <li class="list-group-item">Passwort: {{ user.password }}</li>#}
+            <li class="list-group-item">Passwort: <a href="#" class="float-right">Nutzerpasswort zurücksetzen</a></li>
             {#            <li class="list-group-item">Telefon: {{ user.phone }}</li>#}
             {#            <li class="list-group-item">Mobiltelefon: {{ user.mobile_phone }}</li>#}
             <li class="list-group-item">Gruppen:
@@ -36,6 +36,12 @@
             <a href="{{ url('realm-user-update', args = [realm.id, user.dn]) }}" class="btn btn-primary mr-auto p-2">
                 <i class="fas fa-user-cog"></i> Nutzer bearbeiten
             </a>
+            {% if not user.last_login %}
+                <a href="{{ url('realm-user-resend-welcome-mail', args = [realm.id, user.dn]) }}"
+                   class="btn btn-secondary p-2 mr-2">
+                    <i class="fas fa-paper-plane"></i> Wilkommensmail erneut senden
+                </a>
+            {% endif %}
             <a href="{{ url('realm-user-delete-confirm', args = [realm.id, user.dn]) }}" class="btn btn-danger p-2">
                 <i class="fas fa-trash"></i> Nutzer löschen
             </a>
