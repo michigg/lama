@@ -43,7 +43,7 @@
                 <td>
                     <a href="{{ url('realm-user-detail', args=[realm.id, user.user.dn]) }}">{{ user.user.username }}</a>
                 </td>
-                <td>{{ user.user.email }}</td>
+                <td><a href="mailto:{{ user.user.email }}">{{ user.user.email }}</a></td>
                 <td>{{ user.user.first_name }}</td>
                 <td>{{ user.user.last_name }}</td>
                 <td class="text-center">{% if user.active %}
@@ -82,12 +82,12 @@
                 </td>
                 <td>{{ realm_wrapper.realm.ldap_base_dn }}</td>
                 <td>
- 										{% if realm_wrapper.realm.email %}
-                        {{ realm_wrapper.realm.email }}
+                    {% if realm_wrapper.realm.email %}
+                        <a href="mailto:{{ realm_wrapper.realm.email }}">{{ realm_wrapper.realm.email }}</a>
                     {% else %}
                         <span class="text-danger"><i class="fas fa-exclamation-circle"></i></span>
                     {% endif %}
-								</td>
+                </td>
                 <td>
                     {% if realm_wrapper.realm.admin_group %}
                         {{ realm_wrapper.realm.admin_group }}
