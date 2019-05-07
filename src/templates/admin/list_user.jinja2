@@ -5,7 +5,9 @@
 {% block admin_content %}
     <div class="row">
         <div class="col-12">
-            <h2>Django bekannte Nutzer</h2>
+            <h2>Django bekannte Nutzer
+                <small><a href="/admin" class="float-right h5">Django Admin Seiten</a></small>
+            </h2>
             {{ mutils.get_warning_box(extra_errors) }}
             <div class="alert alert-info">Um einen Nutzer zum Superadmin zu ernennen, klicke auf das Superadmin Icon
             </div>
