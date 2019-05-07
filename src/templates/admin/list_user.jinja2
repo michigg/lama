@@ -1,0 +1,51 @@
+{% extends 'base_admin.jinja2' %}
+{% import 'macros/form_macros.jinja2' as mform %}
+{% import 'macros/utils_macros.jinja2' as mutils %}
+
+{% block admin_content %}
+    <div class="row">
+        <div class="col-12">
+            <h2>Django bekannte Nutzer</h2>
+            {{ mutils.get_warning_box(extra_errors) }}
+            <div class="alert alert-info">Um einen Nutzer zum Superadmin zu ernennen, klicke auf das Superadmin Icon
+            </div>
+            <div class="table-search-field form-group w-25 float-right">
+                <input type="text"
+                       class="form-control"
+                       id="data-table-search-input">
+                <label for="data-table-search-input">Suche</label>
+            </div>
+            <table class="table table-hover table-striped table-inverse table-bordered data-table">
+                <thead>
+                <tr>
+                    <th scope="col">Superadmin</th>
+                    <th scope="col">Nutzername</th>
+                    <th scope="col">E-Mail</th>
+                    <th scope="col">Vorname</th>
+                    <th scope="col">Nachname</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td class="text-center">{% if user.is_superuser %}
+                            <a href="{{ url('django-additional-admin-remove', args=[user.id]) }}"><i
+                                    class="fas fa-check-circle text-success"></i></a>{% else %}
+                            <a href="{{ url('django-additional-admin-add', args=[user.id]) }}"><i
+                                    class="far fa-times-circle text-warning"></i></a>{% endif %}
+                        </td>
+                        <td>
+                            {{ user.username }}
+                        </td>
+                        <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+                        <td>{{ user.first_name }}</td>
+                        <td>{{ user.last_name }}</td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+{% endblock %}

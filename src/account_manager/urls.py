@@ -3,8 +3,14 @@ from django.urls import path
 from . import main_views
 from account_manager.views import user_views
 from account_manager.views import group_views
+from account_manager.views import super_admin_views
 
 urlpatterns = [
+    # Superadmin
+    path('lama/admin/list', super_admin_views.user_list, name='django-additional-admin-list'),
+    path('lama/admin/add/<int:user_id>/', super_admin_views.add_superuser, name='django-additional-admin-add'),
+    path('lama/admin/remove/<int:user_id>/', super_admin_views.remove_superuser, name='django-additional-admin-remove'),
+
     # Realm
     path('', main_views.realm_list, name='realm-home'),
     path('realm/add/', main_views.realm_add, name='realm-add'),

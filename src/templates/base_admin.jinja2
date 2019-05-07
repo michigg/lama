@@ -3,6 +3,13 @@
 {% block body %}
     <div class="d-flex wrapper">
         <div class="bg-light border-right sidebar-wrapper">
+            <div class="border-top w-100"></div>
+            {% if request.user.is_superuser %}
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item list-group-item-action bg-light"
+                       href="{{ url('django-additional-admin-list') }}">Django Adminbereich</a>
+                </div>
+            {% endif %}
             {% if realms %}
                 <h2 class="sidebar-heading">Bereiche</h2>
                 <div class="list-group list-group-flush">
@@ -12,7 +19,7 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="list-group-flush border-top">
+                <div class="list-group-flush">
                     <a href="{{ url('realm-home') }}" class="list-group-item list-group-item-action bg-light">
                         <i class="fas fa-list"></i> Bereichsübersicht</a>
                 </div>

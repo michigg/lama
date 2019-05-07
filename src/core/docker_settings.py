@@ -213,13 +213,13 @@ LOGGING = {
             'handlers': ['console', ],
             'level': 'DEBUG',
         },
-        'django_auth_ldap': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-        },
-        'django': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        }
+        # 'django_auth_ldap': {
+        #     'level': 'WARNING',
+        #     'handlers': ['console'],
+        # },
+        # 'django': {
+        #     'handlers': ['console'],
+        #     'level': 'DEBUG',
+        # }
     },
 }

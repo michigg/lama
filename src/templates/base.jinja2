@@ -30,7 +30,6 @@
     {% block extra_nav %}
     {% endblock %}
     <a class="navbar-brand" href="{{ url('realm-home') }}">
-        {#      TODO: Icon#}
         <img src="{{ static('images/lama.svg') }}" width="30" height="30" class="d-inline-block align-top"
              alt="">
         LAMa
@@ -50,7 +49,7 @@
     {% block content %}{% endblock %}
 {% endblock %}
 
-{% if not realms and not realm %}
+{% if not realms and not realm and not request.user.is_superuser%}
 
     <footer class="bg-light footer mt-auto py-3 text-center">
         <div class="container">
