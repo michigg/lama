@@ -127,6 +127,11 @@
 /*.dataTables_length, .dataTables_info, .dataTables_paginate {*/
 /*!*visibility: hidden*!*/
 /*}*/
+
+.paginate_button {
+    padding: 0px 2px
+}
+
 @media (max-width: 480px) {
     .table-search-field {
         width: 100% !important;

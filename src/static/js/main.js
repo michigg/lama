@@ -4,15 +4,27 @@ const TABLE_CLASS = '.data-table';
 $(document).ready(function () {
     // if ($(TABLE_CLASS)) {
     const data_table = $(TABLE_CLASS).DataTable({
-        "lengthMenu": [[-1], ["All"]],
-        "bPaginate": true,
+        "paging": true,
         "pageLength": 10,
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Alle"]],
         // "sPaginationType": "custom",
-        "dom": 'itlp',
-        // "paginate": {
-        //     next: '<i class="fas fa-arrow-alt-circle-right"></i>',
-        //     previous: '<i class="fas fa-arrow-alt-circle-left"></i>'
-        // },
+        "dom": 'lt<"mb-3 float-left" i><"float-right"p><"clearfix">',
+        "oLanguage": {
+            "sEmptyTable": "Keine Daten verfügbar",
+            "sInfo": "_START_ - _END_ von _TOTAL_",
+            "sInfoEmpty": "Keine Eintäge gefunden",
+            "sLengthMenu": "Zeige _MENU_ Einträge",
+            "oPaginate": {
+                "sFirst": "First page",
+                "sLast": "Last page",
+                "sNext": "<i class=\"fas fa-arrow-alt-circle-right\"></i>",
+                "sPrevious": "<i class=\"fas fa-arrow-alt-circle-left\"></i>",
+            },
+            "oAria": {
+                "sSortAscending": " - click/return to sort ascending",
+                "sSortDescending": " - click/return to sort descending",
+            },
+        },
         rowReorder: {
             selector: true,
         },
