@@ -47,8 +47,8 @@
                 <td>{{ user.user.first_name }}</td>
                 <td>{{ user.user.last_name }}</td>
                 <td class="text-center">{% if user.active %}
-                    <i class="fas fa-check-circle text-success"></i>{% else %}
-                    <i class="far fa-times-circle text-warning"></i>{% endif %}</td>
+                    <i class="fas fa-check-circle text-success"></i><span class="d-none">-</span>{% else %}
+                    <i class="far fa-times-circle text-warning"></i><span class="d-none">+</span>{% endif %}</td>
             </tr>
         {% endfor %}
         </tbody>
