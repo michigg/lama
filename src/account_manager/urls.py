@@ -27,7 +27,7 @@ urlpatterns = [
          name='realm-user-detail'),
     path('realm/<int:realm_id>/user/<str:user_dn>/update/', user_views.realm_user_update,
          name='realm-user-update'),
-    path('realm/<int:realm_id>/user/<str:user_dn>/mail/password/', user_views.realm_user_resend_welcome_mail,
+    path('realm/<int:realm_id>/user/<str:user_dn>/mail/password/', user_views.realm_user_resend_password_reset,
          name='realm-user-password-reset'),
     path('realm/<int:realm_id>/user/<str:user_dn>/mail/welcome/', user_views.realm_user_resend_welcome_mail,
          name='realm-user-resend-welcome-mail'),

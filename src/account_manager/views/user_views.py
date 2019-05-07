@@ -1,19 +1,23 @@
+import logging
+import os
+
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetConfirmView, PasswordChangeView
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpRequest
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 from django.utils.translation import gettext as _
 from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
+
 from account_helper.models import Realm
 from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
     UserGroupListForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
 from account_manager.utils.mail_utils import send_welcome_mail
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -137,36 +141,34 @@ def realm_user_update(request, realm_id, user_dn):
                                       {'model_field': 'email', 'form_field': 'email'}, ])
 
 
-#
-# @login_required
-# @is_realm_admin
-# @protect_cross_realm_user_access
-# def realm_user_password_reset(request, realm_id, user_dn):
-#     realm_obj = Realm.objects.get(id=realm_id)
-#     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
-#     ldap_user = LdapUser.objects.get(dn=user_dn)
-#
-#     password_reset_request = HttpRequest()
-#     password_reset_request.method = 'POST'
-#     password_reset_request.META['HTTP_HOST'] = request.META['HTTP_HOST']
-#     password_reset_request.POST = {'email': ldap_user.email, 'csrfmiddlewaretoken': get_token(HttpRequest())}
-#     PasswordResetView.as_view()(password_reset_request)
-#
-#     realm_obj = Realm.objects.get(id=realm_id)
-#     LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
-#     ldap_user = LdapUser.objects.get(dn=user_dn)
-#     return user_update_controller(request=request,
-#                                   realm=realm_obj,
-#                                   ldap_user=ldap_user,
-#                                   redirect_name='realm-user-detail',
-#                                   update_view='user/realm_user_detail.jinja2',
-#                                   form_class=AdminUpdateLDAPUserForm,
-#                                   form_attrs=[
-#                                       {'model_field': 'username', 'form_field': 'username'},
-#                                       {'model_field': 'password', 'form_field': 'password'},
-#                                       {'model_field': 'first_name', 'form_field': 'first_name'},
-#                                       {'model_field': 'last_name', 'form_field': 'last_name'},
-#                                       {'model_field': 'email', 'form_field': 'email'}, ])
+@login_required
+@is_realm_admin
+@protect_cross_realm_user_access
+def realm_user_resend_password_reset(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    try:
+        if ldap_user.email:
+            logger.info("Sending email for to this email:", ldap_user.email)
+            form = PasswordResetForm({'email': ldap_user.email})
+            if form.is_valid():
+                logger.info('CREATE REQUEST')
+                pw_reset_request = HttpRequest()
+                pw_reset_request.META['SERVER_NAME'] = get_current_site(request).domain
+                pw_reset_request.META['SERVER_PORT'] = '80'
+                if request.is_secure():
+                    pw_reset_request.META['SERVER_PORT'] = '443'
+                logger.info('form.save')
+                form.save(
+                    request=pw_reset_request,
+                    use_https=True,
+                    from_email=os.environ.get('DEFAULT_FROM_EMAIL', 'vergesslich@test.de'),
+                    email_template_name='registration/password_reset_email.html')
+
+    except Exception as e:
+        logger.info('Error')
+    return redirect('realm-user-detail', realm_id, user_dn)
 
 
 @login_required
