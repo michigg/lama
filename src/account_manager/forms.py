@@ -26,8 +26,8 @@ class UpdateLDAPUserForm(forms.Form):
     email = forms.EmailField(label='E-Mail')
     first_name = forms.CharField(label='Vorname', required=True)
     last_name = forms.CharField(label='Nachname', required=True)
-    # phone = forms.(db_column='telephoneNumber', blank=True)
-    # mobile_phone = forms.CharField(db_column='mobile', blank=True)
+    phone = forms.CharField(label='Festnetz', required=False)
+    mobile_phone = forms.CharField(label='Mobiltelefon', required=False)
     # photo = forms.ImageField(label='Profilfoto', required=False)
 
 

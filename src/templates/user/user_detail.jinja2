@@ -43,11 +43,13 @@
             {% else %}
                 <div class="col-12 col-sm-8 col-md-7 col-lg-5 col-xl-4 bg-white text-dark p-3 mt-5 border">
                     <h1 class="mb-4">Nutzerdetails anpassen</h1>
-                    <form method="post" class="floating-label-form">
+                    <form method="post" class="floating-label-form" enctype="multipart/form-data">
                         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                         {{ mform.email_input(form.email) }}
                         {{ mform.text_input(form.first_name) }}
                         {{ mform.text_input(form.last_name) }}
+                        {{ mform.text_input(form.phone) }}
+                        {{ mform.text_input(form.mobile_phone) }}
                         <div class="d-flex mt-4">
                             <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
                             <a href="{{ url('user-detail', args = [realm.id, user.dn]) }}"

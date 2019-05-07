@@ -135,7 +135,6 @@ def realm_user_update(request, realm_id, user_dn):
                                   form_class=AdminUpdateLDAPUserForm,
                                   form_attrs=[
                                       {'model_field': 'username', 'form_field': 'username'},
-                                      {'model_field': 'password', 'form_field': 'password'},
                                       {'model_field': 'first_name', 'form_field': 'first_name'},
                                       {'model_field': 'last_name', 'form_field': 'last_name'},
                                       {'model_field': 'email', 'form_field': 'email'}, ])
@@ -301,7 +300,9 @@ def user_update(request, realm_id, user_dn):
                                       form_attrs=[
                                           {'model_field': 'first_name', 'form_field': 'first_name'},
                                           {'model_field': 'last_name', 'form_field': 'last_name'},
-                                          {'model_field': 'email', 'form_field': 'email'}, ])
+                                          {'model_field': 'email', 'form_field': 'email'},
+                                          {'model_field': 'phone', 'form_field': 'phone'},
+                                          {'model_field': 'mobile_phone', 'form_field': 'mobile_phone'}, ])
     else:
         return redirect('permission-denied')
 
@@ -414,15 +415,17 @@ def user_update_controller(request, realm, ldap_user, redirect_name, update_view
         form = form_class(request.POST)
         if form.is_valid():
             for form_attr in form_attrs:
-                if form.cleaned_data[form_attr['form_field']]:
-                    ldap_user.__setattr__(form_attr['model_field'], form.cleaned_data[form_attr['form_field']])
+                # if form.cleaned_data[form_attr['form_field']]:
+                logger.info(form.cleaned_data[form_attr['form_field']])
+                ldap_user.__setattr__(form_attr['model_field'], form.cleaned_data[form_attr['form_field']])
             ldap_user.display_name = f'{form.cleaned_data["first_name"]} {form.cleaned_data["last_name"]}'
-            logger.debug(ldap_user.display_name)
+            logger.debug(form.data)
             ldap_user.save()
             return redirect(redirect_name, realm.id, ldap_user.dn)
     else:
         form_data = {'username': ldap_user.username, 'first_name': ldap_user.first_name,
-                     'last_name': ldap_user.last_name, 'email': ldap_user.email}
+                     'last_name': ldap_user.last_name, 'email': ldap_user.email, 'phone': ldap_user.phone,
+                     'mobile_phone': ldap_user.mobile_phone}
         form = form_class(initial=form_data)
     return render(request, update_view, {'form': form, 'realm': realm, 'user': ldap_user})
 

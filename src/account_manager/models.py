@@ -33,7 +33,8 @@ class LdapUser(Model):
     email = ldap_fields.CharField(db_column='mail')
     phone = ldap_fields.CharField(db_column='telephoneNumber', blank=True)
     mobile_phone = ldap_fields.CharField(db_column='mobile', blank=True)
-    photo = ldap_fields.ImageField(db_column='jpegPhoto')
+    photo = ldap_fields.ImageField(db_column='photo')
+    # photo = ldap_fields.ImageField(db_column='jpegPhoto')
 
     def __str__(self):
         return self.username
