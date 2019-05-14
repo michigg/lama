@@ -43,7 +43,7 @@ services:
       - docker/lama/dev.env
 
   ldap:
-    image: docker.clkl.de/ldap/ldap:0.1-lama
+    image: docker.clkl.de/ldap/ldap:0.3-lama
     build:
       context: docker/ldap
       dockerfile: Dockerfile.ldap
