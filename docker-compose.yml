@@ -2,12 +2,9 @@ version: "3"
 
 networks:
   pg_db:
-    internal: true
+    external: false
   ldap_net:
-    internal: true
-  frontend_net:
-    external: true
-
+    external: false
 
 services:
   lama:
@@ -16,7 +13,6 @@ services:
       context: docker/lama
       dockerfile: Dockerfile.dev
     networks:
-      - frontend_net
       - ldap_net
       - pg_db
     env_file:
@@ -26,13 +22,9 @@ services:
     depends_on:
       - dblama
       - ldap
-      - traefik
-    labels:
-      - "traefik.port=80"
-      - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:lama.localhost"
-      - "traefik.docker.network=frontend_net"
-
+    ports:
+      - 0.0.0.0:8888:80
+  
   dblama:
     image: postgres:11.2-alpine
     networks:
@@ -60,28 +52,7 @@ services:
       dockerfile: Dockerfile.admin
     networks:
       - ldap_net
-      - frontend_net
     depends_on:
-      - traefik
       - ldap
-    labels:
-      - "traefik.port=80"
-      - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:ldap.localhost"
-      - "traefik.docker.network=frontend_net"
-
-  traefik:
-    image: traefik:v1.7.9-alpine
-    command: --api --docker --docker.watch --docker.exposedByDefault=false
     ports:
-      - 80:80
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./docker/traefik/traefik.toml:/etc/traefik/traefik.toml
-    networks:
-      - frontend_net
-    labels:
-      - "traefik.port=8080"
-      - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:traefik.localhost"
-      - "traefik.docker.network=frontend_net"
+      - 0.0.0.0:8080:80
