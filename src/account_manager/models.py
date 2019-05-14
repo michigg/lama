@@ -34,6 +34,8 @@ class LdapUser(Model):
     phone = ldap_fields.CharField(db_column='telephoneNumber', blank=True)
     mobile_phone = ldap_fields.CharField(db_column='mobile', blank=True)
     photo = ldap_fields.ImageField(db_column='photo')
+    last_login = ldap_fields.DateTimeField(db_column='authTimestamp', blank=True)
+
     # photo = ldap_fields.ImageField(db_column='jpegPhoto')
 
     def __str__(self):

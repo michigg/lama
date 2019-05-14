@@ -16,7 +16,9 @@
             <li class="list-group-item">Vorname: {{ user.first_name }}</li>
             <li class="list-group-item">Nachname: {{ user.last_name }}</li>
             <li class="list-group-item">Email: {{ user.email }}</li>
-            <li class="list-group-item">Passwort: <a href="{{ url('realm-user-password-reset', args = [realm.id, user.dn]) }}" class="float-right">Nutzerpasswort zurücksetzen</a></li>
+            <li class="list-group-item">Passwort: <a
+                    href="{{ url('realm-user-password-reset', args = [realm.id, user.dn]) }}" class="float-right">Nutzerpasswort
+                zurücksetzen</a></li>
             {#            <li class="list-group-item">Telefon: {{ user.phone }}</li>#}
             {#            <li class="list-group-item">Mobiltelefon: {{ user.mobile_phone }}</li>#}
             <li class="list-group-item">Gruppen:
@@ -31,6 +33,12 @@
                 <a href="{{ url('realm-user-group-update', args=[realm.id, user.dn]) }}" class="float-right">
                     Gruppen zuweisen</a>
             </li>
+            <li class="list-group-item">Zuletzt eingeloggt:
+                {% if user.last_login %}
+                {{ user.last_login.strftime('%d.%m.%Y') }}
+            {% else %}
+                <i class="far fa-times-circle text-danger"></i><span class="d-none">+</span>
+            {% endif %}</li>
         </ul>
         <div class="d-flex mt-3">
             <a href="{{ url('realm-user-update', args = [realm.id, user.dn]) }}" class="btn btn-primary mr-auto p-2">

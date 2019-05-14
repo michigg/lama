@@ -41,8 +41,8 @@ def protect_cross_realm_user_access(view_func):
 @login_required
 @is_realm_admin
 def realm_user(request, realm_id):
-    realm_obj = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = realm_obj.ldap_base_dn
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = realm.ldap_base_dn
     realm_users = LdapUser.objects.all()
     user_wrappers = []
     for user in realm_users:
@@ -54,7 +54,7 @@ def realm_user(request, realm_id):
                 user_wrappers.append({'user': user, 'active': False})
         except ObjectDoesNotExist:
             user_wrappers.append({'user': user, 'active': False})
-    return render(request, 'realm/realm_user.jinja2', {'realm': realm_obj, 'realm_user': user_wrappers})
+    return render(request, 'realm/realm_user.jinja2', {'realm': realm, 'realm_user': user_wrappers})
 
 
 @login_required
