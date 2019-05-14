@@ -16,9 +16,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{{ static('libs/bootstrap-4.3.1-dist/css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ static('css/floating_labels.css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.14.2/dist/bootstrap-table.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-          integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ static('libs/fontawesome-free-5.8.2-web/css/all.css') }}">
 
 
     {% block css_extra %}{% endblock %}
@@ -63,11 +61,10 @@
 
 
 {% block js_tail %}{% endblock %}
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/rowreorder/1.2.5/js/dataTables.rowReorder.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-
+<script src="{{ static('libs/jquery-3.4.1.js') }}"></script>
+<script src="{{ static('libs/DataTables/DataTables-1.10.18/js/jquery.dataTables.js') }}"></script>
+<script src="{{ static('libs/DataTables/RowReorder-1.2.4/js/dataTables.rowReorder.min.js') }}"></script>
+<script src="{{ static('libs/DataTables/Responsive-2.2.2/js/dataTables.responsive.min.js') }}"></script>
 <script src="{{ static('js/main.js') }}"></script>
 
 </body>
