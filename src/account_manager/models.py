@@ -11,6 +11,7 @@ from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
 from ldapdb.models import fields as ldap_fields
 from ldapdb.models.base import Model
 
+from account_manager.utils.dbldap import get_filterstr
 from account_manager.utils.mail_utils import send_welcome_mail
 
 logger = logging.getLogger(__name__)
@@ -129,6 +130,20 @@ class LdapGroup(Model):
         LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
         LdapGroup.base_dn = group_base_dn
         return LdapGroup.objects.filter(members=user.dn)
+
+    @staticmethod
+    def remove_user_from_groups(ldap_user, user_groups=None):
+        if not user_groups:
+            LdapGroup.base_dn = LdapGroup.ROOT_DN
+            user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
+        for group in user_groups:
+            logger.info(group.members)
+            logger.info(ldap_user)
+            group.members.remove(ldap_user.dn)
+            logger.info(group)
+            # logger.info(get_filterstr(group))
+            # LdapGroup.base_dn = 'cn=uiuiui,ou=groups,ou=wiai,ou=fachschaften,dc=test,dc=de'
+            group.save()
 
     def __str__(self):
         return self.name

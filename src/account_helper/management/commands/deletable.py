@@ -1,4 +1,6 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
+from account_manager.models import LdapGroup, LdapUser
 from account_helper.models import DeletedUser
 from django.utils import timezone
 from django.core import serializers
@@ -32,7 +34,17 @@ class Command(BaseCommand):
 
         if options['delete']:
             for user in deletables:
-                pass
+                # LdapGroup.base_dn = LdapGroup.ROOT_DN
+                # user_groups = LdapGroup.objects.filter(members__contains=user.ldap_dn)
+                LdapUser.base_dn = LdapUser.ROOT_DN
+                ldap_user = LdapUser.objects.get(dn=user.ldap_dn)
+                LdapGroup.remove_user_from_groups(ldap_user)
+                ldap_user.delete()
+                try:
+                    user.user.delete()
+                    user.delete()
+                except ObjectDoesNotExist:
+                    pass
             if not options['json']:
                 output += '\nSuccessfully deleted all listed users'
         self.stdout.write(self.style.SUCCESS(output))

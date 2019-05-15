@@ -418,7 +418,7 @@ def realm_user_group_update_delete(request, realm_id, user_dn):
             for group_name in group_names:
                 groups.append(LdapGroup.objects.get(name=group_name))
             try:
-                ldap_remove_user_from_groups(user_dn, groups)
+                LdapGroup.remove_user_from_groups(user_dn, groups)
             except OBJECT_CLASS_VIOLATION as err:
                 ldap_user, realm_groups_available, user_groups = get_available_given_groups(realm, user_dn)
                 return render(request, 'user/realm_user_update_groups.jinja2',
@@ -470,12 +470,6 @@ def user_delete_controller(ldap_user, realm):
     except ObjectDoesNotExist:
         pass
     return
-
-
-def ldap_remove_user_from_groups(ldap_user, user_groups):
-    for group in user_groups:
-        group.members.remove(ldap_user)
-        group.save()
 
 
 def ldap_add_user_to_groups(ldap_user, user_groups):
