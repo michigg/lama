@@ -27,6 +27,7 @@
             {{ mform.text_input(form.name) }}
             {{ mform.textarea_input(form.description) }}
             {{ form.members.label }}
+            {{ mutils.get_data_table_search_field() }}
             {{ mform.user_select_table_input(users, field=form.members) }}
             <div class="d-flex mt-4">
                 <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>

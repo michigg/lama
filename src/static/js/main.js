@@ -1,8 +1,8 @@
 // make the table a dataTable and show all entries by default
 const TABLE_CLASS = '.data-table';
+const TABLE_CLASS_NO_PAGING = '.data-table-npaging';
 
 $(document).ready(function () {
-    // if ($(TABLE_CLASS)) {
     const data_table = $(TABLE_CLASS).DataTable({
         "paging": true,
         "pageLength": 10,
@@ -30,7 +30,6 @@ $(document).ready(function () {
         },
         responsive: true,
     });
-    // }
     $('#data-table-search-input').keyup(function () {
         data_table.search($(this).val()).draw();
     });
@@ -45,5 +44,13 @@ $(document).ready(function () {
 
     $(".menu-toggle").click(function () {
         $(".wrapper").toggleClass("toggled");
-    })
+    });
+
+
+    $('form').submit(function () {
+        data_table.search('').draw();
+        data_table.rows().nodes().page.len(-1).draw(false);
+        $('#data-table-search-input input').val('');
+        return true; // return false to cancel form action
+    });
 });

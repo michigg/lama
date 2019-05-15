@@ -288,8 +288,8 @@
     </div>
 {% endmacro %}
 
-{% macro user_select_table_input(users, deletable_users=[], blocked_users=[], field=None, name=None, css_classes='',show_lastlogin=False, checkbox_label_classes='') -%}
-    <table class="table table-hover table-striped table-inverse table-bordered data-table">
+{% macro user_select_table_input(users, deletable_users=[], blocked_users=[], field=None, name=None, css_classes='',show_lastlogin=False, checkbox_label_classes='',data_table_class='data-table') -%}
+    <table class="table table-hover table-striped table-inverse table-bordered {{ data_table_class }}">
         <thead>
         <tr>
             <th scope="col" class="text-center">
@@ -297,14 +297,10 @@
                     <input type="checkbox"
                            class="table-checkbox-control-input"
                            id="delete-all-checkbox"
-                    ><label class="
-
-
-
-
-
-                        {% if checkbox_label_classes %}{{ checkbox_label_classes }}{% else %}table-checkbox-control-label table-checkbox-control-label-add{% endif %}"
-                            for="delete-all-checkbox"></label>
+                    >
+                    <label class="
+                            {% if checkbox_label_classes %}{{ checkbox_label_classes }}{% else %}table-checkbox-control-label table-checkbox-control-label-add{% endif %}"
+                           for="delete-all-checkbox"></label>
                 {% endif %}
             </th>
             <th scope="col">Nutzername</th>
@@ -329,6 +325,20 @@
                            {% if field and field.value() and user.username in field.value() %}checked{% endif %}
                     >
                     <label class="
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

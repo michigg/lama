@@ -125,3 +125,12 @@
     {% endif %}
 {% endmacro %}
 
+{% macro get_data_table_search_field(input_id="data-table-search-input") -%}
+    <div class="form-group w-25 float-right">
+        <input type="text"
+               class="form-control"
+               id="{{ input_id }}">
+        <label for="{{ input_id }}">Suche</label>
+    </div>
+{% endmacro %}
+
