@@ -26,9 +26,9 @@ $(document).ready(function () {
             },
         },
         rowReorder: {
-            selector: true,
+            selector: 'td:nth-child(2)'
         },
-        responsive: true,
+        responsive: true
     });
     $('#data-table-search-input').keyup(function () {
         data_table.search($(this).val()).draw();
