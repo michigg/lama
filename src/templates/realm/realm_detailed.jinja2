@@ -55,12 +55,13 @@
                         <a href="{{ url('realm-update', args=[realm.id]) }}" class="btn btn-primary mr-auto p-2"><i
                                 class="fas fa-info-circle"></i> Bereichsinformationen
                             anpassen</a>
-                    {% endif %}
-                    {#                    <a href="{{ url('realm-mail-add-update', args=[realm.id]) }}" class="btn btn-primary p-2">E-Mail#}
-                    {#                        Einstellungen</a>#}
-                    {% if realm.email %}
-                        <a href="{{ url('realm-mail-test', args=[realm.id]) }}" class="btn btn-secondary p-2"><i
-                                class="fas fa-paper-plane"></i> Test Mail</a>
+
+                        {#                    <a href="{{ url('realm-mail-add-update', args=[realm.id]) }}" class="btn btn-primary p-2">E-Mail#}
+                        {#                        Einstellungen</a>#}
+                        {% if realm.email %}
+                            <a href="{{ url('realm-mail-test', args=[realm.id]) }}" class="btn btn-secondary p-2"><i
+                                    class="fas fa-paper-plane"></i> Test Mail</a>
+                        {% endif %}
                     {% endif %}
                 </div>
                 {% block realm_form %}
