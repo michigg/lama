@@ -15,7 +15,10 @@
                                     <li class="list-group-item">
                                         <span class="font-weight-bold">Gruppen:</span>
                                         {% for group in groups %}
-                                            <span class="badge badge-primary p-1">{{ group.name }}</span>
+                                            <span class="badge badge-primary p-1" data-toggle="tooltip"
+                                                  data-placement="right"
+                                                  title="{{ group.description }}"
+                                            >{{ group.name }}</span>
                                         {% endfor %}
                                     </li>
                                 {% endif %}

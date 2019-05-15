@@ -19,12 +19,15 @@
             <li class="list-group-item">Passwort: <a
                     href="{{ url('realm-user-password-reset', args = [realm.id, user.dn]) }}" class="float-right">Nutzerpasswort
                 zurücksetzen</a></li>
-            {#            <li class="list-group-item">Telefon: {{ user.phone }}</li>#}
-            {#            <li class="list-group-item">Mobiltelefon: {{ user.mobile_phone }}</li>#}
+            <li class="list-group-item">Telefon: {{ user.phone }}</li>
+            <li class="list-group-item">Mobiltelefon: {{ user.mobile_phone }}</li>
             <li class="list-group-item">Gruppen:
                 {% if groups %}
                     {% for group in groups %}
                         <a href="{{ url('realm-group-detail', args=[realm.id, group.dn]) }}"
+                           data-toggle="tooltip"
+                           data-placement="right"
+                           title="{{ group.description }}"
                            class="badge badge-secondary p-1">{{ group.name }}</a>
                     {% endfor %}
                 {% else %}
@@ -35,10 +38,10 @@
             </li>
             <li class="list-group-item">Zuletzt eingeloggt:
                 {% if user.last_login %}
-                {{ user.last_login.strftime('%d.%m.%Y') }}
-            {% else %}
-                <i class="far fa-times-circle text-danger"></i><span class="d-none">+</span>
-            {% endif %}</li>
+                    {{ user.last_login.strftime('%d.%m.%Y') }}
+                {% else %}
+                    <i class="far fa-times-circle text-danger"></i><span class="d-none">+</span>
+                {% endif %}</li>
         </ul>
         <div class="d-flex mt-3">
             <a href="{{ url('realm-user-update', args = [realm.id, user.dn]) }}" class="btn btn-primary mr-auto p-2">

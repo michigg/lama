@@ -13,7 +13,12 @@
         <tbody>
         {% for group in realm_groups %}
             <tr>
-                <td><a href="{{ url('realm-group-detail', args=[realm.id, group.dn]) }}">{{ group.name }}</a></td>
+                <td><a href="{{ url('realm-group-detail', args=[realm.id, group.dn]) }}"
+                       data-toggle="tooltip"
+                       data-placement="right"
+                       title="{{ group.description }}"
+                >{{ group.name }}</a>
+                </td>
                 <td>{{ group.dn }}</td>
                 <td>{{ group.members|length }}</td>
             </tr>
