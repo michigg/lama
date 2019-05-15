@@ -14,9 +14,9 @@ class Realm(models.Model):
         return f'{self.name} - {self.ldap_base_dn}'
 
 
-class DeletedUser(models.Model):
-    deletion_date = models.DateField(auto_now=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f'{self.user.username} - {self.deletion_date}'
+# class DeletedUser(models.Model):
+#     deletion_date = models.DateField(auto_now=True)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#
+#     def __str__(self):
+#         return f'{self.user.username} - {self.deletion_date}'
