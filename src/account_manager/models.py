@@ -1,18 +1,19 @@
 # Create your models here.
+import logging
+import os
 import re
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
 from ldapdb.models import fields as ldap_fields
 from ldapdb.models.base import Model
 
-from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
-from django.core.exceptions import ObjectDoesNotExist
 from account_manager.utils.mail_utils import send_welcome_mail
 
-import os
+logger = logging.getLogger(__name__)
 
 
 class LdapUser(Model):
@@ -67,6 +68,7 @@ class LdapUser(Model):
     @staticmethod
     def get_users_by_dn(realm, users):
         LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+        logger.debug(users)
         users = [re.compile('uid=([a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user).group(1) for
                  user in users]
         query = Q(username=users.pop())
