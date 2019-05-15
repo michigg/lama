@@ -13,7 +13,7 @@ from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
 from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
 
-from account_helper.models import Realm, DeletedUser
+from account_helper.models import Realm
 from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
     UserGroupListForm
 from account_manager.main_views import is_realm_admin
