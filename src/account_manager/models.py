@@ -68,8 +68,8 @@ class LdapUser(Model):
     @staticmethod
     def get_users_by_dn(realm, users):
         LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-        logger.debug(users)
-        users = [re.compile('uid=([a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user).group(1) for
+        # logger.debug(users)
+        users = [re.compile('uid=([a-zA-Z0-9_-]*),(ou=[a-zA-Z_]*),(.*)').match(user).group(1) for
                  user in users]
         query = Q(username=users.pop())
         for user in users:
