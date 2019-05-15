@@ -1,10 +1,11 @@
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.management.base import BaseCommand, CommandError
-from account_manager.models import LdapGroup, LdapUser
-from account_helper.models import DeletedUser
-from django.utils import timezone
-from django.core import serializers
 import json
+
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+
+from account_helper.models import DeletedUser
+from account_manager.models import LdapGroup, LdapUser
 
 
 class Command(BaseCommand):
