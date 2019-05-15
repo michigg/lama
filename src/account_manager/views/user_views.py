@@ -47,14 +47,7 @@ def realm_user(request, realm_id):
     realm_users = LdapUser.objects.all()
     user_wrappers = []
     for user in realm_users:
-        try:
-            django_user = User.objects.get(username=user.username)
-            if django_user.last_login:
-                user_wrappers.append({'user': user, 'active': True})
-            else:
-                user_wrappers.append({'user': user, 'active': False})
-        except ObjectDoesNotExist:
-            user_wrappers.append({'user': user, 'active': False})
+        user_wrappers.append(LdapUser.get_extended_user(user))
     return render(request, 'realm/realm_user.jinja2', {'realm': realm, 'realm_user': user_wrappers})
 
 

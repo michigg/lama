@@ -12,6 +12,7 @@ from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
 from ldapdb.models import fields as ldap_fields
 from ldapdb.models.base import Model
 
+from account_helper.models import DeletedUser
 from account_manager.utils.dbldap import get_filterstr
 from account_manager.utils.mail_utils import send_welcome_mail
 
@@ -60,6 +61,23 @@ class LdapUser(Model):
             return ldap_user
         else:
             raise ALREADY_EXISTS('User already exists')
+
+    @staticmethod
+    def get_extended_user(ldap_user):
+        wrapper = {'user': ldap_user}
+        try:
+            wrapper['deleted_user'] = DeletedUser.objects.get(ldap_dn=ldap_user.dn)
+        except ObjectDoesNotExist:
+            wrapper['deleted_user'] = {}
+        try:
+            django_user = User.objects.get(username=ldap_user.username)
+            if django_user.last_login:
+                wrapper['active'] = True
+            else:
+                wrapper['active'] = False
+        except ObjectDoesNotExist:
+            wrapper['active'] = False
+        return wrapper
 
     @staticmethod
     def password_reset(user, raw_password):
