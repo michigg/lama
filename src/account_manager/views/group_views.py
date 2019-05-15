@@ -104,13 +104,7 @@ def group_update(request, realm_id, group_dn):
     else:
         members = LdapUser.objects.none()
         if group.members:
-            group_members = [re.compile('uid=([a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(member).group(1) for
-                             member in
-                             group.members]
-            query = Q(username=group_members.pop())
-            for member in group_members:
-                query = query | Q(username=member)
-            members = LdapUser.objects.filter(query)
+            members = LdapUser.get_users_by_dn(realm, group.members)
         data = {'name': group.name, 'members': members}
         form = AddLDAPGroupForm(initial=data)
 
