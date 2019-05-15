@@ -1,5 +1,6 @@
 # Create your models here.
 import re
+from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
 
@@ -100,6 +101,12 @@ class LdapUser(Model):
             else:
                 user_wrappers.append({'user': user, 'active': False})
         return user_wrappers
+
+    @staticmethod
+    def get_inactive_users():
+        last_semester = datetime.now() - timedelta(days=182)
+        return (LdapUser.objects.filter(last_login__lte=last_semester) | LdapUser.objects.exclude(
+            last_login__lte=datetime.now() + timedelta(days=1)))
 
 
 class LdapGroup(Model):

@@ -288,20 +288,32 @@
     </div>
 {% endmacro %}
 
-{% macro user_select_table_input(field, users, css_classes='') -%}
+{% macro user_select_table_input(users, deletable_users=[], blocked_users=[], field=None, name=None, css_classes='',show_lastlogin=False, checkbox_label_classes='') -%}
     <table class="table table-hover table-striped table-inverse table-bordered data-table">
         <thead>
         <tr>
             <th scope="col" class="text-center">
-                <input type="checkbox"
-                       class="table-checkbox-control-input"
-                       id="delete-all-checkbox"
-                ><label class="table-checkbox-control-label table-checkbox-control-label-add" for="delete-all-checkbox"></label>
+                {% if not deletable_users and not blocked_users %}
+                    <input type="checkbox"
+                           class="table-checkbox-control-input"
+                           id="delete-all-checkbox"
+                    ><label class="
+
+
+
+
+
+                        {% if checkbox_label_classes %}{{ checkbox_label_classes }}{% else %}table-checkbox-control-label table-checkbox-control-label-add{% endif %}"
+                            for="delete-all-checkbox"></label>
+                {% endif %}
             </th>
             <th scope="col">Nutzername</th>
             <th scope="col">E-Mail</th>
             <th scope="col">Vorname</th>
             <th scope="col">Nachname</th>
+            {% if show_lastlogin %}
+                <th scope="col">Letzter Login</th>
+            {% endif %}
         </tr>
         </thead>
         <tbody>
@@ -311,12 +323,18 @@
                     <input type="checkbox"
                            class="table-checkbox-control-input multiple-select-checkbox"
                            aria-describedby="{{ choice_label }}_help"
-                           name="{{ field.html_name }}"
+                           name="{% if field %}{{ field.html_name }}{% else %}{{ name }}{% endif %}"
                            id="{{ user.username }}_{{ loop.index }}"
                            value="{{ user.username }}"
-                           {% if field.value() and user.username in field.value() %}checked{% endif %}
+                           {% if field and field.value() and user.username in field.value() %}checked{% endif %}
                     >
-                    <label class="table-checkbox-control-label table-checkbox-control-label-add" for="{{ user.username }}_{{ loop.index }}">
+                    <label class="
+
+
+
+
+                            {% if checkbox_label_classes %}{{ checkbox_label_classes }}{% else %}table-checkbox-control-label table-checkbox-control-label-add{% endif %}"
+                           for="{{ user.username }}_{{ loop.index }}">
 
                     </label>
                 </td>
@@ -324,6 +342,69 @@
                 <td>{{ user.email }}</td>
                 <td>{{ user.first_name }}</td>
                 <td>{{ user.last_name }}</td>
+                {% if show_lastlogin %}
+                    <td class="text-center">
+                        {% if user.last_login %}
+                            {{ user.last_login.strftime('%Y-%m-%d') }}
+                        {% else %}
+                            <i class="far fa-times-circle text-danger"></i><span class="d-none">+</span>
+                        {% endif %}
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        {% for user in deletable_users %}
+            <tr>
+                <td class="text-center">
+                    <input type="checkbox"
+                           class="table-checkbox-control-input multiple-select-checkbox"
+                           id="user_{{ loop.index }}"
+                           value="{{ user.username }}"
+                           name="ldap_users"
+                           checked
+                           disabled
+                    ><label class="table-checkbox-control-label" for="user_{{ loop.index }}"></label>
+                </td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                {% if show_lastlogin %}
+                    <td class="text-center">
+                        {% if user.last_login %}
+                            {{ user.last_login.strftime('%Y-%m-%d') }}
+                        {% else %}
+                            <i class="far fa-times-circle text-danger"></i><span class="d-none">+</span>
+                        {% endif %}
+                    </td>
+                {% endif %}
+            </tr>
+            <input type="checkbox" value="{{ user.username }}" name="ldap_users" checked hidden>
+        {% endfor %}
+        {% for user in blocked_users %}
+            <tr>
+                <td class="text-center">
+                    <input type="checkbox"
+                           class="table-checkbox-control-input delete-checkbox"
+                           id="user_{{ loop.index }}"
+                           value="{{ user.username }}"
+                           name="ldap_users"
+                           disabled
+                    ><label class="table-checkbox-control-label" for="user_{{ loop.index }}"></label>
+                </td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                {% if show_lastlogin %}
+                    <td class="text-center">
+                        {% if user.last_login %}
+                            {{ user.last_login.strftime('%Y-%m-%d') }}
+                        {% else %}
+                            <i class="far fa-times-circle text-danger"></i><span class="d-none">+</span>
+                        {% endif %}
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

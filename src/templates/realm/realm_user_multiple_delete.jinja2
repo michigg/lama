@@ -26,55 +26,7 @@
     </div>
     <form action="{{ url('realm-multiple-user-delete', args=[realm.id]) }}" method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        <table class="table table-hover table-striped table-inverse table-bordered data-table">
-            <thead>
-            <tr>
-                <th scope="col" class="text-center"></th>
-                <th scope="col">Nutzername</th>
-                <th scope="col">E-Mail</th>
-                <th scope="col">Vorname</th>
-                <th scope="col">Nachname</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for user in deletable_users %}
-                <tr>
-                    <td class="text-center">
-                        <input type="checkbox"
-                               class="table-checkbox-control-input multiple-select-checkbox"
-                               id="user_{{ loop.index }}"
-                               value="{{ user.username }}"
-                               name="ldap_users"
-                               checked
-                               disabled
-                        ><label class="table-checkbox-control-label" for="user_{{ loop.index }}"></label>
-                    </td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.first_name }}</td>
-                    <td>{{ user.last_name }}</td>
-                </tr>
-                <input type="checkbox" value="{{ user.username }}" name="ldap_users" checked hidden>
-            {% endfor %}
-            {% for user in blocked_users %}
-                <tr>
-                    <td class="text-center">
-                        <input type="checkbox"
-                               class="table-checkbox-control-input delete-checkbox"
-                               id="user_{{ loop.index }}"
-                               value="{{ user.username }}"
-                               name="ldap_users"
-                               disabled
-                        ><label class="table-checkbox-control-label" for="user_{{ loop.index }}"></label>
-                    </td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.first_name }}</td>
-                    <td>{{ user.last_name }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        {{ mform.user_select_table_input(users=[], deletable_users=deletable_users, blocked_users=blocked_users, name="ldap_users",css_classes='',show_lastlogin=True, checkbox_label_classes='table-checkbox-control-label') }}
         <div class="d-flex mt-4">
             <button type="submit" class="btn btn-danger mr-auto p-2">Ausführen</button>
             <a href="{{ url('realm-user-list', args = [realm.id]) }}"

@@ -248,6 +248,28 @@ def realm_multiple_user_delete(request, realm_id):
 
 @login_required
 @is_realm_admin
+def realm_multiple_user_delete_inactive(request, realm_id):
+    realm = Realm.objects.get(id=realm_id)
+    if request.method == 'POST':
+        form = UserDeleteListForm(request.POST)
+        if form.is_valid():
+            ldap_users = form.cleaned_data['ldap_users']
+            blocked_users, deletable_users = get_deletable_blocked_users(ldap_users, realm)
+            return render(request, 'realm/realm_user_multiple_delete.jinja2',
+                          {'form': form, 'realm': realm, 'deletable_users': deletable_users,
+                           'blocked_users': blocked_users,
+                           'confirm': True})
+    LdapUser.base_dn = realm.ldap_base_dn
+    inactive_users = LdapUser.get_inactive_users()
+
+    # TODO: Form not valid
+    form = UserDeleteListForm()
+    return render(request, 'realm/realm_user_multiple_delete_confirm.jinja2',
+                  {'form': form, 'realm': realm, 'users': inactive_users, })
+
+
+@login_required
+@is_realm_admin
 def realm_multiple_user_delete_confirm(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
     if request.method == 'POST':
