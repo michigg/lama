@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetConfirmView, PasswordChangeView
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 from django.http import HttpRequest
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
@@ -454,14 +455,17 @@ def user_update_controller(request, realm, ldap_user, redirect_name, update_view
 
 def user_delete_controller(ldap_user, realm):
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-    user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
-    ldap_remove_user_from_groups(ldap_user.dn, user_groups)
-    ldap_user.delete()
+    # user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
+    # ldap_remove_user_from_groups(ldap_user.dn, user_groups)
+    # ldap_user.delete()
     try:
         django_user = User.objects.get(username=ldap_user.username)
-        django_user.delete()
+        # django_user.delete()
         # TODO user deletion cron
-        # DeletedUser.objects.create(user=django_user)
+        try:
+            DeletedUser.objects.create(user=django_user, ldap_dn=ldap_user.dn)
+        except IntegrityError as err:
+            pass
 
     except ObjectDoesNotExist:
         pass
