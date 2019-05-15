@@ -61,11 +61,12 @@ def group_add(request, realm_id):
         # check whether it's valid:
         if form.is_valid():
             name = form.cleaned_data["name"]
+            description = form.cleaned_data["description"]
             members = form.cleaned_data['members']
             members = [member.dn for member in members]
             LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
             try:
-                LdapGroup.objects.create(name=name, members=members)
+                LdapGroup.objects.create(name=name, description=description, members=members)
             except ALREADY_EXISTS:
                 return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm, 'users': users,
                                                                   'extra_error': 'Der Gruppenname ist leider schon belegt. Bitte wähle einen anderen.'})
@@ -93,6 +94,7 @@ def group_update(request, realm_id, group_dn):
         form = AddLDAPGroupForm(request.POST)
         if form.is_valid():
             group.name = form.cleaned_data['name']
+            group.description = form.cleaned_data['description']
             members = form.cleaned_data['members']
             group.members = [member.dn for member in members]
             group.save()
@@ -105,7 +107,7 @@ def group_update(request, realm_id, group_dn):
         members = LdapUser.objects.none()
         if group.members:
             members = LdapUser.get_users_by_dn(realm, group.members)
-        data = {'name': group.name, 'members': members}
+        data = {'name': group.name, 'description': group.description, 'members': members}
         form = AddLDAPGroupForm(initial=data)
 
     return render(request, 'group/group_detail.jinja2',

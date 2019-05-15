@@ -121,6 +121,7 @@ class LdapGroup(Model):
     object_classes = ['groupOfNames']
 
     name = ldap_fields.CharField(db_column='cn', max_length=200, primary_key=True)
+    description = ldap_fields.CharField(db_column='description', max_length=1024)
     members = ldap_fields.ListField(db_column='member')
 
     @staticmethod

@@ -9,6 +9,7 @@
     <form action="{{ url('realm-group-add', args=[realm.id]) }}" method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         {{ mform.text_input(form.name) }}
+        {{ mform.textarea_input(form.description) }}
         {{ form.members.label }}
         <div class="form-group w-25 float-right">
             <input type="text"

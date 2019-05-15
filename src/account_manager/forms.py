@@ -41,7 +41,7 @@ class UserGroupListForm(forms.Form):
 
 class AddLDAPGroupForm(forms.Form):
     name = forms.CharField(label='Gruppenname', max_length=400)
-    # TODO show only allowed user
+    description = forms.CharField(label='Beschreibung', max_length=1024, required=False)
     members = forms.ModelMultipleChoiceField(label='Nutzer hinzufügen', widget=forms.CheckboxSelectMultiple,
                                              queryset=LdapUser.objects.all(), )
 

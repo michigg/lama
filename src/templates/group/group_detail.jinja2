@@ -7,6 +7,10 @@
         <h3>Gruppe {{ group.name }}</h3>
         <ul class="list-group list-group-flush w-100 mb-3">
             <li class="list-group-item">Ldap Domain: {{ group.dn }}</li>
+
+            {% if group.description %}
+                <li class="list-group-item">Beschreibung: {{ group.description }}</li>
+            {% endif %}
         </ul>
         <h3>Mitglieder</h3>
         {{ mutils.get_user_table(realm, users) }}
@@ -21,6 +25,7 @@
         <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             {{ mform.text_input(form.name) }}
+            {{ mform.textarea_input(form.description) }}
             {{ form.members.label }}
             {{ mform.user_select_table_input(users, field=form.members) }}
             <div class="d-flex mt-4">
