@@ -53,6 +53,8 @@ urlpatterns = [
          name='realm-multiple-user-delete'),
     path('realm/<int:realm_id>/user/delete/multiple/inactive/', user_views.realm_multiple_user_delete_inactive,
          name='realm-multiple-user-delete-inactive'),
+    path('realm/<int:realm_id>/user/delete/<str:user_dn>/cancel/', user_views.realm_user_delete_cancel,
+         name='realm-user-delete-cancel'),
 
     # Realm Group
     path('realm/<int:realm_id>/groups/', group_views.realm_groups, name='realm-group-list'),

@@ -60,8 +60,9 @@ def realm_user_detail(request, realm_id, user_dn):
     LdapGroup.base_dn = LdapGroup.ROOT_DN
 
     user = LdapUser.objects.get(dn=user_dn)
+    user_wrapper = LdapUser.get_extended_user(user)
     groups = LdapGroup.objects.filter(members=user.dn)
-    return render(request, 'user/realm_user_detail.jinja2', {'user': user, 'groups': groups, 'realm': realm})
+    return render(request, 'user/realm_user_detail.jinja2', {'user': user_wrapper, 'groups': groups, 'realm': realm})
 
 
 @login_required
@@ -215,6 +216,22 @@ def realm_user_delete_confirm(request, realm_id, user_dn):
     cancel_link = {'name': 'realm-user-detail', 'args': [realm.id, ldap_user.dn]}
     return render(request, 'user/user_confirm_delete.jinja2',
                   {'realm': realm, 'user': ldap_user, 'deletion_link': deletion_link, 'cancel_link': cancel_link})
+
+
+@login_required
+@is_realm_admin
+@protect_cross_realm_user_access
+def realm_user_delete_cancel(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    ldap_user = LdapUser.objects.get(dn=user_dn)
+    try:
+        deleted_user = DeletedUser.objects.get(ldap_dn=ldap_user.dn)
+        deleted_user.delete()
+    except ObjectDoesNotExist as err:
+        pass
+
+    return redirect('realm-user-detail', realm_id, user_dn)
 
 
 @login_required
