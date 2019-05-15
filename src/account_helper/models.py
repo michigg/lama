@@ -1,4 +1,4 @@
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.db import models
 
 
@@ -12,3 +12,11 @@ class Realm(models.Model):
 
     def __str__(self):
         return f'{self.name} - {self.ldap_base_dn}'
+
+
+class DeletedUser(models.Model):
+    deletion_date = models.DateField(auto_now=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user.username} - {self.deletion_date}'

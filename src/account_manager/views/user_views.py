@@ -12,7 +12,7 @@ from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
 from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
 
-from account_helper.models import Realm
+from account_helper.models import Realm, DeletedUser
 from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
     UserGroupListForm
 from account_manager.main_views import is_realm_admin
@@ -460,6 +460,9 @@ def user_delete_controller(ldap_user, realm):
     try:
         django_user = User.objects.get(username=ldap_user.username)
         django_user.delete()
+        # TODO user deletion cron
+        # DeletedUser.objects.create(user=django_user)
+
     except ObjectDoesNotExist:
         pass
     return
