@@ -23,22 +23,22 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        deletables = DeletedUser.objects.filter(deletion_date__lte=timezone.now() + timezone.timedelta(+16))
+        deletables = DeletedUser.objects.filter(deletion_date__lte=timezone.now())
         output = ""
         if options['json']:
-            django_serialized = serializers.serialize('json', deletables)
-            output = json.dumps({'deletables': json.loads(django_serialized)})
+            json_output = {'deletables': []}
+            for deletable in deletables:
+                json_output['deletables'].append({'ldap_dn': deletable.ldap_dn, 'username': deletable.user.username})
+            output = json.dumps(json_output)
         else:
             for user in deletables:
                 output += f'{user}\n'
 
         if options['delete']:
+            LdapUser.base_dn = LdapUser.ROOT_DN
             for user in deletables:
-                # LdapGroup.base_dn = LdapGroup.ROOT_DN
-                # user_groups = LdapGroup.objects.filter(members__contains=user.ldap_dn)
-                LdapUser.base_dn = LdapUser.ROOT_DN
                 ldap_user = LdapUser.objects.get(dn=user.ldap_dn)
-                LdapGroup.remove_user_from_groups(ldap_user)
+                LdapGroup.remove_user_from_groups(ldap_user.dn)
                 ldap_user.delete()
                 try:
                     user.user.delete()

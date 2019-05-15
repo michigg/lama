@@ -14,3 +14,16 @@ class Realm(models.Model):
     def __str__(self):
         return f'{self.name} - {self.ldap_base_dn}'
 
+
+def get_deletion_time():
+    return timezone.now() + timezone.timedelta(+14)
+
+
+class DeletedUser(models.Model):
+    deletion_marker_date = models.DateField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    ldap_dn = models.CharField(max_length=512, unique=True)
+    deletion_date = models.DateField(default=get_deletion_time)
+
+    def __str__(self):
+        return f'{self.user.username} - {self.deletion_marker_date} - {self.deletion_date} - {self.ldap_dn}'
