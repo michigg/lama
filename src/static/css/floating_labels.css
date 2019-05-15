@@ -128,9 +128,19 @@
 /*!*visibility: hidden*!*/
 /*}*/
 
+.data-table {
+    width: 100% !important;
+}
+
 .paginate_button {
     padding: 0px 2px
 }
+
+.paginate_button.current {
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
 
 @media (max-width: 480px) {
     .table-search-field {
