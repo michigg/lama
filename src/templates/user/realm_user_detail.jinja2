@@ -46,8 +46,10 @@
                 {% else %}
                     <span class="text-warning">Keine zugewiesen</span>
                 {% endif %}
-                <a href="{{ url('realm-user-group-update', args=[realm.id, user.user.dn]) }}" class="float-right">
-                    Gruppen zuweisen</a>
+                {% if not user.deleted_user.deletion_date %}
+                    <a href="{{ url('realm-user-group-update', args=[realm.id, user.user.dn]) }}" class="float-right">
+                        Gruppen zuweisen</a>
+                {% endif %}
             </li>
             <li class="list-group-item">Zuletzt eingeloggt:
                 {% if user.user.last_login %}
