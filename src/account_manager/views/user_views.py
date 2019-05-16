@@ -20,6 +20,8 @@ from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
 from account_manager.utils.mail_utils import send_welcome_mail, send_deletion_mail
 
+from django.conf import settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -216,7 +218,8 @@ def realm_user_delete_confirm(request, realm_id, user_dn):
     deletion_link = {'name': 'realm-user-delete', 'args': [realm.id, ldap_user.dn]}
     cancel_link = {'name': 'realm-user-detail', 'args': [realm.id, ldap_user.dn]}
     return render(request, 'user/user_confirm_delete.jinja2',
-                  {'realm': realm, 'user': ldap_user, 'deletion_link': deletion_link, 'cancel_link': cancel_link})
+                  {'realm': realm, 'user': ldap_user, 'deletion_link': deletion_link, 'cancel_link': cancel_link,
+                   'deletion_wait_days': settings.DELETION_WAIT_DAYS})
 
 
 @login_required

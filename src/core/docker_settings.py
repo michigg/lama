@@ -18,8 +18,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOMAIN = os.environ['DOMAIN']
 SITE_NAME = os.environ['SITE_NAME']
 SECRET_KEY = os.environ['SECRET_KEY']
-DEBUG = os.environ.get('DEBUG', 'False') =='True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS'].split()
+DELETION_WAIT_DAYS = os.environ.get('DELETION_WAIT_DAYS', 14)
 
 # Application definition
 INSTALLED_APPS = [
