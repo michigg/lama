@@ -8,6 +8,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.conf import settings
 
 from core.settings import EMAIL_HOST, EMAIL_PORT, EMAIL_USE_SSL, EMAIL_USE_TLS
 
@@ -50,6 +51,7 @@ def send_deletion_mail(realm, user):
     mail_subject = 'Aktiviere deinen StuVe Account'
     message = render_to_string('registration/deletion_information_email.jinja2', {
         'user': user,
+        'deletion_wait_days': settings.DELETION_WAIT_DAYS,
     })
     # TODO failure handling
     p1 = Process(target=realm_send_mail, args=(realm, user.email, mail_subject, message))

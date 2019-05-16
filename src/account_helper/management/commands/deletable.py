@@ -24,7 +24,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        deletables = DeletedUser.objects.filter(deletion_date__lte=timezone.now() + timezone.timedelta(+15))
+        deletables = DeletedUser.objects.filter(deletion_date__lte=timezone.now())
         output = ""
         if options['json']:
             json_output = {'deletables': []}

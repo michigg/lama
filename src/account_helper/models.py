@@ -1,6 +1,7 @@
 from django.contrib.auth.models import Group, User
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 
 # Create your models here.
@@ -16,7 +17,7 @@ class Realm(models.Model):
 
 
 def get_deletion_time():
-    return timezone.now() + timezone.timedelta(+14)
+    return timezone.now() + timezone.timedelta(settings.DELETION_WAIT_DAYS)
 
 
 class DeletedUser(models.Model):
