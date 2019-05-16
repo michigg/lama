@@ -18,7 +18,7 @@ from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDA
     UserGroupListForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
-from account_manager.utils.mail_utils import send_welcome_mail
+from account_manager.utils.mail_utils import send_welcome_mail, send_deletion_mail
 
 logger = logging.getLogger(__name__)
 
@@ -465,15 +465,11 @@ def user_update_controller(request, realm, ldap_user, redirect_name, update_view
 
 def user_delete_controller(ldap_user, realm):
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-    # user_groups = LdapGroup.objects.filter(members__contains=ldap_user.dn)
-    # ldap_remove_user_from_groups(ldap_user.dn, user_groups)
-    # ldap_user.delete()
     try:
         django_user = User.objects.get(username=ldap_user.username)
-        # django_user.delete()
-        # TODO user deletion cron
         try:
             DeletedUser.objects.create(user=django_user, ldap_dn=ldap_user.dn)
+            send_deletion_mail(realm=realm, user=ldap_user)
         except IntegrityError as err:
             pass
 

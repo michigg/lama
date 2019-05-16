@@ -44,3 +44,13 @@ def send_welcome_mail(domain, email, protocol, realm, user):
     # TODO failure handling
     p1 = Process(target=realm_send_mail, args=(realm, user.email, mail_subject, message))
     p1.start()
+
+
+def send_deletion_mail(realm, user):
+    mail_subject = 'Aktiviere deinen StuVe Account'
+    message = render_to_string('registration/deletion_information_email.jinja2', {
+        'user': user,
+    })
+    # TODO failure handling
+    p1 = Process(target=realm_send_mail, args=(realm, user.email, mail_subject, message))
+    p1.start()
