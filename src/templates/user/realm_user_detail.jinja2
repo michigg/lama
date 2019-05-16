@@ -56,7 +56,8 @@
                     <i class="far fa-times-circle text-danger"></i><span class="d-none">+</span>
                 {% endif %}</li>
             {% if user.deleted_user.deletion_date %}
-                <li class="list-group-item text-danger">Löschvorgang: {{ user.deleted_user.deletion_date.strftime('%d.%m.%Y') }}
+                <li class="list-group-item text-danger">
+                    Löschvorgang: {{ user.deleted_user.deletion_date.strftime('%d.%m.%Y') }}
                     <a href="{{ url('realm-user-delete-cancel', args=[realm.id, user.user.dn]) }}"
                        class="float-right">
                         Löschvorgang abbrechen</a>
@@ -64,20 +65,24 @@
             {% endif %}
         </ul>
         <div class="d-flex mt-3">
-            <a href="{{ url('realm-user-update', args = [realm.id, user.user.dn]) }}"
-               class="btn btn-primary mr-auto p-2">
-                <i class="fas fa-user-cog"></i> Nutzer bearbeiten
-            </a>
-            {% if not user.last_login %}
-                <a href="{{ url('realm-user-resend-welcome-mail', args = [realm.id, user.user.dn]) }}"
-                   class="btn btn-secondary p-2 mr-2">
-                    <i class="fas fa-paper-plane"></i> Wilkommensmail erneut senden
+            {% if not user.deleted_user.deletion_date %}
+                <a href="{{ url('realm-user-update', args = [realm.id, user.user.dn]) }}"
+                   class="btn btn-primary mr-auto p-2">
+                    <i class="fas fa-user-cog"></i> Nutzer bearbeiten
+                </a>
+
+                {% if not user.user.last_login %}
+                    <a href="{{ url('realm-user-resend-welcome-mail', args = [realm.id, user.user.dn]) }}"
+                       class="btn btn-secondary p-2 mr-2">
+                        <i class="fas fa-paper-plane"></i> Wilkommensmail erneut senden
+                    </a>
+                {% endif %}
+
+                <a href="{{ url('realm-user-delete-confirm', args = [realm.id, user.user.dn]) }}"
+                   class="btn btn-danger p-2">
+                    <i class="fas fa-trash"></i> Nutzer löschen
                 </a>
             {% endif %}
-            <a href="{{ url('realm-user-delete-confirm', args = [realm.id, user.user.dn]) }}"
-               class="btn btn-danger p-2">
-                <i class="fas fa-trash"></i> Nutzer löschen
-            </a>
         </div>
     {% else %}
         <form method="post">
