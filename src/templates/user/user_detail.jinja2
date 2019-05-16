@@ -8,8 +8,14 @@
                 <div class="col-12 col-sm-8 col-md-7 col-lg-5 col-xl-4 bg-white text-dark p-3 mt-5">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">{{ user.username }}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">{{ user.last_name }}, {{ user.first_name }}</h6>
+                            {% if user.deleted_user.deletion_date %}
+                                <h5 class="card-title text-danger">{{ user.user.username }}
+                                    <small>Als gelöscht markiert</small>
+                                </h5>
+                            {% else %}
+                                <h5 class="card-title">{{ user.user.username }}</h5>
+                            {% endif %}
+                            <h6 class="card-subtitle mb-2 text-muted">{{ user.user.last_name }}, {{ user.user.first_name }}</h6>
                             <ul class="list-group list-group-flush">
                                 {% if groups %}
                                     <li class="list-group-item">
@@ -23,21 +29,26 @@
                                     </li>
                                 {% endif %}
                                 <li class="list-group-item"><span
-                                        class="font-weight-bold">Email:</span> {{ user.email }}</li>
+                                        class="font-weight-bold">Email:</span> {{ user.user.email }}</li>
                                 <li class="list-group-item"><span
                                         class="font-weight-bold">Passwort:</span> <a
                                         href="{{ url('password_change') }}">Passwort ändern</a>
                                 </li>
                                 <li class="list-group-item"><span
-                                        class="font-weight-bold">Telefon:</span> {{ user.phone }}</li>
+                                        class="font-weight-bold">Telefon:</span> {{ user.user.phone }}</li>
                                 <li class="list-group-item"><span
-                                        class="font-weight-bold">Mobiltelefon:</span> {{ user.mobile_phone }}</li>
+                                        class="font-weight-bold">Mobiltelefon:</span> {{ user.user.mobile_phone }}</li>
+                                {% if user.deleted_user.deletion_date %}
+                                    <li class="list-group-item text-danger">
+                                        Löschvorgang: {{ user.deleted_user.deletion_date.strftime('%d.%m.%Y') }}
+                                    </li>
+                                {% endif %}
                             </ul>
                             <div class="card-footer d-flex bg-white">
-                                <a href="{{ url('user-update', args = [realm.id, user.dn]) }}"
+                                <a href="{{ url('user-update', args = [realm.id, user.user.dn]) }}"
                                    class="btn btn-primary mr-auto p-2"><i class="fas fa-user-edit"></i> Profil
                                     bearbeiten</a>
-                                <a href="{{ url('user-delete-confirm', args = [realm.id, user.dn]) }}"
+                                <a href="{{ url('user-delete-confirm', args = [realm.id, user.user.dn]) }}"
                                    class="btn btn-danger p-2"><i class="fas fa-trash"></i> Profil löschen</a>
                             </div>
                         </div>

@@ -72,8 +72,9 @@ def user_detail(request, realm_id, user_dn):
     LdapGroup.base_dn = LdapGroup.ROOT_DN
 
     user = LdapUser.objects.get(dn=user_dn)
+    user_wrapper = LdapUser.get_extended_user(user)
     groups = LdapGroup.objects.filter(members=user.dn)
-    return render(request, 'user/user_detail.jinja2', {'user': user, 'groups': groups, 'realm': realm})
+    return render(request, 'user/user_detail.jinja2', {'user': user_wrapper, 'groups': groups, 'realm': realm})
 
 
 @login_required
