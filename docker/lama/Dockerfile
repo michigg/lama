@@ -1,7 +1,7 @@
 FROM alpine:3.9
 ADD ["requirements.txt", "/requirements.txt"]
 RUN apk upgrade --update && \
-	apk add --update python3 build-base openldap-dev python3-dev py3-psycopg2 && \
+	apk add --update python3 build-base openldap-dev python3-dev py3-psycopg2 gettext && \
 	pip3 install -r /requirements.txt && rm /requirements.txt
 WORKDIR /lama
 EXPOSE 80

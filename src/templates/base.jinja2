@@ -1,4 +1,5 @@
 {#{% load static %}#}
+{#{% load i18n %}#}
 {# ===== HTML ===== #}
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -30,7 +31,7 @@
     <a class="navbar-brand" href="{{ url('realm-home') }}">
         <img src="{{ static('images/lama.svg') }}" width="30" height="30" class="d-inline-block align-top"
              alt="">
-        LAMa
+        {% trans "LAMa" %}
     </a>
 
     {% if request.user.is_authenticated %}
