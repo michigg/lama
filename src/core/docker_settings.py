@@ -194,7 +194,8 @@ USE_TZ = True
 
 LANGUAGES = (
     ('en', _('English')),
-    ('de', _('Deutsch'))
+    ('de', _('Deutsch')),
+    ('de-fr', _('Deutsch'))
 )
 USE_L10N = True
 LANGUAGE_CODE = 'de'

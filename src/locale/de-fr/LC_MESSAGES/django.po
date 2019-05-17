@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-17 22:48+0000\n"
+"POT-Creation-Date: 2019-05-17 22:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: account_manager/views/user_views.py:37
 msgid ""
@@ -28,14 +27,14 @@ msgstr ""
 msgid "English"
 msgstr ""
 
-#: core/docker_settings.py:197
+#: core/docker_settings.py:197 core/docker_settings.py:198
 msgid "Deutsch"
 msgstr ""
 
 #. Translators: The Application Name: default LAMa
 #: templates/base.jinja2:33
 msgid "AppName"
-msgstr "LAMa"
+msgstr ""
 
 #. Translators: Logout button
 #: templates/base.jinja2:40
@@ -50,89 +49,75 @@ msgstr ""
 #. Translators: About link title
 #: templates/base.jinja2:58 templates/base_admin.jinja2:50
 msgid "About"
-msgstr "Über"
+msgstr ""
 
 #: templates/base_admin.jinja2:10
 msgid "DjangoAdminArea"
-msgstr "Django Adminbereich"
+msgstr ""
 
 #: templates/base_admin.jinja2:14
 msgid "Realms"
-msgstr "Bereiche"
+msgstr ""
 
 #: templates/base_admin.jinja2:24
 msgid "RealmOverview"
-msgstr "Bereichsübersicht"
+msgstr ""
 
 #: templates/base_admin.jinja2:27
 msgid "Realm"
-msgstr "Bereich"
+msgstr ""
 
 #: templates/base_admin.jinja2:31
 msgid "RealmInformation"
-msgstr "Bereichsinformationen"
+msgstr ""
 
 #: templates/base_admin.jinja2:34
 msgid "User"
-msgstr "Nutzer"
+msgstr ""
 
 #: templates/base_admin.jinja2:37
 msgid "Groups"
-msgstr "Gruppen"
+msgstr ""
 
 #: templates/base_admin.jinja2:46
 msgid "RealmAdd"
-msgstr "Bereich hinzufügen"
+msgstr ""
 
 #. Translators: Is the Headline of the create new realm view
 #: templates/realm/realm_add.jinja2:10
 msgid "CreateNewRealm"
-msgstr "Neuen Bereich anlegen"
+msgstr ""
 
 #. Translators: the submit button text for the create new realm form
 #: templates/realm/realm_add.jinja2:16
 msgid "CreateRealm"
-msgstr "Bereich anlegen"
+msgstr ""
 
 #: templates/realm/realm_add_failed.jinja2:5
 msgid "AddRealmError"
-msgstr "Hinzufügen Fehlgeschlagen"
+msgstr ""
 
 #: templates/realm/realm_add_failed.jinja2:7
 msgid "AddRealmErrorInfo"
-msgstr "Das hinzufügen des Bereichs ist fehlgeschlagen."
+msgstr ""
 
 #: templates/realm/realm_add_failed.jinja2:11
 msgid "AddRealmErrorLdapInfo"
-msgstr "Bitte überprüfe den Ldap base dn, ob dieser auch wirklich existiert."
+msgstr ""
 
 #. Translators: The Application Name: default LAMa
 #: templates/realm/realm_confirm_delete.jinja2:7
 msgid "RealmDelete"
-msgstr "Löschen des Bereichs"
+msgstr ""
 
 #: templates/realm/realm_confirm_delete.jinja2:27
 msgid "RealmDeleteCancel"
-msgstr "Abbrechen"
+msgstr ""
 
 #: templates/realm/realm_confirm_delete.jinja2:29
 msgid "RealmDeleteAgree"
-msgstr "Bereich löschen"
+msgstr ""
 
 #: templates/user/realm_user_detail.jinja2:22
 msgid "Anzeigename:"
 msgstr ""
-
-#: templates/realm/realm_confirm_delete.jinja2:29
-#, python-format
-msgid "RealmDeleteInformation %(realm)s %(realm_ldap_base_dn)"
-msgstr ""
-"<p>Achtung! Sie sind gerade dabei den Bereich <span class='text-uppercase font-weight-bold'>%(realm)s</span> zu löschen.</p>"
-"<p>Falls Sie sich sicher sind, dass Sie diesen Bereich löschen wollen, klicken Sie bitte auf \"Bereich löschen\"."
-"<p>Hierdurch werden <strong>Alle</strong> Nutzer und Gruppen gelöscht, die unter der Ldap Basis"
-"DN %(realm_ldap_base_dn)s eingetragen sind. Die Ldap Basis DN mit Ihren Organisationseinheiten "
-"\"groups\" und \"people\" bleiben bestehen.</p>"
-"<p>Bitte beachten Sie, dass die Daten der Nutzer, die in den Diensten hochgeladen wurden, weiterhin bestehen bleiben. "
-"Diese Daten müssen vom Systemadministrator seperat gelöscht werden. </p>"
-"<p>Möchten Sie das Löschen der Accountdaten verhindern, klicken Sie auf \"Abbrechen\"</p>"
-
