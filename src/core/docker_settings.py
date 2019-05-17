@@ -20,7 +20,7 @@ SITE_NAME = os.environ['SITE_NAME']
 SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS'].split()
-DELETION_WAIT_DAYS = os.environ.get('DELETION_WAIT_DAYS', 14)
+DELETION_WAIT_DAYS = int(os.environ.get('DELETION_WAIT_DAYS', "14"))
 
 # Application definition
 INSTALLED_APPS = [
