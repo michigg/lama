@@ -115,8 +115,9 @@ dmypy.json
 .pyre/
 
 .idea/
-#migrations/
+migrations/
 logs/
 db/
+data/
 !docker/ldap/data/var/
 *.mdb
