@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-17 14:35+0000\n"
+"POT-Creation-Date: 2019-05-17 14:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,6 +93,18 @@ msgstr "Neuen Bereich anlegen"
 #: templates/realm/realm_add.jinja2:16
 msgid "CreateRealm"
 msgstr "Bereich anlegen"
+
+#: templates/realm/realm_add_failed.jinja2:5
+msgid "AddRealmError"
+msgstr "Hinzufügen Fehlgeschlagen"
+
+#: templates/realm/realm_add_failed.jinja2:7
+msgid "AddRealmErrorInfo"
+msgstr "Das hinzufügen des Bereichs ist fehlgeschlagen."
+
+#: templates/realm/realm_add_failed.jinja2:11
+msgid "AddRealmErrorLdapInfo"
+msgstr "Bitte überprüfe den Ldap base dn, ob dieser auch wirklich existiert."
 
 #: templates/user/realm_user_detail.jinja2:22
 msgid "Anzeigename:"

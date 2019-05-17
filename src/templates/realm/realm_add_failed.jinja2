@@ -2,13 +2,13 @@
 {% block admin_content %}
     <div class="row ">
         <div class="col-12 p-3">
-            <h1>Fehler {{ realm_name }}</h1>
+            <h1>{{ _('AddRealmError') }} <span class="realm-name">{{ realm_name }}</span></h1>
             <div class="alert alert-danger">
-                <p>Das hinzufügen des Bereichs ist fehlgeschlagen.</p>
+                <p>{{ _('AddRealmErrorInfo') }}</p>
                 {% if error %}
                     <p>{{ error }}</p>
                 {% else %}
-                    <p>Bitte überprüfe den Ldap base dn, ob dieser auch wirklich existiert.</p>
+                    <p>{{ _('AddRealmErrorLdapInfo') }}</p>
                 {% endif %}
             </div>
         </div>
