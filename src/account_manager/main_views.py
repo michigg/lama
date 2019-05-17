@@ -15,6 +15,7 @@ from account_manager.utils.mail_utils import realm_send_mail
 from .forms import RealmAddForm, RealmUpdateForm
 from .models import LdapGroup, LdapUser
 from ldap import LDAPError
+from django.utils.translation import gettext
 
 logger = logging.getLogger(__name__)
 

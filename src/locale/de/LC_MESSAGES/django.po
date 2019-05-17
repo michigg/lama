@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-16 13:48+0000\n"
+"POT-Creation-Date: 2019-05-17 14:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,10 +32,58 @@ msgstr ""
 msgid "Deutsch"
 msgstr ""
 
-#: templates/base.jinja2:34
-msgid "LAMa"
+#. Translators: The Application Name: default LAMa
+#: templates/base.jinja2:33
+msgid "AppName"
+msgstr "LAMa"
+
+#. Translators: Logout button
+#: templates/base.jinja2:40
+msgid "Logout"
 msgstr ""
 
-#: templates/user/realm_user_detail.jinja2:23
+#. Translators: Login Button
+#: templates/base.jinja2:43
+msgid "Login"
+msgstr ""
+
+#. Translators: About link title
+#: templates/base.jinja2:58 templates/base_admin.jinja2:50
+msgid "About"
+msgstr "Über"
+
+#: templates/base_admin.jinja2:10
+msgid "DjangoAdminArea"
+msgstr "Django Adminbereich"
+
+#: templates/base_admin.jinja2:14
+msgid "Realms"
+msgstr "Bereiche"
+
+#: templates/base_admin.jinja2:24
+msgid "RealmOverview"
+msgstr "Bereichsübersicht"
+
+#: templates/base_admin.jinja2:27
+msgid "Realm"
+msgstr "Bereich"
+
+#: templates/base_admin.jinja2:31
+msgid "RealmInformation"
+msgstr "Bereichsinformationen"
+
+#: templates/base_admin.jinja2:34
+msgid "User"
+msgstr "Nutzer"
+
+#: templates/base_admin.jinja2:37
+msgid "Groups"
+msgstr "Gruppen"
+
+#: templates/base_admin.jinja2:46
+msgid "RealmAdd"
+msgstr "Bereich hinzufügen"
+
+#: templates/user/realm_user_detail.jinja2:22
 msgid "Anzeigename:"
 msgstr ""

@@ -1,5 +1,3 @@
-{#{% load static %}#}
-{#{% load i18n %}#}
 {# ===== HTML ===== #}
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -31,15 +29,18 @@
     <a class="navbar-brand" href="{{ url('realm-home') }}">
         <img src="{{ static('images/lama.svg') }}" width="30" height="30" class="d-inline-block align-top"
              alt="">
-        {% trans "LAMa" %}
+        {# Translators: The Application Name: default LAMa #}
+        {{ _('AppName') }}
     </a>
 
     {% if request.user.is_authenticated %}
         <span class="navbar-text">
         Hi <a href="{{ url('realm-home') }}?show_user=True">{{ request.user.username }}</a>!
-        <a href="{{ url('logout') }}?next=/">Logout <i class="fas fa-sign-out-alt"></i></a>
+        {# Translators: Logout button #}
+        <a href="{{ url('logout') }}?next=/">{{ _('Logout') }} <i class="fas fa-sign-out-alt"></i></a>
     {% else %}
-        <a href="{{ url('login') }}"><i class="fas fa-sign-in-alt"></i> Login</a>
+        {# Translators: Login Button #}
+        <a href="{{ url('login') }}"><i class="fas fa-sign-in-alt"></i> {{ _('Login') }}</a>
     {% endif %}
     </span>
 </nav>
@@ -48,12 +49,13 @@
     {% block content %}{% endblock %}
 {% endblock %}
 
-{% if not realms and not realm and not request.user.is_superuser%}
+{% if not realms and not realm and not request.user.is_superuser %}
 
     <footer class="bg-light footer mt-auto py-3 text-center">
         <div class="container">
     <span class="text-muted">
-        <a href="{{ url('about') }}">Über</a>
+         {# Translators: About link title #}
+        <a href="{{ url('about') }}">{{ _('About') }}</a>
     </span>
         </div>
     </footer>

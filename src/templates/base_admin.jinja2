@@ -1,5 +1,4 @@
 {% extends 'base.jinja2' %}
-{#{% load i18n %}#}
 
 {% block body %}
     <div class="d-flex wrapper">
@@ -8,11 +7,11 @@
             {% if request.user.is_superuser %}
                 <div class="list-group list-group-flush">
                     <a class="list-group-item list-group-item-action bg-light"
-                       href="{{ url('django-additional-admin-list') }}"><i class="fas fa-crown"></i> Django Adminbereich</a>
+                       href="{{ url('django-additional-admin-list') }}"><i class="fas fa-crown"></i> {{ _('DjangoAdminArea') }}</a>
                 </div>
             {% endif %}
             {% if realms %}
-                <h2 class="sidebar-heading">Bereiche</h2>
+                <h2 class="sidebar-heading">{{ _('Realms') }}</h2>
                 <div class="list-group list-group-flush">
                     {% for realm_item in realms %}
                         <a href="{{ url('realm-detail', args=[realm_item.id]) }}"
@@ -22,20 +21,20 @@
             {% else %}
                 <div class="list-group-flush">
                     <a href="{{ url('realm-home') }}" class="list-group-item list-group-item-action bg-light">
-                        <i class="fas fa-list"></i> Bereichsübersicht</a>
+                        <i class="fas fa-list"></i> {{ _('RealmOverview') }}</a>
                 </div>
                 {% if realm %}
-                    <h2 class="sidebar-heading">Bereich {{ realm.name }}</h2>
+                    <h2 class="sidebar-heading">{{ _('Realm') }} <span class="text-uppercase">{{ realm.name }}</span></h2>
                     <div class="list-group list-group-flush">
                         <a href="{{ url('realm-detail', args=[realm.id]) }}"
                            class="list-group-item list-group-item-action bg-light"><i class="fas fa-cogs"></i>
-                            Bereichsinformationen</a>
+                            {{ _('RealmInformation') }}</a>
                         <a href="{{ url('realm-user-list', args=[realm.id]) }}"
                            class="list-group-item list-group-item-action bg-light"><i class="fas fa-users"></i>
-                            Nutzer</a>
+                            {{ _('User') }}</a>
                         <a href="{{ url('realm-group-list', args=[realm.id]) }}"
                            class="list-group-item list-group-item-action bg-light"><i class="fas fa-user-friends"></i>
-                            Gruppen</a>
+                            {{ _('Groups') }}</a>
                     </div>
                 {% endif %}
             {% endif %}
@@ -44,11 +43,11 @@
                     <div class="list-group-item bg-light border-0"></div>
                     <a href="{{ url('realm-add') }}"
                        class="list-group-item list-group-item-action bg-light"><i class="fas fa-plus-square"></i>
-                        Bereich hinufügen</a>
+                        {{ _('RealmAdd') }}</a>
                 </div>
             {% endif %}
             <div class="sidebar-bottom list-group-flush border-top">
-                <a href="{{ url('about') }}" class="list-group-item list-group-item-action bg-light">Über</a>
+                <a href="{{ url('about') }}" class="list-group-item list-group-item-action bg-light">{{ _('About') }}</a>
             </div>
         </div>
 
