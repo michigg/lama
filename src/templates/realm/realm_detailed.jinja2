@@ -21,11 +21,14 @@
             {% block detail_content %}
                 <ul class="list-group list-group-flush w-100">
                     <li class="list-group-item">LDAP Organisationseinheit: {{ realm.ldap_base_dn }}</li>
-                    <li class="list-group-item">Nutzeranzahl: {{ users_count }}</li>
-                    <li class="list-group-item">Inaktive Nutzer: {{ inactive_user_count }} <a
-                            href="{{ url('realm-multiple-user-delete-inactive', args=[realm.id]) }}"
-                            class="float-right">
-                        Inaktive Nutzer löschen</a></li>
+                    <li class="list-group-item">Nutzeranzahl (Aktive/Inaktive): {{ users_count }}
+                        ({{ users_count-inactive_user_count }}/{{ inactive_user_count }})
+                        <a
+                                href="{{ url('realm-multiple-user-delete-inactive', args=[realm.id]) }}"
+                                class="float-right">
+                            Inaktive Nutzer löschen
+                        </a>
+                    </li>
                     {% if realm.email %}
                         <li class="list-group-item">Email: {{ realm.email }}</li>
                     {% else %}

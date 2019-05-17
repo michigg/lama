@@ -118,5 +118,6 @@ dmypy.json
 migrations/
 logs/
 db/
+data/
 !docker/ldap/data/var/
 *.mdb
