@@ -6,12 +6,14 @@
     <div class="row justify-content-center justify-content-sm-center">
         <div class="col-12 col-sm-8 col-md-8 col-lg-6 col-xl-5 bg-white text-dark p-3 mt-5">
             {% if request.user.is_superuser %}
-                <h2>Neuen Bereich anlegen</h2>
+                {# Translators: Is the Headline of the create new realm view #}
+                <h2>{{ _('CreateNewRealm') }}</h2>
                 <form method="post">
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                     {{ mform.text_input(form.name) }}
                     {{ mform.text_input(form.ldap_base_dn) }}
-                    <button type="submit" class="btn btn-primary btn-block">Anlegen</button>
+                    {# Translators: the submit button text for the create new realm form#}
+                    <button type="submit" class="btn btn-primary btn-block">{{ _('CreateRealm') }}</button>
                 </form>
             {% endif %}
         </div>

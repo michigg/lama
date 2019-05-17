@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-17 14:23+0000\n"
+"POT-Creation-Date: 2019-05-17 14:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,6 +83,16 @@ msgstr "Gruppen"
 #: templates/base_admin.jinja2:46
 msgid "RealmAdd"
 msgstr "Bereich hinzufügen"
+
+#. Translators: Is the Headline of the create new realm view
+#: templates/realm/realm_add.jinja2:10
+msgid "CreateNewRealm"
+msgstr "Neuen Bereich anlegen"
+
+#. Translators: the submit button text for the create new realm form
+#: templates/realm/realm_add.jinja2:16
+msgid "CreateRealm"
+msgstr "Bereich anlegen"
 
 #: templates/user/realm_user_detail.jinja2:22
 msgid "Anzeigename:"
