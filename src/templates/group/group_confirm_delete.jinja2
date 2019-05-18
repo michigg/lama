@@ -4,6 +4,7 @@
         <div class="row justify-content-center justify-content-sm-center">
             <div class="col-12 col-sm-8 col-md-7 col-lg-5 col-xl-4 bg-white text-dark p-3 mt-5">
                 <div class="alert alert-warning" role="alert">
+                    {# TODO: Add translation #}
                     <p>Achtung! Sie sind gerade dabei die Gruppe <strong>{{ group.name }}</strong> aus dem
                         Bereich <strong>{{ realm.name }}</strong> zu löschen.
                     </p>
@@ -13,9 +14,9 @@
                 </div>
                 <div class="d-flex">
                     <a href="{{ url('realm-group-detail', args = [realm.id, group.dn]) }}"
-                       class="btn btn-secondary mr-auto p-2">Abbrechen</a>
+                       class="btn btn-secondary mr-auto p-2">{{ _('Cancel') }}</a>
                     <a href="{{ url('realm-group-delete', args = [realm.id, group.dn]) }}"
-                       class="btn btn-danger p-2">Gruppe löschen</a>
+                       class="btn btn-danger p-2">{{ _('DeleteGroup') }}</a>
                 </div>
             </div>
         </div>

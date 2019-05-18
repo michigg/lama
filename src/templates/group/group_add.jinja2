@@ -3,7 +3,7 @@
 {% import 'macros/utils_macros.jinja2' as uform %}
 
 {% block detail_content %}
-    <h2>Gruppe anlegen</h2>
+    <h2>{{ _('AddGroup') }}</h2>
     {% if extra_error %}
         <div class="alert alert-warning">{{ extra_error }}</div>
     {% endif %}
@@ -15,9 +15,9 @@
         {{ uform.get_data_table_search_field() }}
         {{ mform.user_select_table_input(users, field=form.members) }}
         <div class="d-flex mt-4">
-            <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+            <button type="submit" class="btn btn-primary mr-auto p-2">{{ _('Save') }}</button>
             <a href="{{ url('realm-group-list', args = [realm.id]) }}"
-               class="btn btn-secondary p-2">Abbrechen</a>
+               class="btn btn-secondary p-2">{{ _('Cancel') }}</a>
         </div>
     </form>
 {% endblock %}

@@ -3,12 +3,12 @@
 {% import 'macros/utils_macros.jinja2' as mutils %}
 
 {% block detail_content %}
-    <h3><span class="text-uppercase">{{ user.username }}</span> - Gruppenzuweisung ändern</h3>
+    <h3><span class="text-uppercase">{{ user.username }}</span> - {{ _('UpdateGroupMembership') }}</h3>
     {{ mutils.get_warning_box(extra_error) }}
     <div class="row">
         <div class="col-6">
             <form method="post" action="{{ url('realm-user-group-update-delete', args = [realm.id, user.dn]) }}">
-                <button type="submit" class="btn btn-warning w-100 mb-2"><i class="fas fa-minus-square"></i> Entfernen
+                <button type="submit" class="btn btn-warning w-100 mb-2"><i class="fas fa-minus-square"></i> {{ _('UserGroupDelete') }}
                 </button>
                 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                 <ul>
@@ -27,7 +27,7 @@
         </div>
         <div class="col-6">
             <form method="post" action="{{ url('realm-user-group-update-add', args = [realm.id, user.dn]) }}">
-                <button type="submit" class="btn btn-success w-100 mb-2"><i class="fas fa-plus-square"></i> Hinzufügen
+                <button type="submit" class="btn btn-success w-100 mb-2"><i class="fas fa-plus-square"></i> {{ _('UserGroupAdd') }}
                 </button>
                 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                 <ul>
@@ -47,6 +47,6 @@
     </div>
     <div class="mt-4">
         <a href="{{ url('realm-user-detail', args = [realm.id, user.dn]) }}"
-           class="btn btn-primary p-2 float-right w-25">Fertig</a>
+           class="btn btn-primary p-2 float-right w-25">{{ _('Done') }}</a>
     </div>
 {% endblock %}

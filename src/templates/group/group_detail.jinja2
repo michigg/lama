@@ -4,23 +4,25 @@
 
 {% block detail_content %}
     {% if not form %}
-        <h3>Gruppe {{ group.name }}</h3>
+        <h3>{{ _('Group') }} {{ group.name }}</h3>
         <ul class="list-group list-group-flush w-100 mb-3">
-            <li class="list-group-item">Ldap Domain: {{ group.dn }}</li>
+            <li class="list-group-item">{{ _('LdapDomain') }}: {{ group.dn }}</li>
 
             {% if group.description %}
-                <li class="list-group-item">Beschreibung: {{ group.description }}</li>
+                <li class="list-group-item">{{ _('Description') }}: {{ group.description }}</li>
             {% endif %}
         </ul>
-        <h3>Mitglieder</h3>
+        <h3>{{ _('Members') }}</h3>
         {{ mutils.get_user_table(realm, users) }}
         <div class="d-flex mt-3">
             <a href="{{ url('realm-group-update', args = [realm.id, group.dn]) }}" class="btn btn-primary mr-auto p-2">
-                <i class="fas fa-pen-square"></i> Gruppe bearbeiten</a>
+                <i class="fas fa-pen-square"></i> {{ _('UpdateGroup') }}</a>
             <a href="{{ url('realm-group-delete-confirm', args = [realm.id, group.dn]) }}" class="btn btn-danger p-2"><i
-                    class="fas fa-trash"></i> <span class="d-sm-none d-md-inline-block">Gruppe löschen</span></a>
+                    class="fas fa-trash"></i> <span
+                    class="d-sm-none d-md-inline-block">{{ _('DeleteGroup') }}</span></a>
         </div>
     {% else %}
+        <h3>{{ _('UpdateGroup') }} {{ group.name }}</h3>
         {{ mutils.get_warning_box(extra_error) }}
         <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
@@ -30,9 +32,9 @@
             {{ mutils.get_data_table_search_field() }}
             {{ mform.user_select_table_input(users, field=form.members) }}
             <div class="d-flex mt-4">
-                <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+                <button type="submit" class="btn btn-primary mr-auto p-2">{{ _('Save') }}</button>
                 <a href="{{ url('realm-group-detail', args = [realm.id, group.dn]) }}"
-                   class="btn btn-secondary p-2">Abbrechen</a>
+                   class="btn btn-secondary p-2">{{ _('Cancel') }}</a>
             </div>
         </form>
     {% endif %}

@@ -2,19 +2,18 @@
 {% import 'macros/form_macros.jinja2' as mform %}
 
 {% block detail_content %}
-    <h2>Nutzer anlegen</h2>
+    <h2>{{ _('AddUser') }}</h2>
     {% if extra_error %}
         <div class="alert alert-warning">{{ extra_error }}</div>
     {% endif %}
     <form action="{{ url('realm-user-add', args=[realm.id]) }}" method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        {#        {{ form.as_p() }}#}
         {{ mform.text_input(form.username) }}
         {{ mform.email_input(form.email) }}
         <div class="d-flex mt-4">
-            <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+            <button type="submit" class="btn btn-primary mr-auto p-2">{{ _('Save') }}</button>
             <a href="{{ url('realm-user-list', args = [realm.id]) }}"
-               class="btn btn-secondary p-2">Abbrechen</a>
+               class="btn btn-secondary p-2">{{ _('Cancel') }}</a>
         </div>
     </form>
 {% endblock %}

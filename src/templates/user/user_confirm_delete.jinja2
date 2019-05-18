@@ -7,6 +7,7 @@
         <div class="row justify-content-center justify-content-sm-center">
             <div class="col-12 col-sm-8 col-md-7 col-lg-5 col-xl-4 bg-white text-dark p-3 mt-5">
                 <div class="alert alert-warning" role="alert">
+                    {# TODO: Translation #}
                     <p><strong>Achtung!</strong> Sie sind gerade dabei den Account von <strong>{{ user.username }}</strong> zu schließen.
                     </p>
                     <p>Falls Sie sich sicher sind, dass Sie diesen Nutzer löschen wollen, klicken Sie bitte auf "Nutzer
@@ -21,9 +22,9 @@
                 </div>
                 <div class="d-flex">
                     <a href="{{ url(cancel_link.name, args = cancel_link.args) }}"
-                       class="btn btn-secondary mr-auto p-2">Abbrechen</a>
+                       class="btn btn-secondary mr-auto p-2">{{ _('Cancel') }}</a>
                     <a href="{{ url(deletion_link.name, args = deletion_link.args) }}"
-                       class="btn btn-danger p-2">Nutzer löschen</a>
+                       class="btn btn-danger p-2">{{ _('DeleteUser') }}</a>
                 </div>
             </div>
         </div>

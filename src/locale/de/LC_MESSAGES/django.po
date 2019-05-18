@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-18 00:28+0000\n"
+"POT-Creation-Date: 2019-05-18 01:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,6 +31,55 @@ msgstr ""
 #: core/docker_settings.py:197 core/docker_settings.py:198
 msgid "Deutsch"
 msgstr ""
+
+#: templates/admin/list_user.jinja2:8
+msgid "DjangoKnownUsers"
+msgstr "Django bekannte Nutzer"
+
+#: templates/admin/list_user.jinja2:9
+msgid "DjangoAdminPages"
+msgstr "Django Adminbereich"
+
+#: templates/admin/list_user.jinja2:12
+msgid "SuperAdminInfo"
+msgstr ""
+"Um einen Nutzer zum Superadmin zu ernennen, klicke auf das Superadmin Icon"
+
+#: templates/admin/list_user.jinja2:18 templates/macros/utils_macros.jinja2:28
+#: templates/macros/utils_macros.jinja2:77
+#: templates/macros/utils_macros.jinja2:138
+#: templates/realm/realm_user_multiple_delete.jinja2:23
+#: templates/realm/realm_user_multiple_delete_confirm.jinja2:11
+msgid "Search"
+msgstr "Suche"
+
+#: templates/admin/list_user.jinja2:23
+msgid "SuperAdmin"
+msgstr "Superadmin"
+
+#: templates/admin/list_user.jinja2:24 templates/macros/form_macros.jinja2:309
+#: templates/macros/utils_macros.jinja2:33
+msgid "Username"
+msgstr "Nutzername"
+
+#: templates/admin/list_user.jinja2:25 templates/macros/form_macros.jinja2:310
+#: templates/macros/utils_macros.jinja2:34
+#: templates/realm/realm_detailed.jinja2:28
+#: templates/user/realm_user_detail.jinja2:32
+msgid "Email"
+msgstr "E-Mail"
+
+#: templates/admin/list_user.jinja2:26 templates/macros/form_macros.jinja2:311
+#: templates/macros/utils_macros.jinja2:35
+#: templates/user/realm_user_detail.jinja2:30
+msgid "FirstName"
+msgstr "Vorname"
+
+#: templates/admin/list_user.jinja2:27 templates/macros/form_macros.jinja2:312
+#: templates/macros/utils_macros.jinja2:36
+#: templates/user/realm_user_detail.jinja2:31
+msgid "LastName"
+msgstr "Nachname"
 
 #. Translators: The Application Name: default LAMa
 #: templates/base.jinja2:33
@@ -77,6 +126,7 @@ msgid "User"
 msgstr "Nutzer"
 
 #: templates/base_admin.jinja2:37 templates/realm/realm_groups.jinja2:4
+#: templates/user/realm_user_detail.jinja2:37
 msgid "Groups"
 msgstr "Gruppen"
 
@@ -84,38 +134,61 @@ msgstr "Gruppen"
 msgid "RealmAdd"
 msgstr "Bereich hinzufügen"
 
-#: templates/macros/form_macros.jinja2:309
-#: templates/macros/utils_macros.jinja2:33
-msgid "Username"
-msgstr "Nutzername"
+#: templates/group/group_add.jinja2:6
+msgid "AddGroup"
+msgstr "Gruppe anlegen"
 
-#: templates/macros/form_macros.jinja2:310
-#: templates/macros/utils_macros.jinja2:34
-#: templates/realm/realm_detailed.jinja2:28
-msgid "Email"
-msgstr "E-Mail"
+#: templates/group/group_add.jinja2:18 templates/group/group_detail.jinja2:35
+#: templates/realm/realm_update.jinja2:14
+#: templates/user/realm_user_add.jinja2:14
+#: templates/user/realm_user_detail.jinja2:97
+msgid "Save"
+msgstr "Sichern"
 
-#: templates/macros/form_macros.jinja2:311
-#: templates/macros/utils_macros.jinja2:35
-msgid "FirstName"
-msgstr "Vorname"
+#: templates/group/group_add.jinja2:20
+#: templates/group/group_confirm_delete.jinja2:17
+#: templates/group/group_detail.jinja2:37
+#: templates/realm/realm_update.jinja2:16
+#: templates/realm/realm_user_multiple_delete.jinja2:31
+#: templates/realm/realm_user_multiple_delete_confirm.jinja2:19
+#: templates/user/realm_user_add.jinja2:16
+#: templates/user/realm_user_detail.jinja2:99
+#: templates/user/user_confirm_delete.jinja2:25
+msgid "Cancel"
+msgstr "Abbrechen"
 
-#: templates/macros/form_macros.jinja2:312
-#: templates/macros/utils_macros.jinja2:36
-msgid "LastName"
-msgstr "Nachname"
+#: templates/group/group_confirm_delete.jinja2:19
+#: templates/group/group_detail.jinja2:22
+msgid "DeleteGroup"
+msgstr "Gruppe löschen"
+
+#: templates/group/group_detail.jinja2:7
+msgid "Group"
+msgstr "Gruppe"
+
+#: templates/group/group_detail.jinja2:9
+#: templates/user/realm_user_detail.jinja2:22
+msgid "LdapDomain"
+msgstr "Ldap Domain"
+
+#: templates/group/group_detail.jinja2:12 templates/realm/realm_groups.jinja2:9
+msgid "Description"
+msgstr "Beschreibung"
+
+#: templates/group/group_detail.jinja2:15
+msgid "Members"
+msgstr "Mitglieder"
+
+#: templates/group/group_detail.jinja2:19
+#: templates/group/group_detail.jinja2:25
+msgid "UpdateGroup"
+msgstr "Gruppe bearbeiten"
 
 #: templates/macros/form_macros.jinja2:314
 #: templates/macros/utils_macros.jinja2:38
+#: templates/user/realm_user_detail.jinja2:54
 msgid "LastLogin"
 msgstr "Letzter Login"
-
-#: templates/macros/utils_macros.jinja2:28
-#: templates/macros/utils_macros.jinja2:77
-#: templates/realm/realm_user_multiple_delete.jinja2:26
-#: templates/realm/realm_user_multiple_delete_confirm.jinja2:11
-msgid "Search"
-msgstr "Suche"
 
 #: templates/macros/utils_macros.jinja2:37
 msgid "Active"
@@ -152,6 +225,10 @@ msgstr "Nutzeranzahl"
 #: templates/macros/utils_macros.jinja2:88
 msgid "GroupCount"
 msgstr "Gruppenanzahl"
+
+#: templates/permission_denied.jinja2:8
+msgid "PermissionDeniedInfo"
+msgstr "Leider hast du keine Rechte :´("
 
 #. Translators: Is the Headline of the create new realm view
 #: templates/realm/realm_add.jinja2:10
@@ -230,10 +307,6 @@ msgstr "Test Mail senden"
 msgid "Name"
 msgstr "Name"
 
-#: templates/realm/realm_groups.jinja2:9
-msgid "Description"
-msgstr "Beschreibung"
-
 #: templates/realm/realm_groups.jinja2:10
 msgid "MemberCount"
 msgstr "Mitgliederanzahl"
@@ -242,17 +315,7 @@ msgstr "Mitgliederanzahl"
 msgid "AddGroups"
 msgstr "Gruppen hinzufügen"
 
-#: templates/realm/realm_update.jinja2:14
-msgid "Save"
-msgstr "Sichern"
-
-#: templates/realm/realm_update.jinja2:16
-#: templates/realm/realm_user_multiple_delete.jinja2:34
-#: templates/realm/realm_user_multiple_delete_confirm.jinja2:19
-msgid "Cancel"
-msgstr "Abbrechen"
-
-#: templates/realm/realm_user.jinja2:8
+#: templates/realm/realm_user.jinja2:8 templates/user/realm_user_add.jinja2:5
 msgid "AddUser"
 msgstr "Nutzer hinzufügen"
 
@@ -261,24 +324,87 @@ msgid "RemoveMultipleUser"
 msgstr "Mehrere Nutzer löschen"
 
 #: templates/realm/realm_user_multiple_delete.jinja2:6
+#: templates/realm/realm_user_multiple_delete_confirm.jinja2:5
+#: templates/user/realm_user_detail.jinja2:85
+#: templates/user/user_confirm_delete.jinja2:27
 msgid "DeleteUser"
 msgstr "Nutzer löschen"
 
 #: templates/realm/realm_user_multiple_delete.jinja2:10
 msgid "MultipleUserDeleteError"
 msgstr ""
-" <h3>Admin User festgestellt</h3>"
-"<p>Die folgenden Nutzer können nicht gelöscht werden, da Sie noch Mitglieder von ein oder mehreren Admin"
-"Gruppen sind. Bitte tragen Sie diese vorher aus den Admin Gruppen.</p>"
+" <h3>Admin User festgestellt</h3><p>Die folgenden Nutzer können nicht "
+"gelöscht werden, da Sie noch Mitglieder von ein oder mehreren AdminGruppen "
+"sind. Bitte tragen Sie diese vorher aus den Admin Gruppen.</p>"
 
-#: templates/realm/realm_user_multiple_delete.jinja2:32
+#: templates/realm/realm_user_multiple_delete.jinja2:29
 #: templates/realm/realm_user_multiple_delete_confirm.jinja2:17
 msgid "Execute"
 msgstr "Ausführen"
 
-#: templates/user/realm_user_detail.jinja2:22
-msgid "Anzeigename:"
-msgstr ""
+#: templates/user/realm_user_detail.jinja2:23
+msgid "UserDisplayName"
+msgstr "Anzeigename"
+
+#: templates/user/realm_user_detail.jinja2:27
+msgid "NotGeneratedYet"
+msgstr "Noch nicht generiert"
+
+#: templates/user/realm_user_detail.jinja2:33
+msgid "Password"
+msgstr "Passwort"
+
+#: templates/user/realm_user_detail.jinja2:34
+msgid "UserPasswordReset"
+msgstr "Nutzerpasswort zurücksetzen"
+
+#: templates/user/realm_user_detail.jinja2:35
+msgid "Phone"
+msgstr "Telefon"
+
+#: templates/user/realm_user_detail.jinja2:36
+msgid "MobilePhone"
+msgstr "Mobiltelefon"
+
+#: templates/user/realm_user_detail.jinja2:47
+msgid "NoneGroupAssigned"
+msgstr "Keine zugewiesen"
+
+#: templates/user/realm_user_detail.jinja2:51
+msgid "AssignGroups"
+msgstr "Gruppen zuweisen"
+
+#: templates/user/realm_user_detail.jinja2:62
+msgid "DeletionProcess"
+msgstr "Löschvorgang"
+
+#: templates/user/realm_user_detail.jinja2:65
+msgid "CancelDeletionProcess"
+msgstr "Löschvorgang abbrechen"
+
+#: templates/user/realm_user_detail.jinja2:73
+msgid "UpdateUser"
+msgstr "Nutzer bearbeiten"
+
+#: templates/user/realm_user_detail.jinja2:79
+msgid "ResendWelcomeMail"
+msgstr "Willkommensmail erneut senden"
+
+#: templates/user/realm_user_update_groups.jinja2:6
+msgid "UpdateGroupMembership"
+msgstr "Gruppenzuweisung ändern"
+
+#: templates/user/realm_user_update_groups.jinja2:11
+msgid "UserGroupDelete"
+msgstr "Gruppe entfernen"
+
+#: templates/user/realm_user_update_groups.jinja2:30
+msgid "UserGroupAdd"
+msgstr "Gruppe hinzufügen"
+
+#: templates/user/realm_user_update_groups.jinja2:50
+msgid "Done"
+msgstr "Fertig"
 
 #~ msgid "RealmDeleteInformation %(realm)s %(realm_ldap_base_dn)"
 #~ msgstr ""

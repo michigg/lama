@@ -5,26 +5,26 @@
 {% block admin_content %}
     <div class="row">
         <div class="col-12">
-            <h2>Django bekannte Nutzer
-                <small><a href="/admin" class="float-right h5">Django Admin Seiten</a></small>
+            <h2>{{ _('DjangoKnownUsers') }}
+                <small><a href="/admin" class="float-right h5">{{ _('DjangoAdminPages') }}</a></small>
             </h2>
             {{ mutils.get_warning_box(extra_errors) }}
-            <div class="alert alert-info">Um einen Nutzer zum Superadmin zu ernennen, klicke auf das Superadmin Icon
+            <div class="alert alert-info">{{ _('SuperAdminInfo') }}
             </div>
             <div class="table-search-field form-group w-25 float-right">
                 <input type="text"
                        class="form-control"
                        id="data-table-search-input">
-                <label for="data-table-search-input">Suche</label>
+                <label for="data-table-search-input">{{ _('Search') }}</label>
             </div>
             <table class="table table-hover table-striped table-inverse table-bordered data-table">
                 <thead>
                 <tr>
-                    <th scope="col">Superadmin</th>
-                    <th scope="col">Nutzername</th>
-                    <th scope="col">E-Mail</th>
-                    <th scope="col">Vorname</th>
-                    <th scope="col">Nachname</th>
+                    <th scope="col">{{ _('SuperAdmin') }}</th>
+                    <th scope="col">{{ _('Username') }}</th>
+                    <th scope="col">{{ _('Email') }}</th>
+                    <th scope="col">{{ _('FirstName') }}</th>
+                    <th scope="col">{{ _('LastName') }}</th>
                 </tr>
                 </thead>
                 <tbody>

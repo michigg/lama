@@ -8,9 +8,6 @@
     {% if blocked_users %}
         <div class="alert alert-warning">
             {{ _('MultipleUserDeleteError')|safe }}
-{#            <h3>Admin User festgestellt</h3>#}
-{#            <p>Die folgenden Nutzer können nicht gelöscht werden, da Sie noch Mitglieder von ein oder mehreren Admin#}
-{#                Gruppen sind. Bitte tragen Sie diese vorher aus den Admin Gruppen.</p>#}
             <ul>
                 {% for blocked_user in blocked_users %}
                     <li>{{ blocked_user.username }}</li>
