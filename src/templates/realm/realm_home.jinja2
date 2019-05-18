@@ -3,12 +3,12 @@
 {% import 'macros/utils_macros.jinja2' as mutils %}
 
 {% block admin_content %}
-    <h2>Bereiche</h2>
+    <h2>{{ _('Realms') }}</h2>
     {{ mutils.get_realm_table(realm_wrappers) }}
     {% if request.user.is_superuser %}
         <div class="row justify-content-center justify-content-sm-center">
             <div class="col-12 col-sm-8 col-md-8 col-lg-6 col-xl-5 bg-white text-dark p-3 mt-5">
-                <a href="{{ url('realm-add') }}" class="btn btn-primary w-100">Bereich hinzufügen</a>
+                <a href="{{ url('realm-add') }}" class="btn btn-primary w-100">{{ _('RealmAdd') }}</a>
             </div>
         </div>
     {% endif %}

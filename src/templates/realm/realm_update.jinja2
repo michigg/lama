@@ -11,9 +11,9 @@
             {{ mform.select_input(form.admin_group) }}
             {{ mform.select_input(form.default_group) }}
             <div class="d-flex mt-4">
-                <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+                <button type="submit" class="btn btn-primary mr-auto p-2">{{ _('Save') }}</button>
                 <a href="{{ url('realm-detail', args = [realm.id]) }}"
-                   class="btn btn-secondary p-2">Abbrechen</a>
+                   class="btn btn-secondary p-2">{{ _('Cancel') }}</a>
             </div>
         </form>
     {% endif %}

@@ -2,11 +2,10 @@
 {% import 'macros/utils_macros.jinja2' as mutils %}
 
 {% block detail_content %}
-    <h2>Nutzer </h2>
+    <h2>{{ _('User') }}</h2>
     {{ mutils.get_user_table(realm, realm_user) }}
     <a href="{{ url('realm-user-add', args=[realm.id]) }}" class="btn btn-primary"><i class="fas fa-user-plus"></i>
-        Nutzer hinzufügen</a>
+        {{ _('AddUser') }}</a>
     <a href="{{ url('realm-multiple-user-delete-confirm', args=[realm.id]) }}" class="btn btn-danger float-right"><i
-            class="fas fa-trash"></i> Mehrere Nutzer
-        Löschen</a>
+            class="fas fa-trash"></i> {{ _('RemoveMultipleUser') }}</a>
 {% endblock %}

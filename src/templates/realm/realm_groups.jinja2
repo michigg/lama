@@ -1,13 +1,13 @@
 {% extends 'realm/realm_detailed.jinja2' %}
 
 {% block detail_content %}
-    <h3>Gruppen</h3>
+    <h3>{{ _('Groups') }}</h3>
     <table class="table">
         <thead>
         <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Ldap Domain</th>
-            <th scope="col">Mitgliederanzahl</th>
+            <th scope="col">{{ _('Name') }}</th>
+            <th scope="col">{{ _('Description') }}</th>
+            <th scope="col">{{ _('MemberCount') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -19,12 +19,14 @@
                        title="{{ group.description }}"
                 >{{ group.name }}</a>
                 </td>
-                <td>{{ group.dn }}</td>
+                <td data-toggle="tooltip"
+                    data-placement="right"
+                    title="{{ group.description }}">{{ group.description|truncate(100) }}</td>
                 <td>{{ group.members|length }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
     <a href="{{ url('realm-group-add', args=[realm.id]) }}" class="btn btn-primary"><i class="far fa-plus-square"></i>
-        Gruppen hinzufügen</a>
+        {{ _('AddGroups') }}</a>
 {% endblock %}

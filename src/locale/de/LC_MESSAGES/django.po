@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-17 22:48+0000\n"
+"POT-Creation-Date: 2019-05-18 00:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,7 +28,7 @@ msgstr ""
 msgid "English"
 msgstr ""
 
-#: core/docker_settings.py:197
+#: core/docker_settings.py:197 core/docker_settings.py:198
 msgid "Deutsch"
 msgstr ""
 
@@ -56,7 +56,7 @@ msgstr "Über"
 msgid "DjangoAdminArea"
 msgstr "Django Adminbereich"
 
-#: templates/base_admin.jinja2:14
+#: templates/base_admin.jinja2:14 templates/realm/realm_home.jinja2:6
 msgid "Realms"
 msgstr "Bereiche"
 
@@ -64,7 +64,7 @@ msgstr "Bereiche"
 msgid "RealmOverview"
 msgstr "Bereichsübersicht"
 
-#: templates/base_admin.jinja2:27
+#: templates/base_admin.jinja2:27 templates/realm/realm_detailed.jinja2:5
 msgid "Realm"
 msgstr "Bereich"
 
@@ -72,17 +72,86 @@ msgstr "Bereich"
 msgid "RealmInformation"
 msgstr "Bereichsinformationen"
 
-#: templates/base_admin.jinja2:34
+#: templates/base_admin.jinja2:34 templates/realm/realm_user.jinja2:5
 msgid "User"
 msgstr "Nutzer"
 
-#: templates/base_admin.jinja2:37
+#: templates/base_admin.jinja2:37 templates/realm/realm_groups.jinja2:4
 msgid "Groups"
 msgstr "Gruppen"
 
-#: templates/base_admin.jinja2:46
+#: templates/base_admin.jinja2:46 templates/realm/realm_home.jinja2:11
 msgid "RealmAdd"
 msgstr "Bereich hinzufügen"
+
+#: templates/macros/form_macros.jinja2:309
+#: templates/macros/utils_macros.jinja2:33
+msgid "Username"
+msgstr "Nutzername"
+
+#: templates/macros/form_macros.jinja2:310
+#: templates/macros/utils_macros.jinja2:34
+#: templates/realm/realm_detailed.jinja2:28
+msgid "Email"
+msgstr "E-Mail"
+
+#: templates/macros/form_macros.jinja2:311
+#: templates/macros/utils_macros.jinja2:35
+msgid "FirstName"
+msgstr "Vorname"
+
+#: templates/macros/form_macros.jinja2:312
+#: templates/macros/utils_macros.jinja2:36
+msgid "LastName"
+msgstr "Nachname"
+
+#: templates/macros/form_macros.jinja2:314
+#: templates/macros/utils_macros.jinja2:38
+msgid "LastLogin"
+msgstr "Letzter Login"
+
+#: templates/macros/utils_macros.jinja2:28
+#: templates/macros/utils_macros.jinja2:77
+#: templates/realm/realm_user_multiple_delete.jinja2:26
+#: templates/realm/realm_user_multiple_delete_confirm.jinja2:11
+msgid "Search"
+msgstr "Suche"
+
+#: templates/macros/utils_macros.jinja2:37
+msgid "Active"
+msgstr "Aktiv"
+
+#: templates/macros/utils_macros.jinja2:39
+msgid "DeletionDate"
+msgstr "Löschdatum"
+
+#: templates/macros/utils_macros.jinja2:82
+msgid "RealmName"
+msgstr "Bereichsname"
+
+#: templates/macros/utils_macros.jinja2:83
+msgid "LdapBaseDN"
+msgstr "Ldap Basis DN"
+
+#: templates/macros/utils_macros.jinja2:84
+msgid "MailAddress"
+msgstr "Mailadresse"
+
+#: templates/macros/utils_macros.jinja2:85
+msgid "AdminGroup"
+msgstr "Admingruppe"
+
+#: templates/macros/utils_macros.jinja2:86
+msgid "DefaultGroup"
+msgstr "Defaultgruppe"
+
+#: templates/macros/utils_macros.jinja2:87
+msgid "UserCount"
+msgstr "Nutzeranzahl"
+
+#: templates/macros/utils_macros.jinja2:88
+msgid "GroupCount"
+msgstr "Gruppenanzahl"
 
 #. Translators: Is the Headline of the create new realm view
 #: templates/realm/realm_add.jinja2:10
@@ -119,20 +188,108 @@ msgstr "Abbrechen"
 msgid "RealmDeleteAgree"
 msgstr "Bereich löschen"
 
+#: templates/realm/realm_detailed.jinja2:10
+msgid "RealmDetailRemoveRealm"
+msgstr "Bereich löschen"
+
+#: templates/realm/realm_detailed.jinja2:19
+msgid "RealmDetailLdapOU"
+msgstr "LDAP Organisationseinheit"
+
+#: templates/realm/realm_detailed.jinja2:20
+msgid "RealmDetailUserCount"
+msgstr "Nutzeranzahl (Aktive/Inaktive)"
+
+#: templates/realm/realm_detailed.jinja2:25
+msgid "RealmDetailRemoveInactiveUser"
+msgstr "Inaktive Nutzer löschen"
+
+#: templates/realm/realm_detailed.jinja2:30
+#: templates/realm/realm_detailed.jinja2:37
+#: templates/realm/realm_detailed.jinja2:45
+msgid "RealmDetailStillPending"
+msgstr "Noch ausstehend"
+
+#: templates/realm/realm_detailed.jinja2:32
+msgid "RealmDetailAdminGroup"
+msgstr "Admin Gruppe"
+
+#: templates/realm/realm_detailed.jinja2:40
+msgid "RealmDetailDefaultGroup"
+msgstr "Default Gruppe"
+
+#: templates/realm/realm_detailed.jinja2:52
+msgid "RealmDetailChangeRealmInfo"
+msgstr "Bereichsinformationen anpassen"
+
+#: templates/realm/realm_detailed.jinja2:56
+msgid "RealmDetailTestMail"
+msgstr "Test Mail senden"
+
+#: templates/realm/realm_groups.jinja2:8
+msgid "Name"
+msgstr "Name"
+
+#: templates/realm/realm_groups.jinja2:9
+msgid "Description"
+msgstr "Beschreibung"
+
+#: templates/realm/realm_groups.jinja2:10
+msgid "MemberCount"
+msgstr "Mitgliederanzahl"
+
+#: templates/realm/realm_groups.jinja2:31
+msgid "AddGroups"
+msgstr "Gruppen hinzufügen"
+
+#: templates/realm/realm_update.jinja2:14
+msgid "Save"
+msgstr "Sichern"
+
+#: templates/realm/realm_update.jinja2:16
+#: templates/realm/realm_user_multiple_delete.jinja2:34
+#: templates/realm/realm_user_multiple_delete_confirm.jinja2:19
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: templates/realm/realm_user.jinja2:8
+msgid "AddUser"
+msgstr "Nutzer hinzufügen"
+
+#: templates/realm/realm_user.jinja2:10
+msgid "RemoveMultipleUser"
+msgstr "Mehrere Nutzer löschen"
+
+#: templates/realm/realm_user_multiple_delete.jinja2:6
+msgid "DeleteUser"
+msgstr "Nutzer löschen"
+
+#: templates/realm/realm_user_multiple_delete.jinja2:10
+msgid "MultipleUserDeleteError"
+msgstr ""
+" <h3>Admin User festgestellt</h3>"
+"<p>Die folgenden Nutzer können nicht gelöscht werden, da Sie noch Mitglieder von ein oder mehreren Admin"
+"Gruppen sind. Bitte tragen Sie diese vorher aus den Admin Gruppen.</p>"
+
+#: templates/realm/realm_user_multiple_delete.jinja2:32
+#: templates/realm/realm_user_multiple_delete_confirm.jinja2:17
+msgid "Execute"
+msgstr "Ausführen"
+
 #: templates/user/realm_user_detail.jinja2:22
 msgid "Anzeigename:"
 msgstr ""
 
-#: templates/realm/realm_confirm_delete.jinja2:29
-#, python-format
-msgid "RealmDeleteInformation %(realm)s %(realm_ldap_base_dn)"
-msgstr ""
-"<p>Achtung! Sie sind gerade dabei den Bereich <span class='text-uppercase font-weight-bold'>%(realm)s</span> zu löschen.</p>"
-"<p>Falls Sie sich sicher sind, dass Sie diesen Bereich löschen wollen, klicken Sie bitte auf \"Bereich löschen\"."
-"<p>Hierdurch werden <strong>Alle</strong> Nutzer und Gruppen gelöscht, die unter der Ldap Basis"
-"DN %(realm_ldap_base_dn)s eingetragen sind. Die Ldap Basis DN mit Ihren Organisationseinheiten "
-"\"groups\" und \"people\" bleiben bestehen.</p>"
-"<p>Bitte beachten Sie, dass die Daten der Nutzer, die in den Diensten hochgeladen wurden, weiterhin bestehen bleiben. "
-"Diese Daten müssen vom Systemadministrator seperat gelöscht werden. </p>"
-"<p>Möchten Sie das Löschen der Accountdaten verhindern, klicken Sie auf \"Abbrechen\"</p>"
-
+#~ msgid "RealmDeleteInformation %(realm)s %(realm_ldap_base_dn)"
+#~ msgstr ""
+#~ "<p>Achtung! Sie sind gerade dabei den Bereich <span class='text-uppercase "
+#~ "font-weight-bold'>%(realm)s</span> zu löschen.</p><p>Falls Sie sich "
+#~ "sicher sind, dass Sie diesen Bereich löschen wollen, klicken Sie bitte "
+#~ "auf \"Bereich löschen\".<p>Hierdurch werden <strong>Alle</strong> Nutzer "
+#~ "und Gruppen gelöscht, die unter der Ldap BasisDN %(realm_ldap_base_dn)s "
+#~ "eingetragen sind. Die Ldap Basis DN mit Ihren Organisationseinheiten "
+#~ "\"groups\" und \"people\" bleiben bestehen.</p><p>Bitte beachten Sie, "
+#~ "dass die Daten der Nutzer, die in den Diensten hochgeladen wurden, "
+#~ "weiterhin bestehen bleiben. Diese Daten müssen vom Systemadministrator "
+#~ "seperat gelöscht werden. </p><p>Möchten Sie das Löschen der Accountdaten "
+#~ "verhindern, klicken Sie auf \"Abbrechen\"</p>"

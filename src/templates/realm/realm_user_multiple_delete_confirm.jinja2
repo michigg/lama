@@ -2,21 +2,21 @@
 {% import 'macros/form_macros.jinja2' as mform %}
 
 {% block detail_content %}
-    <h2>Nutzer löschen</h2>
+    <h2>{{ _('DeleteUser') }}</h2>
     <div class="form-group w-25 float-right">
         <input type="text"
                class="form-control"
                placeholder="Personen Suche"
                id="data-table-search-input">
-        <label for="data-table-search-input">Suche</label>
+        <label for="data-table-search-input">{{ _('Search') }}</label>
     </div>
     <form action="{{ url('realm-multiple-user-delete-confirm', args=[realm.id]) }}" method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         {{ mform.user_select_table_input(users, name="ldap_users",css_classes='',show_lastlogin=True, checkbox_label_classes='table-checkbox-control-label') }}
         <div class="d-flex mt-4">
-            <button type="submit" class="btn btn-danger mr-auto p-2">Ausführen</button>
+            <button type="submit" class="btn btn-danger mr-auto p-2">{{ _('Execute') }}</button>
             <a href="{{ url('realm-user-list', args = [realm.id]) }}"
-               class="btn btn-secondary p-2">Abbrechen</a>
+               class="btn btn-secondary p-2">{{ _('Cancel') }}</a>
         </div>
     </form>
 {% endblock %}

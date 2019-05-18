@@ -299,16 +299,19 @@
                            id="delete-all-checkbox"
                     >
                     <label class="
-                            {% if checkbox_label_classes %}{{ checkbox_label_classes }}{% else %}table-checkbox-control-label table-checkbox-control-label-add{% endif %}"
-                           for="delete-all-checkbox"></label>
+                        {% if checkbox_label_classes %}
+                            {{ checkbox_label_classes }}
+                        {% else %}
+                            table-checkbox-control-label table-checkbox-control-label-add
+                        {% endif %}" for="delete-all-checkbox"></label>
                 {% endif %}
             </th>
-            <th scope="col">Nutzername</th>
-            <th scope="col">E-Mail</th>
-            <th scope="col">Vorname</th>
-            <th scope="col">Nachname</th>
+            <th scope="col">{{ _('Username') }}</th>
+            <th scope="col">{{ _('Email') }}</th>
+            <th scope="col">{{ _('FirstName') }}</th>
+            <th scope="col">{{ _('LastName') }}</th>
             {% if show_lastlogin %}
-                <th scope="col">Letzter Login</th>
+                <th scope="col">{{ _('LastLogin') }}</th>
             {% endif %}
         </tr>
         </thead>
@@ -325,27 +328,11 @@
                            {% if field and field.value() and user.username in field.value() %}checked{% endif %}
                     >
                     <label class="
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            {% if checkbox_label_classes %}{{ checkbox_label_classes }}{% else %}table-checkbox-control-label table-checkbox-control-label-add{% endif %}"
-                           for="{{ user.username }}_{{ loop.index }}">
-
+                        {% if checkbox_label_classes %}
+                            {{ checkbox_label_classes }}
+                        {% else %}
+                            table-checkbox-control-label table-checkbox-control-label-add
+                        {% endif %}" for="{{ user.username }}_{{ loop.index }}">
                     </label>
                 </td>
                 <td>{{ user.username }}</td>

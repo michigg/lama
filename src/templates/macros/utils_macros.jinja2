@@ -25,18 +25,18 @@
         <input type="text"
                class="form-control"
                id="data-table-search-input">
-        <label for="data-table-search-input">Suche</label>
+        <label for="data-table-search-input">{{ _('Search') }}</label>
     </div>
     <table class="table table-hover table-striped table-inverse table-bordered data-table">
         <thead>
         <tr>
-            <th scope="col">Nutzername</th>
-            <th scope="col">E-Mail</th>
-            <th scope="col">Vorname</th>
-            <th scope="col">Nachname</th>
-            <th scope="col">Aktiv</th>
-            <th scope="col">Letzer Login</th>
-            <th scope="col">Löschdatum</th>
+            <th scope="col">{{ _('Username') }}</th>
+            <th scope="col">{{ _('Email') }}</th>
+            <th scope="col">{{ _('FirstName') }}</th>
+            <th scope="col">{{ _('LastName') }}</th>
+            <th scope="col">{{ _('Active') }}</th>
+            <th scope="col">{{ _('LastLogin') }}</th>
+            <th scope="col">{{ _('DeletionDate') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -74,18 +74,18 @@
         <input type="text"
                class="form-control"
                id="data-table-search-input">
-        <label for="data-table-search-input">Suche</label>
+        <label for="data-table-search-input">{{ _('Search') }}</label>
     </div>
     <table class="table table-hover table-striped table-inverse table-bordered data-table text-center">
         <thead>
         <tr>
-            <th scope="col">Bereichsname</th>
-            <th scope="col">Ldap Basis DN</th>
-            <th scope="col">Mailadresse</th>
-            <th scope="col">Admingruppe</th>
-            <th scope="col">Defaultgruppe</th>
-            <th scope="col">Nutzeranzahl</th>
-            <th scope="col">Gruppenanzahl</th>
+            <th scope="col">{{ _('RealmName') }}</th>
+            <th scope="col">{{ _('LdapBaseDN') }}</th>
+            <th scope="col">{{ _('MailAddress') }}</th>
+            <th scope="col">{{ _('AdminGroup') }}</th>
+            <th scope="col">{{ _('DefaultGroup') }}</th>
+            <th scope="col">{{ _('UserCount') }}</th>
+            <th scope="col">{{ _('GroupCount') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -119,7 +119,6 @@
                 <td>{{ realm_wrapper.user_count }}</td>
                 <td>{{ realm_wrapper.group_count }}</td>
             </tr>
-
         {% endfor %}
         </tbody>
     </table>
