@@ -26,14 +26,22 @@
                     <span class="text-warning"> Noch nicht generiert </span>
                 {% endif %}
             </li>
-            <li class="list-group-item">Vorname: {{ user.user.first_name }}</li>
-            <li class="list-group-item">Nachname: {{ user.user.last_name }}</li>
+            {% if user.user.phone %}
+                <li class="list-group-item">Vorname: {{ user.user.first_name }}</li>
+            {% endif %}
+            {% if user.user.phone %}
+                <li class="list-group-item">Nachname: {{ user.user.last_name }}</li>
+            {% endif %}
             <li class="list-group-item">Email: {{ user.user.email }}</li>
             <li class="list-group-item">Passwort: <a
                     href="{{ url('realm-user-password-reset', args = [realm.id, user.user.dn]) }}" class="float-right">Nutzerpasswort
                 zurücksetzen</a></li>
-            <li class="list-group-item">Telefon: {{ user.user.phone }}</li>
-            <li class="list-group-item">Mobiltelefon: {{ user.user.mobile_phone }}</li>
+            {% if user.user.phone %}
+                <li class="list-group-item">Telefon: {{ user.user.phone }}</li>
+            {% endif %}
+            {% if user.user.mobile_phone %}
+                <li class="list-group-item">Mobiltelefon: {{ user.user.mobile_phone }}</li>
+            {% endif %}
             <li class="list-group-item">Gruppen:
                 {% if groups %}
                     {% for group in groups %}

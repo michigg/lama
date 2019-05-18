@@ -15,16 +15,24 @@ class Command(BaseCommand):
         parser.add_argument(
             '--delete',
             action='store_true',
-            help='Delete poll instead of closing it',
+            help='Delete users which deletion time is lower than the current date',
         )
         parser.add_argument(
             '--json',
             action='store_true',
             help='Return an json encoded String',
         )
+        parser.add_argument(
+            '--all',
+            action='store_true',
+            help='Delete all marked user, --delete is required',
+        )
 
     def handle(self, *args, **options):
-        deletables = DeletedUser.objects.filter(deletion_date__lte=timezone.now())
+        if options['all']:
+            deletables = DeletedUser.objects.all()
+        else:
+            deletables = DeletedUser.objects.filter(deletion_date__lte=timezone.now())
         output = ""
         if options['json']:
             json_output = {'deletables': []}
@@ -34,7 +42,6 @@ class Command(BaseCommand):
         else:
             for user in deletables:
                 output += f'{user}\n'
-
         if options['delete']:
             LdapUser.base_dn = LdapUser.ROOT_DN
             for user in deletables:
@@ -48,4 +55,10 @@ class Command(BaseCommand):
                     pass
             if not options['json']:
                 output += '\nSuccessfully deleted all listed users'
-        self.stdout.write(self.style.SUCCESS(output))
+        if output:
+            self.stdout.write(self.style.SUCCESS(output))
+        else:
+            for deletable in deletables:
+                self.stdout.write(self.style.SUCCESS(deletable))
+
+
