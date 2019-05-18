@@ -8,14 +8,13 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.shortcuts import render, redirect, HttpResponse
-from datetime import datetime, timedelta
 
 from account_helper.models import Realm
 from account_manager.utils.mail_utils import realm_send_mail
 from .forms import RealmAddForm, RealmUpdateForm
 from .models import LdapGroup, LdapUser
 from ldap import LDAPError
-from django.utils.translation import gettext
+from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +50,8 @@ def realm_list(request):
 
             return redirect('user-detail', realm.id, user.dn)
         except ObjectDoesNotExist as err:
-            logger.info('Anmeldung fehlgeschlagen', err)
-            return HttpResponse("Invalid login. Please try again.")
+            logger.info('Login failed', err)
+            return HttpResponse(_('InvalidLogin'))
     elif len(realms) == 1:
         return redirect('realm-detail', realms[0].id)
     else:
