@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
 from account_manager.forms import LdapPasswordResetForm
+from account_manager.views.user_views import LdapPasswordChangeView
 from .views import about
 
 login_forbidden = user_passes_test(lambda u: u.is_anonymous(), '/')
@@ -31,5 +32,6 @@ urlpatterns = [
          auth_views.PasswordResetView.as_view(html_email_template_name='registration/password_reset_email.html',
                                               form_class=LdapPasswordResetForm),
          name='password_reset'),
+
     path('accounts/', include('django.contrib.auth.urls')),
 ]

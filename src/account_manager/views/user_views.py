@@ -8,7 +8,7 @@ from django.contrib.auth.views import PasswordResetConfirmView, PasswordChangeVi
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
 from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
@@ -498,9 +498,16 @@ class LdapPasswordResetConfirmView(PasswordResetConfirmView):
 
 
 class LdapPasswordChangeView(PasswordChangeView):
+
     def form_valid(self, form):
+        logger.info('VALIDATED')
         user = form.save()
         password = form.cleaned_data['new_password1']
         LdapUser.base_dn = LdapUser.ROOT_DN
         LdapUser.password_reset(user, password)
-        return super().form_valid(form)
+        logger.info('VALIDATED')
+        # return HttpResponseRedirect(self.get_success_url())
+        cached_request = super().form_valid(form)
+        user.set_unusable_password()
+        user.save()
+        return cached_request
