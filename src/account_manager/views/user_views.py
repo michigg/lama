@@ -12,14 +12,17 @@ from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
 from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
+from django.urls import reverse
+from urllib.parse import urlencode
 
 from account_helper.models import Realm, DeletedUser
 from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
-    UserGroupListForm
+    UserGroupListForm, LdapPasswordChangeForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
 from account_manager.utils.mail_utils import send_welcome_mail, send_deletion_mail
 
+from django.contrib.auth import logout
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -488,6 +491,16 @@ def ldap_add_user_to_groups(ldap_user, user_groups):
         group.save()
 
 
+@login_required
+def password_change_controller(request):
+    logout(request)
+    base_url = reverse('login')
+    next_param = reverse('password_change')
+    query_string = urlencode({'next': next_param})
+    url = '{}?{}'.format(base_url, query_string)
+    return redirect(url)
+
+
 class LdapPasswordResetConfirmView(PasswordResetConfirmView):
     def form_valid(self, form):
         user = form.save()
@@ -501,15 +514,13 @@ class LdapPasswordResetConfirmView(PasswordResetConfirmView):
 
 
 class LdapPasswordChangeView(PasswordChangeView):
+    form_class = LdapPasswordChangeForm
 
     def form_valid(self, form):
-        logger.info('VALIDATED')
         user = form.save()
         password = form.cleaned_data['new_password1']
         LdapUser.base_dn = LdapUser.ROOT_DN
         LdapUser.password_reset(user, password)
-        logger.info('VALIDATED')
-        # return HttpResponseRedirect(self.get_success_url())
         cached_request = super().form_valid(form)
         user.set_unusable_password()
         user.save()

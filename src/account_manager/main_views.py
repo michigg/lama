@@ -68,6 +68,7 @@ def _get_group_user_count_wrapper(realm):
 
 
 @login_required
+@is_realm_admin
 def realm_add(request):
     if request.user.is_superuser:
         realms = Realm.objects.all().order_by('name')
