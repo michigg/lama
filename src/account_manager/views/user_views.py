@@ -160,7 +160,7 @@ def realm_user_resend_password_reset(request, realm_id, user_dn):
                 form.save(
                     request=pw_reset_request,
                     use_https=True,
-                    from_email=os.environ.get('DEFAULT_FROM_EMAIL', 'vergesslich@test.de'),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
                     email_template_name='registration/password_reset_email.html')
 
     except Exception as e:
@@ -494,7 +494,10 @@ class LdapPasswordResetConfirmView(PasswordResetConfirmView):
         password = form.cleaned_data['new_password1']
         LdapUser.base_dn = LdapUser.ROOT_DN
         LdapUser.password_reset(user, password)
-        return super().form_valid(form)
+        cached_redirect = super().form_valid(form)
+        user.set_unusable_password()
+        user.save()
+        return cached_redirect
 
 
 class LdapPasswordChangeView(PasswordChangeView):
