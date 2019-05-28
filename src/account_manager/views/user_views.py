@@ -147,7 +147,7 @@ def realm_user_resend_password_reset(request, realm_id, user_dn):
     ldap_user = LdapUser.objects.get(dn=user_dn)
     try:
         if ldap_user.email:
-            logger.info("Sending email for to this email:", ldap_user.email)
+            logger.info(f"Sending email to {ldap_user.email}")
             form = PasswordResetForm({'email': ldap_user.email})
             if form.is_valid():
                 logger.info('CREATE REQUEST')
@@ -164,7 +164,7 @@ def realm_user_resend_password_reset(request, realm_id, user_dn):
                     email_template_name='registration/password_reset_email.html')
 
     except Exception as e:
-        logger.info('Error')
+        logger.error('Error')
     return redirect('realm-user-detail', realm_id, user_dn)
 
 
