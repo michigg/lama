@@ -105,16 +105,18 @@ def base_dn_available(base_dn):
 @login_required
 @is_realm_admin
 def realm_detail(request, realm_id):
+    return render_realm_detail_page(realm_id, request)
+
+
+def render_realm_detail_page(realm_id, request, notice=""):
     realm = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = realm.ldap_base_dn
-
-    inactive_users = LdapUser.get_inactive_users().count()
-    logger.info(inactive_users)
     ldap_admin_group, ldap_default_group = get_default_admin_group(realm)
-
+    LdapUser.base_dn = realm.ldap_base_dn
+    inactive_users = LdapUser.get_inactive_users().count()
     return render(request, 'realm/realm_detailed.jinja2',
                   {'realm': realm, 'ldap_admin_group': ldap_admin_group, 'ldap_default_group': ldap_default_group,
-                   'inactive_user_count': inactive_users, 'users_count': LdapUser.objects.all().count()})
+                   'inactive_user_count': inactive_users, 'users_count': LdapUser.objects.all().count(),
+                   'notice': notice})
 
 
 def get_default_admin_group(realm):
@@ -241,6 +243,4 @@ def realm_email_test(request, realm_id):
                        'error': f'Mail konnte nicht versendet werden. Bitte kontaktieren sie den Administrator',
                        'ldap_admin_group': ldap_admin_group,
                        'ldap_default_group': ldap_default_group})
-    return render(request, 'realm/realm_detailed.jinja2',
-                  {'realm': realm, 'notice': 'Test erfolgreich', 'ldap_admin_group': ldap_admin_group,
-                   'ldap_default_group': ldap_default_group})
+    return render_realm_detail_page(realm_id, request, notice='Test erfolgreich')
