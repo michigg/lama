@@ -1,4 +1,6 @@
 {% extends 'base_admin.jinja2' %}
+{% import 'macros/utils_macros.jinja2' as mutils %}
+
 {% block admin_content %}
     <div class="row ">
         <div class="col-12 p-3">
@@ -19,6 +21,7 @@
                 <p style="color: darkred">{{ error }}</p>
             {% endif %}
             {% block detail_content %}
+                 {{ mutils.get_success_toast(success_headline, success_text, error_headline, error_text) }}
                 <ul class="list-group list-group-flush w-100">
                     <li class="list-group-item">LDAP Organisationseinheit: {{ realm.ldap_base_dn }}</li>
                     <li class="list-group-item">Nutzeranzahl (Aktive/Inaktive): {{ users_count }}

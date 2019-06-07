@@ -105,16 +105,25 @@ def base_dn_available(base_dn):
 @login_required
 @is_realm_admin
 def realm_detail(request, realm_id):
+    return get_realm_detail_rendered(request, realm_id)
+
+
+def get_realm_detail_rendered(request, realm_id, success_headline=None, success_text=None, error_headline=None,
+                              error_text=None):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm.ldap_base_dn
-
     inactive_users = LdapUser.get_inactive_users().count()
-    logger.info(inactive_users)
     ldap_admin_group, ldap_default_group = get_default_admin_group(realm)
-
     return render(request, 'realm/realm_detailed.jinja2',
-                  {'realm': realm, 'ldap_admin_group': ldap_admin_group, 'ldap_default_group': ldap_default_group,
-                   'inactive_user_count': inactive_users, 'users_count': LdapUser.objects.all().count()})
+                  {'realm': realm,
+                   'ldap_admin_group': ldap_admin_group,
+                   'ldap_default_group': ldap_default_group,
+                   'inactive_user_count': inactive_users,
+                   'users_count': LdapUser.objects.all().count(),
+                   'success_headline': success_headline,
+                   'success_text': success_text,
+                   'error_headline': error_headline,
+                   'error_text': error_text})
 
 
 def get_default_admin_group(realm):
@@ -214,33 +223,19 @@ def permission_denied(request):
 
 def realm_email_test(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
-    ldap_admin_group, ldap_default_group = get_default_admin_group(realm)
     try:
         realm_send_mail(realm, realm.email, f'{realm.name} Test Mail',
                         f'Du hast die Mail Konfiguration für {realm.name} erfolgreich abgeschlossen.')
     except SMTPAuthenticationError as err:
-        return render(request, 'realm/realm_detailed.jinja2',
-                      {'realm': realm, 'error': f'Mail konnte nicht versendet werden, Anmeldedaten inkorrekt.',
-                       'ldap_admin_group': ldap_admin_group,
-                       'ldap_default_group': ldap_default_group})
+        return get_realm_detail_rendered(request, realm_id, error_headline="Testmail",
+                                         error_text=f'Mail konnte nicht versendet werden, Anmeldedaten inkorrekt.')
     except SMTPConnectError as err:
-        return render(request, 'realm/realm_detailed.jinja2',
-                      {'realm': realm,
-                       'error': f'Mail konnte nicht versendet werden. Verbindungsaufbau abgelehnt. Bitte überprüfen sie die Server Addresse und den Port',
-                       'ldap_admin_group': ldap_admin_group,
-                       'ldap_default_group': ldap_default_group})
+        return get_realm_detail_rendered(request, realm_id, error_headline="Testmail",
+                                         error_text=f'Mail konnte nicht versendet werden. Verbindungsaufbau abgelehnt. Bitte überprüfen sie die Server Addresse und den Port')
     except timeout as err:
-        return render(request, 'realm/realm_detailed.jinja2',
-                      {'realm': realm,
-                       'error': f'Mail konnte nicht versendet werden. Zeitüberschreitung beim Verbindungsaufbau. Bitte überprüfen sie die Server Addresse und den Port',
-                       'ldap_admin_group': ldap_admin_group,
-                       'ldap_default_group': ldap_default_group})
+        return get_realm_detail_rendered(request, realm_id, error_headline="Testmail",
+                                         error_text=f'Mail konnte nicht versendet werden. Zeitüberschreitung beim Verbindungsaufbau. Bitte überprüfen sie die Server Addresse und den Port')
     except SMTPException:
-        return render(request, 'realm/realm_detailed.jinja2',
-                      {'realm': realm,
-                       'error': f'Mail konnte nicht versendet werden. Bitte kontaktieren sie den Administrator',
-                       'ldap_admin_group': ldap_admin_group,
-                       'ldap_default_group': ldap_default_group})
-    return render(request, 'realm/realm_detailed.jinja2',
-                  {'realm': realm, 'notice': 'Test erfolgreich', 'ldap_admin_group': ldap_admin_group,
-                   'ldap_default_group': ldap_default_group})
+        return get_realm_detail_rendered(request, realm_id, error_headline="Testmail",
+                                         error_text=f'Mail konnte nicht versendet werden. Bitte kontaktieren sie den Administrator')
+    return get_realm_detail_rendered(request, realm_id, success_headline="Testmail", success_text='Test erfolgreich')

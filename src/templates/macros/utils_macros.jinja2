@@ -131,13 +131,23 @@
     {% endif %}
 {% endmacro %}
 
-{% macro get_success_toast(success_head, success_text) -%}
+{% macro get_success_toast(success_head, success_text, error_headline, error_text) -%}
     {% if success_text and success_head %}
         <div class="toast" role="alert" aria-live="polite" aria-atomic="true" data-delay="5000">
             <div role="alert" aria-live="assertive" aria-atomic="true">
                 <div role="alert" aria-live="assertive" aria-atomic="true" class="" data-autohide="false">
                     <div class="toast-header text-success"><strong class="mr-auto">{{ success_head }}</strong></div>
                     <div class="toast-body">{{ success_text }}</div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if error_text and error_headline %}
+        <div class="toast" role="alert" aria-live="polite" aria-atomic="true" data-delay="5000">
+            <div role="alert" aria-live="assertive" aria-atomic="true">
+                <div role="alert" aria-live="assertive" aria-atomic="true" class="" data-autohide="false">
+                    <div class="toast-header text-error"><strong class="mr-auto">{{ error_headline }}</strong></div>
+                    <div class="toast-body">{{ error_text }}</div>
                 </div>
             </div>
         </div>
