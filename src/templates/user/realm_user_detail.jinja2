@@ -1,7 +1,9 @@
 {% extends 'realm/realm_detailed.jinja2' %}
 {% import 'macros/form_macros.jinja2' as mform %}
+{% import 'macros/utils_macros.jinja2' as mutils %}
 
 {% block detail_content %}
+    {{ mutils.get_success_toast(success_headline, success_text) }}
     {% if user.user %}
         {% if user.deleted_user.deletion_date %}
             <h3 class="text-danger">{{ user.user.username }}

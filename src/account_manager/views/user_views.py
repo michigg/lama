@@ -58,14 +58,19 @@ def realm_user(request, realm_id):
 @is_realm_admin
 @protect_cross_realm_user_access
 def realm_user_detail(request, realm_id, user_dn):
+    return get_rendered_user_details(request, realm_id, user_dn)
+
+
+def get_rendered_user_details(request, realm_id, user_dn, success_headline=None, success_text=None):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm.ldap_base_dn
     LdapGroup.base_dn = LdapGroup.ROOT_DN
-
     user = LdapUser.objects.get(dn=user_dn)
     user_wrapper = LdapUser.get_extended_user(user)
     groups = LdapGroup.objects.filter(members=user.dn)
-    return render(request, 'user/realm_user_detail.jinja2', {'user': user_wrapper, 'groups': groups, 'realm': realm})
+    return render(request, 'user/realm_user_detail.jinja2',
+                  {'user': user_wrapper, 'groups': groups, 'realm': realm, 'success_headline': success_headline,
+                   'success_text': success_text})
 
 
 @login_required
@@ -183,7 +188,8 @@ def realm_user_resend_welcome_mail(request, realm_id, user_dn):
         protocol = 'https'
     send_welcome_mail(domain=current_site.domain, email=ldap_user.email, protocol=protocol, realm=realm,
                       user=User.objects.get(username=ldap_user.username))
-    return redirect('realm-user-detail', realm_id, user_dn)
+    return get_rendered_user_details(request, realm_id, user_dn, success_headline="Willkommensmail",
+                                     success_text="Willkommensmail erfolgreich versendet.")
 
 
 @login_required

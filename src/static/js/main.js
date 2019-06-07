@@ -3,6 +3,10 @@ const TABLE_CLASS = '.data-table';
 const TABLE_CLASS_NO_PAGING = '.data-table-npaging';
 
 $(document).ready(function () {
+    // Bottstrap Toast
+    $('.toast').toast('show');
+
+    //Datatables
     const data_table = $(TABLE_CLASS).DataTable({
         "paging": true,
         "pageLength": 10,
