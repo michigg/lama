@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 
+from account_manager.utils.django_user import update_dajngo_user
 from .models import LdapUser, LdapGroup
 from django.forms import modelformset_factory
 import logging
@@ -83,6 +84,10 @@ class LdapPasswordResetForm(PasswordResetForm):
              that prevent inactive users and users with unusable passwords from
              resetting their password.
              """
+        LdapUser.base_dn = LdapUser.ROOT_DN
+        ldap_users = LdapUser.objects.filter(email=email)
+        for ldap_user in ldap_users:
+            update_dajngo_user(ldap_user)
         logger.debug('Pasword reset get users')
         active_users = UserModel._default_manager.filter(**{
             '%s__iexact' % UserModel.get_email_field_name(): email,

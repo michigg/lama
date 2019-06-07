@@ -18,6 +18,7 @@ from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDA
     UserGroupListForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
+from account_manager.utils.django_user import update_dajngo_user
 from account_manager.utils.mail_utils import send_welcome_mail, send_deletion_mail
 
 from django.conf import settings
@@ -175,6 +176,7 @@ def realm_user_resend_welcome_mail(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
     ldap_user = LdapUser.objects.get(dn=user_dn)
+    update_dajngo_user(ldap_user)
     current_site = get_current_site(request)
     protocol = 'http'
     if request.is_secure():
