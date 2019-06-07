@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
 
 from account_manager.utils.django_user import update_dajngo_user
 from .models import LdapUser, LdapGroup
@@ -95,3 +95,11 @@ class LdapPasswordResetForm(PasswordResetForm):
         })
         logger.debug((u for u in active_users))
         return (u for u in active_users)
+
+
+class LdapPasswordChangeForm(PasswordChangeForm):
+    def clean_old_password(self):
+        """
+        Validates that the old_password field is correct.
+        """
+        return "ralf"

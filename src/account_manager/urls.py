@@ -80,6 +80,8 @@ urlpatterns = [
          name='user-delete'),
     path('accounts/reset/<uidb64>/<token>/', user_views.LdapPasswordResetConfirmView.as_view(),
          name='ldap_password_reset_confirm'),
+    path('accounts/password_change/secure/', user_views.password_change_controller,
+         name='password_change_controller'),
     path('accounts/password_change/', user_views.LdapPasswordChangeView.as_view(),
          name='password_change'),
 

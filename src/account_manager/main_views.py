@@ -45,7 +45,7 @@ def realm_list(request):
         try:
             LdapUser.base_dn = LdapUser.ROOT_DN
             user = LdapUser.objects.get(username=user.username)
-            realm_base_dn = re.compile('(uid=[a-zA-Z0-9_]*),(ou=[a-zA-Z_]*),(.*)').match(user.dn).group(3)
+            realm_base_dn = re.compile('(uid=[a-zA-Z0-9_-]*),(ou=[a-zA-Z_-]*),(.*)').match(user.dn).group(3)
             realm = Realm.objects.get(ldap_base_dn=realm_base_dn)
 
             return redirect('user-detail', realm.id, user.dn)
@@ -68,6 +68,7 @@ def _get_group_user_count_wrapper(realm):
 
 
 @login_required
+@is_realm_admin
 def realm_add(request):
     if request.user.is_superuser:
         realms = Realm.objects.all().order_by('name')
@@ -111,6 +112,7 @@ def realm_detail(request, realm_id):
 def get_realm_detail_rendered(request, realm_id, success_headline=None, success_text=None, error_headline=None,
                               error_text=None):
     realm = Realm.objects.get(id=realm_id)
+    ldap_admin_group, ldap_default_group = get_default_admin_group(realm)
     LdapUser.base_dn = realm.ldap_base_dn
     inactive_users = LdapUser.get_inactive_users().count()
     ldap_admin_group, ldap_default_group = get_default_admin_group(realm)

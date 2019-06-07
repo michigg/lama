@@ -84,7 +84,7 @@ class LdapUser(Model):
         LdapUser.base_dn = LdapUser.ROOT_DN
         ldap_user = LdapUser.objects.get(username=user.username)
         ldap_user.password = raw_password
-        LdapUser.base_dn = re.compile('(uid=[a-zA-Z0-9_]*),(.*)').match(ldap_user.dn).group(2)
+        LdapUser.base_dn = re.compile('(uid=[a-zA-Z0-9_-]*),(.*)').match(ldap_user.dn).group(2)
         ldap_user.save()
 
     @staticmethod

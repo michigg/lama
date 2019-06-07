@@ -8,19 +8,22 @@ from django.contrib.auth.views import PasswordResetConfirmView, PasswordChangeVi
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
 from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
+from django.urls import reverse
+from urllib.parse import urlencode
 
 from account_helper.models import Realm, DeletedUser
 from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
-    UserGroupListForm
+    UserGroupListForm, LdapPasswordChangeForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
 from account_manager.utils.django_user import update_dajngo_user
 from account_manager.utils.mail_utils import send_welcome_mail, send_deletion_mail
 
+from django.contrib.auth import logout
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -153,7 +156,7 @@ def realm_user_resend_password_reset(request, realm_id, user_dn):
     ldap_user = LdapUser.objects.get(dn=user_dn)
     try:
         if ldap_user.email:
-            logger.info("Sending email for to this email:", ldap_user.email)
+            logger.info(f"Sending email to {ldap_user.email}")
             form = PasswordResetForm({'email': ldap_user.email})
             if form.is_valid():
                 logger.info('CREATE REQUEST')
@@ -166,11 +169,11 @@ def realm_user_resend_password_reset(request, realm_id, user_dn):
                 form.save(
                     request=pw_reset_request,
                     use_https=True,
-                    from_email=os.environ.get('DEFAULT_FROM_EMAIL', 'vergesslich@test.de'),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
                     email_template_name='registration/password_reset_email.html')
 
     except Exception as e:
-        logger.info('Error')
+        logger.error('Error')
     return redirect('realm-user-detail', realm_id, user_dn)
 
 
@@ -496,19 +499,37 @@ def ldap_add_user_to_groups(ldap_user, user_groups):
         group.save()
 
 
+@login_required
+def password_change_controller(request):
+    logout(request)
+    base_url = reverse('login')
+    next_param = reverse('password_change')
+    query_string = urlencode({'next': next_param})
+    url = '{}?{}'.format(base_url, query_string)
+    return redirect(url)
+
+
 class LdapPasswordResetConfirmView(PasswordResetConfirmView):
     def form_valid(self, form):
         user = form.save()
         password = form.cleaned_data['new_password1']
         LdapUser.base_dn = LdapUser.ROOT_DN
         LdapUser.password_reset(user, password)
-        return super().form_valid(form)
+        cached_redirect = super().form_valid(form)
+        user.set_unusable_password()
+        user.save()
+        return cached_redirect
 
 
 class LdapPasswordChangeView(PasswordChangeView):
+    form_class = LdapPasswordChangeForm
+
     def form_valid(self, form):
         user = form.save()
         password = form.cleaned_data['new_password1']
         LdapUser.base_dn = LdapUser.ROOT_DN
         LdapUser.password_reset(user, password)
-        return super().form_valid(form)
+        cached_request = super().form_valid(form)
+        user.set_unusable_password()
+        user.save()
+        return cached_request
