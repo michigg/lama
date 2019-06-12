@@ -50,14 +50,93 @@ from account_manager.models import LdapUser
 #         self.assertEqual(response.status_code, 302)
 
 
-class RealmViewWithLoginTest(TestCase):
+# class RealmViewWithLoginTest(TestCase):
+#
+#     @classmethod
+#     def setUpTestData(cls):
+#         realm, _ = Realm.objects.get_or_create(name="test", ldap_base_dn="ou=test,ou=fachschaften,dc=test,dc=de")
+#         LdapUser.set_root_dn(realm)
+#         LdapUser.objects.get_or_create(username="test", email="test@test.de",
+#                                        password=RealmViewWithLoginTest.get_password(),
+#                                        first_name="max",
+#                                        last_name="musterstudent")
+#         User.objects.get_or_create(username="test", email="test@test.de")
+#
+#     @classmethod
+#     def get_password(cls):
+#         return "12345678"
+#
+#     def setUp(self):
+#         self.realm = Realm.objects.get(name="test")
+#         LdapUser.set_root_dn(self.realm)
+#         self.ldap_user = LdapUser.objects.get(username="test")
+#         self.django_user = User.objects.get(username="test")
+#         self.client.login(username=self.ldap_user.username, password=RealmViewWithLoginTest.get_password())
+#
+#     def tearDown(self):
+#         self.realm.delete()
+#         self.ldap_user.delete()
+#         self.django_user.delete()
+
+# def test_realm_home_view_url_accessible_by_name(self):
+#     response = self.client.get(reverse('realm-home'))
+#     response.user = self.django_user
+#     self.assertEqual(response.status_code, 200)
+
+# def test_realm_detail_view_url_accessible_by_name(self):
+#     response = self.client.get(reverse('realm-detail', args=[self.realm.id]))
+#     response.user = self.django_user
+#     self.assertEqual(response.status_code, 200)
+#
+# def test_realm_update_view_url_accessible_by_name(self):
+#     response = self.client.get(reverse('realm-update', args=[self.realm.id]))
+#     response.user = self.django_user
+#     self.assertEqual(response.status_code, 200)
+#
+# def test_realm_delete_confirm_view_url_accessible_by_name(self):
+#     response = self.client.get(reverse('realm-delete-confirm', args=[self.realm.id]))
+#     response.user = self.django_user
+#     self.assertEqual(response.status_code, 200)
+#
+# def test_realm_delete__view_url_accessible_by_name(self):
+#     response = self.client.get(reverse('realm-delete', args=[self.realm.id]))
+#     response.user = self.django_user
+#     self.assertEqual(response.status_code, 200)
+#
+# def test_realm_mail_test_view_url_accessible_by_name(self):
+#     response = self.client.get(reverse('realm-mail-test', args=[self.realm.id]))
+#     response.user = self.django_user
+#     self.assertEqual(response.status_code, 200)
+#
+# def test_realm_add_view_uses_correct_template(self):
+#     response = self.client.get(reverse('realm-add'))
+#     self.assertEqual(response.status_code, 200)
+#     self.assertTemplateUsed(response, 'catalog/author_list.html')
+
+# def test_pagination_is_ten(self):
+#     response = self.client.get(reverse('authors'))
+#     self.assertEqual(response.status_code, 200)
+#     self.assertTrue('is_paginated' in response.context)
+#     self.assertTrue(response.context['is_paginated'] == True)
+#     self.assertTrue(len(response.context['author_list']) == 10)
+#
+# def test_lists_all_authors(self):
+#     # Get second page and confirm it has (exactly) remaining 3 items
+#     response = self.client.get(reverse('authors') + '?page=2')
+#     self.assertEqual(response.status_code, 200)
+#     self.assertTrue('is_paginated' in response.context)
+#     self.assertTrue(response.context['is_paginated'] == True)
+#     self.assertTrue(len(response.context['author_list']) == 3)
+
+
+class RealmAddViewTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
         realm, _ = Realm.objects.get_or_create(name="test", ldap_base_dn="ou=test,ou=fachschaften,dc=test,dc=de")
         LdapUser.set_root_dn(realm)
         LdapUser.objects.get_or_create(username="test", email="test@test.de",
-                                       password=RealmViewWithLoginTest.get_password(),
+                                       password=RealmAddViewTest.get_password(),
                                        first_name="max",
                                        last_name="musterstudent")
         User.objects.get_or_create(username="test", email="test@test.de")
@@ -71,64 +150,49 @@ class RealmViewWithLoginTest(TestCase):
         LdapUser.set_root_dn(self.realm)
         self.ldap_user = LdapUser.objects.get(username="test")
         self.django_user = User.objects.get(username="test")
-        self.client.login(username=self.ldap_user.username, password=RealmViewWithLoginTest.get_password())
+        self.django_superuser = User.objects.create_superuser(
+            username='superuser_test',
+            password='test',
+            email='test@test.de',
+            is_staff=True,
+            is_superuser=True,
+            is_active=True,
+        )
 
     def tearDown(self):
         self.realm.delete()
         self.ldap_user.delete()
         self.django_user.delete()
 
-    def test_realm_home_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('realm-home'))
-        response.user = self.django_user
-        self.assertEqual(response.status_code, 200)
-
-    def test_realm_add_view_url_accessible_by_name(self):
+    def test_realm_add_view_url_accessible_by_name_without_login(self):
         response = self.client.get(reverse('realm-add'))
-        response.user = self.django_user
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
-    def test_realm_detail_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('realm-detail', args=[self.realm.id]))
-        response.user = self.django_user
-        self.assertEqual(response.status_code, 200)
+    def test_realm_add_view_url_accessible_by_name_with_login(self):
+        self.client.login(username=self.ldap_user.username, password=RealmAddViewTest.get_password())
+        response = self.client.get(reverse('realm-add'))
+        self.assertEqual(response.status_code, 403)
+        self.client.logout()
 
-    def test_realm_update_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('realm-update', args=[self.realm.id]))
-        response.user = self.django_user
-        self.assertEqual(response.status_code, 200)
-
-    def test_realm_delete_confirm_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('realm-delete-confirm', args=[self.realm.id]))
-        response.user = self.django_user
-        self.assertEqual(response.status_code, 200)
-
-    def test_realm_delete__view_url_accessible_by_name(self):
-        response = self.client.get(reverse('realm-delete', args=[self.realm.id]))
-        response.user = self.django_user
-        self.assertEqual(response.status_code, 200)
-
-    def test_realm_mail_test_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('realm-mail-test', args=[self.realm.id]))
-        response.user = self.django_user
-        self.assertEqual(response.status_code, 200)
-
-    def test_realm_add_view_uses_correct_template(self):
+    def test_realm_add_view_url_accessible_by_name_with_super_user_login(self):
+        self.client.login(username=self.django_superuser.username, password='test')
         response = self.client.get(reverse('realm-add'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'catalog/author_list.html')
+        self.client.logout()
 
-    # def test_pagination_is_ten(self):
-    #     response = self.client.get(reverse('authors'))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTrue('is_paginated' in response.context)
-    #     self.assertTrue(response.context['is_paginated'] == True)
-    #     self.assertTrue(len(response.context['author_list']) == 10)
-    #
-    # def test_lists_all_authors(self):
-    #     # Get second page and confirm it has (exactly) remaining 3 items
-    #     response = self.client.get(reverse('authors') + '?page=2')
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTrue('is_paginated' in response.context)
-    #     self.assertTrue(response.context['is_paginated'] == True)
-    #     self.assertTrue(len(response.context['author_list']) == 3)
+    def test_realm_add_view_with_super_user_login_add_realm(self):
+        realm = Realm.objects.get(name=self.realm.name)
+        realm.delete()
+        self.client.login(username=self.django_superuser.username, password='test')
+        response = self.client.post(reverse('realm-add'),
+                                    {'name': 'test', 'ldap_base_dn': 'ou=test,ou=fachschaften,dc=test,dc=de'})
+        self.assertEqual(response.status_code, 201)
+        self.client.logout()
+        self.realm, _ = Realm.objects.get_or_create(name="test", ldap_base_dn="ou=test,ou=fachschaften,dc=test,dc=de")
+
+    def test_realm_add_view_with_super_user_login_add_extisting_realm(self):
+        self.client.login(username=self.django_superuser.username, password='test')
+        response = self.client.post(reverse('realm-add'),
+                                    {'name': 'test', 'ldap_base_dn': 'ou=test,ou=fachschaften,dc=test,dc=de'})
+        self.assertEqual(response.status_code, 409)
+        self.client.logout()
