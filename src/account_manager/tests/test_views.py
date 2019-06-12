@@ -1,132 +1,109 @@
-from django.contrib.auth import login
+import logging
+
 from django.contrib.auth.models import User
 from django.test import TestCase
-
 # Create your tests here.
 from django.urls import reverse
 
 from account_helper.models import Realm
-from account_manager.models import LdapUser
+from account_manager.models import LdapUser, LdapGroup
 
 
-# class RealmViewTest(TestCase):
-#     @classmethod
-#     def setUpTestData(cls):
-#         Realm.objects.get_or_create(name="test", ldap_base_dn="ou=test,dc=test,dc=de")
-#
-#     def setUp(self):
-#         self.realm = Realm.objects.get(name="test")
-#
-#     def tearDown(self):
-#         realm = Realm.objects.get(name="test")
-#         realm.delete()
-#
-#     def test_realm_home_view_url_accessible_by_name(self):
-#         response = self.client.get(reverse('realm-home'))
-#         self.assertEqual(response.status_code, 302)
-#
-#     def test_realm_add_view_url_accessible_by_name(self):
-#         response = self.client.get(reverse('realm-add'))
-#         self.assertEqual(response.status_code, 302)
-#
-#     def test_realm_detail_view_url_accessible_by_name(self):
-#         response = self.client.get(reverse('realm-detail', args=[self.realm.id]))
-#         self.assertEqual(response.status_code, 302)
-#
-#     def test_realm_update_view_url_accessible_by_name(self):
-#         response = self.client.get(reverse('realm-update', args=[self.realm.id]))
-#         self.assertEqual(response.status_code, 302)
-#
-#     def test_realm_delete_confirm_view_url_accessible_by_name(self):
-#         response = self.client.get(reverse('realm-delete-confirm', args=[self.realm.id]))
-#         self.assertEqual(response.status_code, 302)
-#
-#     def test_realm_delete__view_url_accessible_by_name(self):
-#         response = self.client.get(reverse('realm-delete', args=[self.realm.id]))
-#         self.assertEqual(response.status_code, 302)
-#
-#     def test_realm_mail_test_view_url_accessible_by_name(self):
-#         response = self.client.get(reverse('realm-mail-test', args=[self.realm.id]))
-#         self.assertEqual(response.status_code, 302)
+class RealmHomeViewTest(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        # User.objects.get_or_create(username="test", email="test@test.de")
+        User.objects.create_superuser(
+            username='test_superuser',
+            password=RealmHomeViewTest.get_password(),
+            email='test@test.de',
+            is_staff=True,
+            is_superuser=True,
+            is_active=True,
+        )
 
-# class RealmViewWithLoginTest(TestCase):
-#
-#     @classmethod
-#     def setUpTestData(cls):
-#         realm, _ = Realm.objects.get_or_create(name="test", ldap_base_dn="ou=test,ou=fachschaften,dc=test,dc=de")
-#         LdapUser.set_root_dn(realm)
-#         LdapUser.objects.get_or_create(username="test", email="test@test.de",
-#                                        password=RealmViewWithLoginTest.get_password(),
-#                                        first_name="max",
-#                                        last_name="musterstudent")
-#         User.objects.get_or_create(username="test", email="test@test.de")
-#
-#     @classmethod
-#     def get_password(cls):
-#         return "12345678"
-#
-#     def setUp(self):
-#         self.realm = Realm.objects.get(name="test")
-#         LdapUser.set_root_dn(self.realm)
-#         self.ldap_user = LdapUser.objects.get(username="test")
-#         self.django_user = User.objects.get(username="test")
-#         self.client.login(username=self.ldap_user.username, password=RealmViewWithLoginTest.get_password())
-#
-#     def tearDown(self):
-#         self.realm.delete()
-#         self.ldap_user.delete()
-#         self.django_user.delete()
+    def create_ldap_objects(self):
+        self.realm_1, _ = Realm.objects.get_or_create(name="test_realm_1",
+                                                      ldap_base_dn="ou=test,ou=fachschaften,dc=test,dc=de")
+        self.realm_2, _ = Realm.objects.get_or_create(name="test_realm_2",
+                                                      ldap_base_dn="ou=test2,ou=fachschaften,dc=test,dc=de")
+        LdapUser.set_root_dn(self.realm_1)
+        self.ldap_user_multiple_admin, _ = LdapUser.objects.get_or_create(username="test_multi_admin",
+                                                                          email="test@test.de",
+                                                                          password=RealmHomeViewTest.get_password(),
+                                                                          first_name="max",
+                                                                          last_name="musterstudent")
+        self.ldap_user_admin, _ = LdapUser.objects.get_or_create(username="test_admin", email="test@test.de",
+                                                                 password=RealmHomeViewTest.get_password(),
+                                                                 first_name="max",
+                                                                 last_name="musterstudent")
+        self.ldap_user, _ = LdapUser.objects.get_or_create(username="test", email="test@test.de",
+                                                           password=RealmHomeViewTest.get_password(),
+                                                           first_name="max",
+                                                           last_name="musterstudent")
+        LdapGroup.set_root_dn(self.realm_1)
+        self.realm_1_ldap_group = LdapGroup.objects.create(name="test_realm_1_admin_group",
+                                                           members=[self.ldap_user_multiple_admin.dn,
+                                                                    self.ldap_user_admin.dn])
+        LdapGroup.set_root_dn(self.realm_1)
+        self.realm_2_ldap_group = LdapGroup.objects.create(name="test_realm_2_admin_group",
+                                                           members=[self.ldap_user_multiple_admin.dn])
+        logging.disable(logging.DEBUG)
+        self.realm_1.admin_group = self.realm_1_ldap_group.get_django_group()
+        self.realm_1.save()
+        self.realm_2.admin_group = self.realm_2_ldap_group.get_django_group()
+        self.realm_2.save()
 
-# def test_realm_home_view_url_accessible_by_name(self):
-#     response = self.client.get(reverse('realm-home'))
-#     response.user = self.django_user
-#     self.assertEqual(response.status_code, 200)
+    @classmethod
+    def get_password(cls):
+        return "12345678"
 
-# def test_realm_detail_view_url_accessible_by_name(self):
-#     response = self.client.get(reverse('realm-detail', args=[self.realm.id]))
-#     response.user = self.django_user
-#     self.assertEqual(response.status_code, 200)
-#
-# def test_realm_update_view_url_accessible_by_name(self):
-#     response = self.client.get(reverse('realm-update', args=[self.realm.id]))
-#     response.user = self.django_user
-#     self.assertEqual(response.status_code, 200)
-#
-# def test_realm_delete_confirm_view_url_accessible_by_name(self):
-#     response = self.client.get(reverse('realm-delete-confirm', args=[self.realm.id]))
-#     response.user = self.django_user
-#     self.assertEqual(response.status_code, 200)
-#
-# def test_realm_delete__view_url_accessible_by_name(self):
-#     response = self.client.get(reverse('realm-delete', args=[self.realm.id]))
-#     response.user = self.django_user
-#     self.assertEqual(response.status_code, 200)
-#
-# def test_realm_mail_test_view_url_accessible_by_name(self):
-#     response = self.client.get(reverse('realm-mail-test', args=[self.realm.id]))
-#     response.user = self.django_user
-#     self.assertEqual(response.status_code, 200)
-#
-# def test_realm_add_view_uses_correct_template(self):
-#     response = self.client.get(reverse('realm-add'))
-#     self.assertEqual(response.status_code, 200)
-#     self.assertTemplateUsed(response, 'catalog/author_list.html')
+    def setUp(self):
+        self.create_ldap_objects()
+        self.django_superuser = User.objects.get(username="test_superuser")
 
-# def test_pagination_is_ten(self):
-#     response = self.client.get(reverse('authors'))
-#     self.assertEqual(response.status_code, 200)
-#     self.assertTrue('is_paginated' in response.context)
-#     self.assertTrue(response.context['is_paginated'] == True)
-#     self.assertTrue(len(response.context['author_list']) == 10)
-#
-# def test_lists_all_authors(self):
-#     # Get second page and confirm it has (exactly) remaining 3 items
-#     response = self.client.get(reverse('authors') + '?page=2')
-#     self.assertEqual(response.status_code, 200)
-#     self.assertTrue('is_paginated' in response.context)
-#     self.assertTrue(response.context['is_paginated'] == True)
-#     self.assertTrue(len(response.context['author_list']) == 3)
+    def tearDown(self):
+        self.clear_ldap_objects()
+        self.django_superuser.delete()
+        logging.disable(logging.NOTSET)
+
+    def clear_ldap_objects(self):
+        self.realm_1.delete()
+        self.realm_2.delete()
+        self.ldap_user_multiple_admin.delete()
+        self.ldap_user_admin.delete()
+        self.ldap_user.delete()
+        self.realm_1_ldap_group.delete()
+        self.realm_2_ldap_group.delete()
+
+    def test_without_login(self):
+        response = self.client.get(reverse('realm-home'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_with_user_login(self):
+        self.client.login(username=self.ldap_user.username, password=RealmHomeViewTest.get_password())
+        response = self.client.get(reverse('realm-home'))
+        self.assertContains(response, 'Profil löschen', status_code=200)
+        self.client.logout()
+
+    def test_with_admin_login(self):
+        self.client.login(username=self.ldap_user_admin.username, password=RealmHomeViewTest.get_password())
+        response = self.client.get(reverse('realm-home'))
+        self.assertContains(response, 'Bereich ', status_code=200)
+        self.client.logout()
+
+    def test_with_admin_multiple_realms_login(self):
+        self.client.login(username=self.ldap_user_multiple_admin.username, password=RealmHomeViewTest.get_password())
+        response = self.client.get(reverse('realm-home'))
+        self.assertContains(response, 'Bereiche', status_code=200)
+        self.client.logout()
+
+    def test_with_superuser_login(self):
+        self.client.login(username=self.django_superuser.username, password=RealmHomeViewTest.get_password())
+        response = self.client.get(reverse('realm-home'))
+        self.assertContains(response, 'Bereiche', status_code=200)
+        self.client.logout()
 
 
 class RealmAddViewTest(TestCase):
@@ -140,6 +117,7 @@ class RealmAddViewTest(TestCase):
                                        first_name="max",
                                        last_name="musterstudent")
         User.objects.get_or_create(username="test", email="test@test.de")
+        logging.disable(logging.DEBUG)
 
     @classmethod
     def get_password(cls):
@@ -163,36 +141,60 @@ class RealmAddViewTest(TestCase):
         self.realm.delete()
         self.ldap_user.delete()
         self.django_user.delete()
+        logging.disable(logging.NOTSET)
 
-    def test_realm_add_view_url_accessible_by_name_without_login(self):
+    def test_without_login(self):
         response = self.client.get(reverse('realm-add'))
         self.assertEqual(response.status_code, 302)
 
-    def test_realm_add_view_url_accessible_by_name_with_login(self):
+    def test_with_login(self):
         self.client.login(username=self.ldap_user.username, password=RealmAddViewTest.get_password())
         response = self.client.get(reverse('realm-add'))
-        self.assertEqual(response.status_code, 403)
+        self.assertContains(response, 'Leider hast du keine Rechte', status_code=403)
         self.client.logout()
 
-    def test_realm_add_view_url_accessible_by_name_with_super_user_login(self):
+    def test_with_login_and_post_valid_form(self):
+        self.client.login(username=self.ldap_user.username, password=RealmAddViewTest.get_password())
+        response = self.client.post(reverse('realm-add'),
+                                    {'name': 'test', 'ldap_base_dn': 'ou=test,ou=fachschaften,dc=test,dc=de'})
+        self.assertContains(response, 'Leider hast du keine Rechte', status_code=403)
+        self.client.logout()
+
+    def test_with_super_user_login(self):
         self.client.login(username=self.django_superuser.username, password='test')
         response = self.client.get(reverse('realm-add'))
-        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Neuen Bereich anlegen', status_code=200)
         self.client.logout()
 
-    def test_realm_add_view_with_super_user_login_add_realm(self):
+    def test_with_super_user_login_add_realm(self):
         realm = Realm.objects.get(name=self.realm.name)
         realm.delete()
         self.client.login(username=self.django_superuser.username, password='test')
         response = self.client.post(reverse('realm-add'),
                                     {'name': 'test', 'ldap_base_dn': 'ou=test,ou=fachschaften,dc=test,dc=de'})
-        self.assertEqual(response.status_code, 201)
+        self.assertContains(response, 'Bereich test', status_code=201)
         self.client.logout()
         self.realm, _ = Realm.objects.get_or_create(name="test", ldap_base_dn="ou=test,ou=fachschaften,dc=test,dc=de")
 
-    def test_realm_add_view_with_super_user_login_add_extisting_realm(self):
+    def test_with_super_user_login_add_extisting_realm(self):
         self.client.login(username=self.django_superuser.username, password='test')
         response = self.client.post(reverse('realm-add'),
                                     {'name': 'test', 'ldap_base_dn': 'ou=test,ou=fachschaften,dc=test,dc=de'})
-        self.assertEqual(response.status_code, 409)
+        self.assertContains(response, 'Das hinzufügen des Bereichs ist fehlgeschlagen.', status_code=409)
+        self.client.logout()
+
+    def test_with_super_user_login_add_extisting_realm_with_different_name(self):
+        self.client.login(username=self.django_superuser.username, password='test')
+        response = self.client.post(reverse('realm-add'),
+                                    {'name': 'test_new', 'ldap_base_dn': 'ou=test,ou=fachschaften,dc=test,dc=de'})
+        self.assertContains(response, 'Das hinzufügen des Bereichs ist fehlgeschlagen.', status_code=409)
+        self.client.logout()
+
+    def test_with_super_user_login_add_realm_with_not_existing_ldap_base_dn(self):
+        self.client.login(username=self.django_superuser.username, password='test')
+        response = self.client.post(reverse('realm-add'),
+                                    {'name': 'test_not_extisting_ldap_dn',
+                                     'ldap_base_dn': 'ou=not_exists,ou=fachschaften,dc=test,dc=de'})
+
+        self.assertContains(response, 'Das hinzufügen des Bereichs ist fehlgeschlagen.', status_code=409)
         self.client.logout()
