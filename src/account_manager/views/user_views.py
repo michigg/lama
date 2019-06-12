@@ -1,5 +1,4 @@
 import logging
-import os
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
@@ -8,7 +7,7 @@ from django.contrib.auth.views import PasswordResetConfirmView, PasswordChangeVi
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.http import HttpRequest, HttpResponseRedirect
+from django.http import HttpRequest
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext as _
 from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
@@ -25,6 +24,8 @@ from account_manager.utils.mail_utils import send_welcome_mail, send_deletion_ma
 
 from django.contrib.auth import logout
 from django.conf import settings
+
+from account_manager.utils.user_views import render_user_detail_view
 
 logger = logging.getLogger(__name__)
 
@@ -80,12 +81,9 @@ def get_rendered_user_details(request, realm_id, user_dn, success_headline=None,
 def user_detail(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm.ldap_base_dn
-    LdapGroup.base_dn = LdapGroup.ROOT_DN
+    ldap_user = LdapUser.objects.get(dn=user_dn)
 
-    user = LdapUser.objects.get(dn=user_dn)
-    user_wrapper = LdapUser.get_extended_user(user)
-    groups = LdapGroup.objects.filter(members=user.dn)
-    return render(request, 'user/user_detail.jinja2', {'user': user_wrapper, 'groups': groups, 'realm': realm})
+    return render_user_detail_view(request, realm, ldap_user)
 
 
 @login_required

@@ -5,14 +5,14 @@ from socket import timeout
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect
 from ldap import LDAPError
 
 from account_helper.models import Realm
 from account_manager.utils.mail_utils import realm_send_mail
-from account_manager.utils.main_views import render_permission_denied_view, render_realm_detail_view
+from account_manager.utils.main_views import render_permission_denied_view, render_realm_detail_view, \
+    get_users_home_view
 from .forms import RealmAddForm, RealmUpdateForm
 from .models import LdapGroup, LdapUser
 
@@ -34,37 +34,13 @@ def is_realm_admin(view_func):
 
 @login_required
 def realm_list(request):
-    user = request.user
-    if user.is_superuser:
+    django_user = request.user
+    if django_user.is_superuser:
         realms = Realm.objects.order_by('name').all()
     else:
-        realms = Realm.objects.filter(admin_group__user__username__contains=user.username).order_by('name').order_by(
-            'name')
-    show_user = request.GET.get('show_user', False)
-    if show_user or (len(realms) == 0 and not user.is_superuser):
-        try:
-            LdapUser.base_dn = LdapUser.ROOT_DN
-            user = LdapUser.objects.get(username=user.username)
-            realm_base_dn = re.compile('(uid=[a-zA-Z0-9_-]*),(ou=[a-zA-Z_-]*),(.*)').match(user.dn).group(3)
-            realm = Realm.objects.get(ldap_base_dn=realm_base_dn)
+        realms = Realm.objects.filter(admin_group__user__username__contains=django_user.username).order_by('name')
 
-            return redirect('user-detail', realm.id, user.dn)
-        except ObjectDoesNotExist as err:
-            logger.info('Anmeldung fehlgeschlagen', err)
-            return HttpResponse("Invalid login. Please try again.")
-    elif len(realms) == 1:
-        return redirect('realm-detail', realms[0].id)
-    else:
-        realm_wrappers = []
-        for realm in realms:
-            realm_wrappers.append(_get_group_user_count_wrapper(realm))
-        return render(request, 'realm/realm_home.jinja2', {'realms': realms, 'realm_wrappers': realm_wrappers})
-
-
-def _get_group_user_count_wrapper(realm):
-    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
-    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-    return {'realm': realm, 'group_count': LdapGroup.objects.count(), 'user_count': LdapUser.objects.count()}
+    return get_users_home_view(request, django_user, realms)
 
 
 @login_required
@@ -83,6 +59,7 @@ def realm_add(request):
                     realm.save()
                     return render_realm_detail_view(request, realm.id, status_code=201)
                 except IntegrityError as err:
+                    # TODO: Load no extra fail view, use current add view
                     return render(request, 'realm/realm_add_failed.jinja2',
                                   {'realm_name': name, 'error': err}, status=409)
                 except LDAPError as err:

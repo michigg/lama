@@ -4,7 +4,7 @@ import os
 import re
 from datetime import datetime, timedelta
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import OperationalError
 from django.db.models import Q
@@ -132,6 +132,9 @@ class LdapUser(Model):
         return (LdapUser.objects.filter(last_login__lte=last_semester) | LdapUser.objects.exclude(
             last_login__lte=datetime.now() + timedelta(days=1)))
 
+    def get_users_realm_base_dn(self):
+        return re.compile('(uid=[a-zA-Z0-9_-]*),(ou=[a-zA-Z_-]*),(.*)').match(self.dn).group(3)
+
     @staticmethod
     def set_root_dn(realm):
         LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
@@ -165,6 +168,14 @@ class LdapGroup(Model):
             LdapGroup.base_dn = re.compile('cn=([a-zA-Z0-9_-]*),(ou=[a-zA-Z_]*.*)').match(group.dn).group(2)
             group.members.remove(ldap_user_dn)
             group.save()
+
+    def get_django_group(self):
+        django_group, _ = Group.objects.get_or_create(name=self.name)
+        return django_group
+
+    @staticmethod
+    def set_root_dn(realm):
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
 
     def __str__(self):
         return self.name
