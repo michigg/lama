@@ -1,5 +1,4 @@
 import logging
-import re
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPException
 from socket import timeout
 
@@ -89,19 +88,17 @@ def realm_detail(request, realm_id):
 def realm_update(request, realm_id):
     if request.user.is_superuser:
         realm = Realm.objects.get(id=realm_id)
+
         LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-        ldap_admin_group = None
-        if realm.admin_group:
-            ldap_admin_group = LdapGroup.objects.get(name=realm.admin_group.name)
-        ldap_default_group = None
-        if realm.default_group:
-            ldap_default_group = LdapGroup.objects.get(name=realm.default_group.name)
-        data = {'id': realm.id,
-                'ldap_base_dn': realm.ldap_base_dn,
-                'name': realm.name,
-                'email': realm.email,
-                'admin_group': ldap_admin_group,
-                'default_group': ldap_default_group}
+        ldap_admin_group = None if not realm.admin_group else LdapGroup.objects.get(name=realm.admin_group.name)
+        ldap_default_group = None if not realm.default_group else LdapGroup.objects.get(name=realm.default_group.name)
+
+        form_data = {'id': realm.id,
+                     'ldap_base_dn': realm.ldap_base_dn,
+                     'name': realm.name,
+                     'email': realm.email,
+                     'admin_group': ldap_admin_group,
+                     'default_group': ldap_default_group}
         if request.method == 'POST':
             form = RealmUpdateForm(request.POST)
             if form.is_valid():
@@ -109,23 +106,16 @@ def realm_update(request, realm_id):
                 realm.ldap_base_dn = form.cleaned_data['ldap_base_dn']
                 realm.email = form.cleaned_data['email']
                 admin_ldap_group = form.cleaned_data['admin_group']
-                if admin_ldap_group:
-                    realm.admin_group, _ = Group.objects.get_or_create(name=admin_ldap_group.name)
-                else:
-                    realm.admin_group = None
+                realm.admin_group = None if not admin_ldap_group else admin_ldap_group.get_django_group()
                 default_ldap_group = form.cleaned_data['default_group']
-                if default_ldap_group:
-                    realm.default_group, _ = Group.objects.get_or_create(name=default_ldap_group.name)
-                else:
-                    realm.default_group = None
+                realm.default_group = None if not default_ldap_group else default_ldap_group.get_django_group()
                 realm.save()
-                return redirect('realm-detail', realm.id)
+                return render_realm_detail_view(request, realm_id, status_code=200)
+            return render(request, 'realm/realm_update.jinja2', {'realm': realm, 'form': form}, status=422)
         else:
-            form = RealmUpdateForm(initial=data)
+            form = RealmUpdateForm(initial=form_data)
         return render(request, 'realm/realm_update.jinja2', {'realm': realm, 'form': form})
-    else:
-        realm = Realm.objects.get(id=realm_id)
-        return render(request, 'realm/realm_update.jinja2', {'realm': realm})
+    return render_permission_denied_view(request)
 
 
 @login_required
@@ -169,19 +159,22 @@ def permission_denied(request):
 
 def realm_email_test(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
+    test_msg = f'Du hast die Mail Konfiguration für {realm.name} erfolgreich abgeschlossen.'
+    success_msg = 'Test erfolgreich'
+    error_msg_auth = f'Mail konnte nicht versendet werden, Anmeldedaten inkorrekt.'
+    error_msg_connect = f'Mail konnte nicht versendet werden. Verbindungsaufbau abgelehnt. ' \
+        f'Bitte überprüfen sie die Server Addresse und den Port'
+    error_msg_timeout = f'Mail konnte nicht versendet werden. Zeitüberschreitung beim Verbindungsaufbau. ' \
+        f'Bitte überprüfen sie die Server Addresse und den Port'
+    error_msg_smtp = f'Mail konnte nicht versendet werden. Bitte kontaktieren sie den Administrator'
     try:
-        realm_send_mail(realm, realm.email, f'{realm.name} Test Mail',
-                        f'Du hast die Mail Konfiguration für {realm.name} erfolgreich abgeschlossen.')
-    except SMTPAuthenticationError as err:
-        return render_realm_detail_view(request, realm_id, error_headline="Testmail",
-                                        error_text=f'Mail konnte nicht versendet werden, Anmeldedaten inkorrekt.')
-    except SMTPConnectError as err:
-        return render_realm_detail_view(request, realm_id, error_headline="Testmail",
-                                        error_text=f'Mail konnte nicht versendet werden. Verbindungsaufbau abgelehnt. Bitte überprüfen sie die Server Addresse und den Port')
-    except timeout as err:
-        return render_realm_detail_view(request, realm_id, error_headline="Testmail",
-                                        error_text=f'Mail konnte nicht versendet werden. Zeitüberschreitung beim Verbindungsaufbau. Bitte überprüfen sie die Server Addresse und den Port')
+        realm_send_mail(realm, realm.email, f'{realm.name} Test Mail', test_msg)
+    except SMTPAuthenticationError:
+        return render_realm_detail_view(request, realm_id, error_headline="Testmail", error_text=error_msg_auth)
+    except SMTPConnectError:
+        return render_realm_detail_view(request, realm_id, error_headline="Testmail", error_text=error_msg_connect)
+    except timeout:
+        return render_realm_detail_view(request, realm_id, error_headline="Testmail", error_text=error_msg_timeout)
     except SMTPException:
-        return render_realm_detail_view(request, realm_id, error_headline="Testmail",
-                                        error_text=f'Mail konnte nicht versendet werden. Bitte kontaktieren sie den Administrator')
-    return render_realm_detail_view(request, realm_id, success_headline="Testmail", success_text='Test erfolgreich')
+        return render_realm_detail_view(request, realm_id, error_headline="Testmail", error_text=error_msg_smtp)
+    return render_realm_detail_view(request, realm_id, success_headline="Testmail", success_text=success_msg)
