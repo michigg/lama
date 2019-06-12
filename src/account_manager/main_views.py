@@ -12,7 +12,7 @@ from ldap import LDAPError
 
 from account_helper.models import Realm
 from account_manager.utils.mail_utils import realm_send_mail
-from account_manager.utils.main_views import render_realm_detail_page
+from account_manager.utils.main_views import render_permission_denied_view, render_realm_detail_view
 from .forms import RealmAddForm, RealmUpdateForm
 from .models import LdapGroup, LdapUser
 
@@ -27,7 +27,7 @@ def is_realm_admin(view_func):
                     admin_group__user__username__contains=request.user.username)) > 0):
             return view_func(request, *args, **kwargs)
         else:
-            return redirect('permission-denied')
+            return render_permission_denied_view(request)
 
     return decorator
 
@@ -68,7 +68,6 @@ def _get_group_user_count_wrapper(realm):
 
 
 @login_required
-@is_realm_admin
 def realm_add(request):
     if request.user.is_superuser:
         realms = Realm.objects.all().order_by('name')
@@ -80,21 +79,20 @@ def realm_add(request):
                 try:
                     base_dn_available(ldap_base_dn)
 
-                    realm_obj = Realm.objects.create(name=name, ldap_base_dn=ldap_base_dn)
-                    realm_obj.save()
-                    return redirect('realm-detail', realm_obj.id)
+                    realm = Realm.objects.create(name=name, ldap_base_dn=ldap_base_dn)
+                    realm.save()
+                    return render_realm_detail_view(request, realm.id, status_code=201)
                 except IntegrityError as err:
                     return render(request, 'realm/realm_add_failed.jinja2',
-                                  {'realm_name': name, 'error': err})
+                                  {'realm_name': name, 'error': err}, status=409)
                 except LDAPError as err:
                     logger.debug("Ldap Error", err)
                     return render(request, 'realm/realm_add_failed.jinja2',
-                                  {'realm_name': name})
+                                  {'realm_name': name}, status=409)
         else:
             form = RealmAddForm()
         return render(request, 'realm/realm_add.jinja2', {'realms': realms, 'form': form})
-    else:
-        redirect('permission-denied')
+    return render_permission_denied_view(request)
 
 
 def base_dn_available(base_dn):
@@ -106,38 +104,7 @@ def base_dn_available(base_dn):
 @login_required
 @is_realm_admin
 def realm_detail(request, realm_id):
-    return get_realm_detail_rendered(request, realm_id)
-
-
-def get_realm_detail_rendered(request, realm_id, success_headline=None, success_text=None, error_headline=None,
-                              error_text=None):
-    realm = Realm.objects.get(id=realm_id)
-    ldap_admin_group, ldap_default_group = get_default_admin_group(realm)
-    LdapUser.base_dn = realm.ldap_base_dn
-    inactive_users = LdapUser.get_inactive_users().count()
-    ldap_admin_group, ldap_default_group = get_default_admin_group(realm)
-    return render(request, 'realm/realm_detailed.jinja2',
-                  {'realm': realm,
-                   'ldap_admin_group': ldap_admin_group,
-                   'ldap_default_group': ldap_default_group,
-                   'inactive_user_count': inactive_users,
-                   'users_count': LdapUser.objects.all().count(),
-                   'success_headline': success_headline,
-                   'success_text': success_text,
-                   'error_headline': error_headline,
-                   'error_text': error_text})
-
-
-def get_default_admin_group(realm):
-    ldap_admin_group = None
-    ldap_default_group = None
-    if realm.admin_group:
-        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-        ldap_admin_group = LdapGroup.objects.get(name=realm.admin_group.name)
-    if realm.default_group:
-        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-        ldap_default_group = LdapGroup.objects.get(name=realm.default_group.name)
-    return ldap_admin_group, ldap_default_group
+    return render_realm_detail_view(request, realm_id)
 
 
 @login_required
@@ -220,7 +187,7 @@ def realm_delete(request, realm_id):
 
 
 def permission_denied(request):
-    return render(request, 'permission_denied.jinja2', {})
+    return render_permission_denied_view(request)
 
 
 def realm_email_test(request, realm_id):
@@ -229,15 +196,15 @@ def realm_email_test(request, realm_id):
         realm_send_mail(realm, realm.email, f'{realm.name} Test Mail',
                         f'Du hast die Mail Konfiguration für {realm.name} erfolgreich abgeschlossen.')
     except SMTPAuthenticationError as err:
-        return get_realm_detail_rendered(request, realm_id, error_headline="Testmail",
-                                         error_text=f'Mail konnte nicht versendet werden, Anmeldedaten inkorrekt.')
+        return render_realm_detail_view(request, realm_id, error_headline="Testmail",
+                                        error_text=f'Mail konnte nicht versendet werden, Anmeldedaten inkorrekt.')
     except SMTPConnectError as err:
-        return get_realm_detail_rendered(request, realm_id, error_headline="Testmail",
-                                         error_text=f'Mail konnte nicht versendet werden. Verbindungsaufbau abgelehnt. Bitte überprüfen sie die Server Addresse und den Port')
+        return render_realm_detail_view(request, realm_id, error_headline="Testmail",
+                                        error_text=f'Mail konnte nicht versendet werden. Verbindungsaufbau abgelehnt. Bitte überprüfen sie die Server Addresse und den Port')
     except timeout as err:
-        return get_realm_detail_rendered(request, realm_id, error_headline="Testmail",
-                                         error_text=f'Mail konnte nicht versendet werden. Zeitüberschreitung beim Verbindungsaufbau. Bitte überprüfen sie die Server Addresse und den Port')
+        return render_realm_detail_view(request, realm_id, error_headline="Testmail",
+                                        error_text=f'Mail konnte nicht versendet werden. Zeitüberschreitung beim Verbindungsaufbau. Bitte überprüfen sie die Server Addresse und den Port')
     except SMTPException:
-        return get_realm_detail_rendered(request, realm_id, error_headline="Testmail",
-                                         error_text=f'Mail konnte nicht versendet werden. Bitte kontaktieren sie den Administrator')
-    return get_realm_detail_rendered(request, realm_id, success_headline="Testmail", success_text='Test erfolgreich')
+        return render_realm_detail_view(request, realm_id, error_headline="Testmail",
+                                        error_text=f'Mail konnte nicht versendet werden. Bitte kontaktieren sie den Administrator')
+    return render_realm_detail_view(request, realm_id, success_headline="Testmail", success_text='Test erfolgreich')
