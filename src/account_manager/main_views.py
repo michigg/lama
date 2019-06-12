@@ -8,13 +8,13 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.shortcuts import render, redirect, HttpResponse
-from datetime import datetime, timedelta
+from ldap import LDAPError
 
 from account_helper.models import Realm
 from account_manager.utils.mail_utils import realm_send_mail
+from account_manager.utils.main_views import render_realm_detail_page
 from .forms import RealmAddForm, RealmUpdateForm
 from .models import LdapGroup, LdapUser
-from ldap import LDAPError
 
 logger = logging.getLogger(__name__)
 
@@ -107,17 +107,6 @@ def base_dn_available(base_dn):
 @is_realm_admin
 def realm_detail(request, realm_id):
     return render_realm_detail_page(realm_id, request)
-
-
-def render_realm_detail_page(realm_id, request, notice=""):
-    realm = Realm.objects.get(id=realm_id)
-    ldap_admin_group, ldap_default_group = get_default_admin_group(realm)
-    LdapUser.base_dn = realm.ldap_base_dn
-    inactive_users = LdapUser.get_inactive_users().count()
-    return render(request, 'realm/realm_detailed.jinja2',
-                  {'realm': realm, 'ldap_admin_group': ldap_admin_group, 'ldap_default_group': ldap_default_group,
-                   'inactive_user_count': inactive_users, 'users_count': LdapUser.objects.all().count(),
-                   'notice': notice})
 
 
 def get_default_admin_group(realm):
