@@ -132,6 +132,10 @@ class LdapUser(Model):
         return (LdapUser.objects.filter(last_login__lte=last_semester) | LdapUser.objects.exclude(
             last_login__lte=datetime.now() + timedelta(days=1)))
 
+    @staticmethod
+    def set_root_dn(realm):
+        LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+
 
 class LdapGroup(Model):
     """
