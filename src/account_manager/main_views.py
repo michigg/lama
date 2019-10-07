@@ -33,13 +33,7 @@ def is_realm_admin(view_func):
 
 @login_required
 def realm_list(request):
-    django_user = request.user
-    if django_user.is_superuser:
-        realms = Realm.objects.order_by('name').all()
-    else:
-        realms = Realm.objects.filter(admin_group__user__username__contains=django_user.username).order_by('name')
-
-    return get_users_home_view(request, django_user, realms)
+    return get_users_home_view(request)
 
 
 @login_required
@@ -128,29 +122,31 @@ def realm_delete_confirm(request, realm_id):
 @login_required
 @is_realm_admin
 def realm_delete(request, realm_id):
-    realm = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = realm.ldap_base_dn
-    LdapGroup.base_dn = realm.ldap_base_dn
-    try:
-        ldap_users = LdapUser.objects.all()
-        ldap_usernames = [user.username for user in ldap_users]
-        ldap_groups = LdapGroup.objects.all()
-        ldap_groupnames = [group.name for group in ldap_groups]
-        django_user = User.objects.filter(username__contains=ldap_usernames)
-        django_groups = Group.objects.filter(name__contains=ldap_groupnames)
-        for user in django_user:
-            user.delete()
-        for group in django_groups:
-            group.delete()
-        for user in ldap_users:
-            user.delete()
-        for group in ldap_groups:
-            group.delete()
-    except LDAPError:
-        # TODO: Save delete
-        pass
-    realm.delete()
-    return redirect('realm-home')
+    if request.user.is_superuser:
+        realm = Realm.objects.get(id=realm_id)
+        LdapUser.base_dn = realm.ldap_base_dn
+        LdapGroup.base_dn = realm.ldap_base_dn
+        try:
+            ldap_users = LdapUser.objects.all()
+            ldap_usernames = [user.username for user in ldap_users]
+            ldap_groups = LdapGroup.objects.all()
+            ldap_groupnames = [group.name for group in ldap_groups]
+            django_user = User.objects.filter(username__contains=ldap_usernames)
+            django_groups = Group.objects.filter(name__contains=ldap_groupnames)
+            for user in django_user:
+                user.delete()
+            for group in django_groups:
+                group.delete()
+            for user in ldap_users:
+                user.delete()
+            for group in ldap_groups:
+                group.delete()
+        except LDAPError:
+            # TODO: Save delete
+            pass
+        realm.delete()
+        return get_users_home_view(request)
+    return render_permission_denied_view(request)
 
 
 def permission_denied(request):

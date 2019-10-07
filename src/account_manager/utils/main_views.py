@@ -45,7 +45,13 @@ def get_group_user_count_wrapper(realm):
     return {'realm': realm, 'group_count': LdapGroup.objects.count(), 'user_count': LdapUser.objects.count()}
 
 
-def get_users_home_view(request, django_user, realms):
+def get_users_home_view(request):
+    django_user = request.user
+    if django_user.is_superuser:
+        realms = Realm.objects.order_by('name').all()
+    else:
+        realms = Realm.objects.filter(admin_group__user__username__contains=django_user.username).order_by('name')
+
     show_user = request.GET.get('show_user', False)
     if show_user or (len(realms) == 0 and not django_user.is_superuser):
         LdapUser.base_dn = LdapUser.ROOT_DN
