@@ -1,8 +1,9 @@
 # LAMa (Ldap Account Manager)
-LAMa wurde für die Studierendenvertretung der Universität Bamberg entwickelt, um ein einfache Accountverwaltung der StuVe Accounts zu gewährleisten. Es soll eine einfachere Alternative zu dem Accountmangementool Keycloak bieten. Das Tool baut auf dem Pythonframework django auf und verwendet die Pakete `django-auth-ldap`, `django-ldapdb` für die Verbindung mit ldap.
+LAMa was developed for the student representation of the University of Bamberg in order to guarantee a simple account administration of the StuVe accounts. It should offer a simpler alternative to the Keycloak account management tool.
+The tool is based on the Python framework django and uses the packages `django-auth-ldap`, `django-ldapdb` to connect to ldap.
 
 ## Developer Setup
-1. repo klonen
+1. clone or unzip repo
 2. `docker-compose build`
 3. `docker-compose run ldap sh`
 4. `chown ldap:ldap -R /var/lib/openldap/`
@@ -11,19 +12,14 @@ LAMa wurde für die Studierendenvertretung der Universität Bamberg entwickelt, 
     1. `python3 manage.py makemigrations account_helper`
     2. `python3 manage.py migrate`
     3. `python3 manage.py createsuperuser`
-7. `docker-compose logs -f lama` (Anzeige der server logs)  
+7. `docker-compose logs -f lama` (Display server logs)  
 
-Für die Verwaltung von LDAP wurde ein phpldapadmin gestartet. Dieses ist unter `ldap.localhost` erreichbar. Das voreingestellte Passwort lautet `secret`.
+phpldapadmin was started to manage LDAP. This is available under `localhost:8080`. The default password is `secret`.
 
-LAMa ist unter `lama.localhost` erreichbar.
+LAMa can be reached under `localhost:8888`.
 
-Für das Frontendmanagement wird ein Traefik gestartet, der unter `traefik.localhost` erreichbar ist.
-
-Nach dem initialen Setup sind nur noch Schritte 3, 5 nötig.
+After the initial setup only steps 3, 5 are necessary.
 
 ## Production Setup
 - TODO
 
-
-## Special thanks
-Ich möchte mich vor allem bei @cklug und @mhofmann bedanken für die Unterstützung bei diesem Projekt. 
