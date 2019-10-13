@@ -23,3 +23,15 @@ After the initial setup only steps 3, 5 are necessary.
 ## Production Setup
 - TODO
 
+
+## Used Libraries
+### Frontend
+- Bootstrap4 (MIT)
+- jquery (MIT)
+- dataTables (MIT)
+
+### Backend
+- Django (BSD)
+- django-auth-ldap (BSD 2 Clause)
+- django-ldapdb (BSD 2 Clause)
+- jinja2 (BSD 3 Clause)
