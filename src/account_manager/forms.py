@@ -1,22 +1,26 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
+from django.core.validators import RegexValidator
 
 from account_manager.utils.django_user import update_dajngo_user
 from .models import LdapUser, LdapGroup
 from django.forms import modelformset_factory
 import logging
 
+username_validator = RegexValidator('^[a-zA-Z0-9_-]*$',
+                                    message='Nutzername sollte nur aus Buchstaben oder Zahlen bestehen. Keine Umlaute. Zur Trennung kann "-" benutzt werden')
+
 logger = logging.getLogger(__name__)
 
 
 class AddLDAPUserForm(forms.Form):
-    username = forms.CharField(label='Nutzername', max_length=400)
+    username = forms.CharField(label='Nutzername', max_length=400, validators=[username_validator])
     email = forms.EmailField(label='E-Mail')
 
 
 class AdminUpdateLDAPUserForm(forms.Form):
-    username = forms.CharField(label='Nutzername', max_length=400)
+    username = forms.CharField(label='Nutzername', max_length=400, validators=[username_validator])
     email = forms.EmailField(label='E-Mail')
     password = forms.CharField(label='Passwort', widget=forms.PasswordInput, required=False)
     first_name = forms.CharField(label='Vorname', required=True)
