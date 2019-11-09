@@ -59,7 +59,7 @@ def get_users_home_view(request):
         realm = Realm.objects.get(ldap_base_dn=ldap_user.get_users_realm_base_dn())
 
         return render_user_detail_view(request, realm, ldap_user)
-    elif len(realms) == 1:
+    elif len(realms) == 1 and not django_user.is_superuser:
         return render_realm_detail_view(request, realms[0].id)
     else:
         realm_wrappers = []

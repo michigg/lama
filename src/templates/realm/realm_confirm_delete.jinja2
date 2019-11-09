@@ -19,10 +19,8 @@
                     <p>Möchten Sie das Löschen der Accountdaten verhindern, klicken Sie auf "Abbrechen"</p>
                 </div>
                 <div class="d-flex">
-                    <a href="{{ url('realm-detail', args = [realm.id]) }}"
-                       class="btn btn-secondary mr-auto p-2">Abbrechen</a>
-                    <a href="{{ url('realm-delete', args = [realm.id]) }}"
-                       class="btn btn-danger p-2">Bereich löschen</a>
+                    <a href="{{ url('realm-detail', args = [realm.id]) -}}" class="btn btn-secondary mr-auto p-2">Abbrechen</a>
+                    <a href="{{ url('realm-delete', args = [realm.id]) -}}" class="btn btn-danger p-2">Bereich löschen</a>
                 </div>
             </div>
         </div>
