@@ -159,9 +159,9 @@ def realm_email_test(request, realm_id):
     success_msg = 'Test erfolgreich'
     error_msg_auth = f'Mail konnte nicht versendet werden, Anmeldedaten inkorrekt.'
     error_msg_connect = f'Mail konnte nicht versendet werden. Verbindungsaufbau abgelehnt. ' \
-        f'Bitte überprüfen sie die Server Addresse und den Port'
+                        f'Bitte überprüfen sie die Server Addresse und den Port'
     error_msg_timeout = f'Mail konnte nicht versendet werden. Zeitüberschreitung beim Verbindungsaufbau. ' \
-        f'Bitte überprüfen sie die Server Addresse und den Port'
+                        f'Bitte überprüfen sie die Server Addresse und den Port'
     error_msg_smtp = f'Mail konnte nicht versendet werden. Bitte kontaktieren sie den Administrator'
     try:
         realm_send_mail(realm, realm.email, f'{realm.name} Test Mail', test_msg)

@@ -1,5 +1,8 @@
 import logging
+from urllib.parse import urlencode
 
+from django.conf import settings
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
@@ -9,10 +12,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.http import HttpRequest
 from django.shortcuts import render, redirect
-from django.utils.translation import gettext as _
-from ldap import ALREADY_EXISTS, OBJECT_CLASS_VIOLATION
 from django.urls import reverse
-from urllib.parse import urlencode
+from django.utils.translation import gettext as _
+from ldap import OBJECT_CLASS_VIOLATION
 
 from account_helper.models import Realm, DeletedUser
 from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDAPUserForm, AdminUpdateLDAPUserForm, \
@@ -21,11 +23,8 @@ from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
 from account_manager.utils.django_user import update_dajngo_user
 from account_manager.utils.mail_utils import send_welcome_mail, send_deletion_mail
-
-from django.contrib.auth import logout
-from django.conf import settings
-
-from account_manager.utils.user_views import render_user_detail_view
+from account_manager.utils.user_views import render_user_detail_view, get_rendered_user_details, get_realm_user_list, \
+    create_user, get_protocol
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +38,9 @@ def protect_cross_realm_user_access(view_func):
             return render(request, 'permission_denied.jinja2',
                           {
                               'extra_errors': _(
-                                  'Der angefragte Nutzer gehört einem anderen Bereich an. Nutzer können nur von dem Bereich bearbeitet werden, in dem sie erstellt wurden.')},
+                                  'Der angefragte Nutzer gehört einem anderen Bereich an. '
+                                  'Nutzer können nur von dem Bereich bearbeitet werden, in dem sie erstellt wurden.'),
+                          },
                           status=404)
         return view_func(request, *args, **kwargs)
 
@@ -48,14 +49,8 @@ def protect_cross_realm_user_access(view_func):
 
 @login_required
 @is_realm_admin
-def realm_user(request, realm_id):
-    realm = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = realm.ldap_base_dn
-    realm_users = LdapUser.objects.all()
-    user_wrappers = []
-    for user in realm_users:
-        user_wrappers.append(LdapUser.get_extended_user(user))
-    return render(request, 'realm/realm_user.jinja2', {'realm': realm, 'realm_user': user_wrappers})
+def realm_user_list(request, realm_id):
+    return get_realm_user_list(request, realm_id)
 
 
 @login_required
@@ -63,18 +58,6 @@ def realm_user(request, realm_id):
 @protect_cross_realm_user_access
 def realm_user_detail(request, realm_id, user_dn):
     return get_rendered_user_details(request, realm_id, user_dn)
-
-
-def get_rendered_user_details(request, realm_id, user_dn, success_headline=None, success_text=None):
-    realm = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = realm.ldap_base_dn
-    LdapGroup.base_dn = LdapGroup.ROOT_DN
-    user = LdapUser.objects.get(dn=user_dn)
-    user_wrapper = LdapUser.get_extended_user(user)
-    groups = LdapGroup.objects.filter(members=user.dn)
-    return render(request, 'user/realm_user_detail.jinja2',
-                  {'user': user_wrapper, 'groups': groups, 'realm': realm, 'success_headline': success_headline,
-                   'success_text': success_text})
 
 
 @login_required
@@ -92,34 +75,9 @@ def user_add(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
         form = AddLDAPUserForm(request.POST)
-        # check whether it's valid:
         if form.is_valid():
-            username = form.cleaned_data['username']
-            email = form.cleaned_data['email']
-            current_site = get_current_site(request)
-            protocol = 'http'
-            if request.is_secure():
-                protocol = 'https'
-            LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
-            try:
-                LdapUser.create_with_django_user_creation_and_welcome_mail(realm=realm,
-                                                                           protocol=protocol,
-                                                                           domain=current_site.domain,
-                                                                           username=username,
-                                                                           email=email)
-                if realm.default_group:
-                    user = LdapUser.objects.get(username=username)
-
-                    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-                    default_ldap_group = LdapGroup.objects.get(name=realm.default_group.name)
-                    ldap_add_user_to_groups(ldap_user=user.dn, user_groups=[default_ldap_group, ])
-
-                return redirect('realm-user-list', realm_id)
-            except ALREADY_EXISTS as err:
-                return render(request, 'user/realm_user_add.jinja2', {'form': form, 'realm': realm,
-                                                                      'extra_error': f'Nutzer {username} existiert bereits.'})
+            return create_user(request, realm, form)
     else:
         form = AddLDAPUserForm()
     return render(request, 'user/realm_user_add.jinja2', {'form': form, 'realm': realm})
@@ -129,11 +87,10 @@ def user_add(request, realm_id):
 @is_realm_admin
 @protect_cross_realm_user_access
 def realm_user_update(request, realm_id, user_dn):
-    realm_obj = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = f'ou=people,{realm_obj.ldap_base_dn}'
-    ldap_user = LdapUser.objects.get(dn=user_dn)
+    realm = Realm.objects.get(id=realm_id)
+    ldap_user = LdapUser.get_user_by_dn(dn=user_dn, realm=realm)
     return user_update_controller(request=request,
-                                  realm=realm_obj,
+                                  realm=realm,
                                   ldap_user=ldap_user,
                                   redirect_name='realm-user-detail',
                                   update_view='user/realm_user_detail.jinja2',
@@ -150,8 +107,7 @@ def realm_user_update(request, realm_id, user_dn):
 @protect_cross_realm_user_access
 def realm_user_resend_password_reset(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
-    ldap_user = LdapUser.objects.get(dn=user_dn)
+    ldap_user = LdapUser.get_user_by_dn(dn=user_dn, realm=realm)
     try:
         if ldap_user.email:
             logger.info(f"Sending email to {ldap_user.email}")
@@ -170,8 +126,8 @@ def realm_user_resend_password_reset(request, realm_id, user_dn):
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     email_template_name='registration/password_reset_email.html')
 
-    except Exception as e:
-        logger.error('Error')
+    except Exception as err:
+        logger.error(f'Error: {err}')
     return redirect('realm-user-detail', realm_id, user_dn)
 
 
@@ -180,16 +136,20 @@ def realm_user_resend_password_reset(request, realm_id, user_dn):
 @protect_cross_realm_user_access
 def realm_user_resend_welcome_mail(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
-    ldap_user = LdapUser.objects.get(dn=user_dn)
+    ldap_user = LdapUser.get_user_by_dn(dn=user_dn, realm=realm)
+
     update_dajngo_user(ldap_user)
     current_site = get_current_site(request)
-    protocol = 'http'
-    if request.is_secure():
-        protocol = 'https'
-    send_welcome_mail(domain=current_site.domain, email=ldap_user.email, protocol=protocol, realm=realm,
+    protocol = get_protocol(request)
+    send_welcome_mail(domain=current_site.domain,
+                      email=ldap_user.email,
+                      protocol=protocol,
+                      realm=realm,
                       user=User.objects.get(username=ldap_user.username))
-    return get_rendered_user_details(request, realm_id, user_dn, success_headline="Willkommensmail",
+    return get_rendered_user_details(request,
+                                     realm_id,
+                                     user_dn,
+                                     success_headline="Willkommensmail",
                                      success_text="Willkommensmail erfolgreich versendet.")
 
 
@@ -198,23 +158,29 @@ def realm_user_resend_welcome_mail(request, realm_id, user_dn):
 @protect_cross_realm_user_access
 def realm_user_delete(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    ldap_user = LdapUser.get_user_by_dn(dn=user_dn, realm=realm)
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-    ldap_user = LdapUser.objects.get(dn=user_dn)
     if _is_deleteable_user(realm, ldap_user):
         try:
             user_delete_controller(ldap_user, realm)
-        except OBJECT_CLASS_VIOLATION as err:
+        except OBJECT_CLASS_VIOLATION:
             deletion_link = {'name': 'realm-user-delete', 'args': [realm.id, ldap_user.dn]}
             cancel_link = {'name': 'realm-user-detail', 'args': [realm.id, ldap_user.dn]}
             return render(request, 'user/user_confirm_delete.jinja2',
                           {'realm': realm, 'user': ldap_user, 'deletion_link': deletion_link,
                            'cancel_link': cancel_link,
-                           'extra_errors': f'Der Nutzer {ldap_user.username} konnte nicht gelöscht werden, da er der letzte Nutzer einer Gruppe ist. Bitte lösche die Gruppe zuerst oder trage einen anderen Nutzer in die Gruppe ein.'})
+                           'extra_errors': f'Der Nutzer {ldap_user.username} konnte nicht gelöscht werden, '
+                                           f'da er der letzte Nutzer einer Gruppe ist. '
+                                           f'Bitte lösche die Gruppe zuerst oder trage einen anderen Nutzer '
+                                           f'in die Gruppe ein.',
+                           })
         return redirect('realm-user-list', realm_id)
     else:
         return render(request, 'permission_denied.jinja2', {
-            'extra_errors': f'Der Nutzer, {ldap_user.username}, gehört anscheinend zu den Admins. Solange der Nutzer dieser Gruppe angehört kann dieser nicht gelöscht werden. Bitte trage vorher den Nutzer aus der Admin Gruppe aus.'})
+            'extra_errors': f'Der Nutzer, {ldap_user.username}, gehört anscheinend zu den Admins. '
+                            f'Solange der Nutzer dieser Gruppe angehört kann dieser nicht gelöscht werden. '
+                            f'Bitte trage vorher den Nutzer aus der Admin Gruppe aus.'
+        }, )
 
 
 @login_required
@@ -241,7 +207,7 @@ def realm_user_delete_cancel(request, realm_id, user_dn):
     try:
         deleted_user = DeletedUser.objects.get(ldap_dn=ldap_user.dn)
         deleted_user.delete()
-    except ObjectDoesNotExist as err:
+    except ObjectDoesNotExist:
         pass
 
     return redirect('realm-user-detail', realm_id, user_dn)
@@ -259,13 +225,17 @@ def realm_multiple_user_delete(request, realm_id):
                 if _is_deleteable_user(realm, ldap_user):
                     try:
                         user_delete_controller(ldap_user, realm)
-                    except OBJECT_CLASS_VIOLATION as err:
+                    except OBJECT_CLASS_VIOLATION:
                         blocked_users, deletable_users = get_deletable_blocked_users(ldap_users, realm)
                         return render(request, 'realm/realm_user_multiple_delete.jinja2',
                                       {'form': form, 'realm': realm, 'deletable_users': deletable_users,
                                        'blocked_users': blocked_users,
                                        'confirm': True,
-                                       'extra_errors': f'Nutzer {ldap_user} konnte nicht gelöscht werden, da er der letzte Nutzer einer Gruppe ist. Bitte tragen Sie vorher den Nutzer aus der Gruppe aus. Das löschen der restlichen Nutzer wurde unterbrochen.'})
+                                       'extra_errors': f'Nutzer {ldap_user} konnte nicht gelöscht werden, '
+                                                       f'da er der letzte Nutzer einer Gruppe ist. '
+                                                       f'Bitte tragen Sie vorher den Nutzer aus der Gruppe aus. '
+                                                       f'Das löschen der restlichen Nutzer wurde unterbrochen.',
+                                       }, )
             return redirect('realm-user-list', realm_id)
     return redirect('realm-user-list', realm.id)
 
@@ -325,7 +295,7 @@ def get_deletable_blocked_users(ldap_users, realm):
 
 
 def _is_deleteable_user(realm, user):
-    user_groups = LdapGroup.get_user_groups(realm, user, LdapGroup.ROOT_DN)
+    user_groups = LdapGroup.get_user_groups(realm, user)
     user_group_names = [group.name for group in user_groups]
     user_admin_realms = Realm.objects.filter(id=realm.id).filter(admin_group__name__in=user_group_names)
     return not len(user_admin_realms) > 0

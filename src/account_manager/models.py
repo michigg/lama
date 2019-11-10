@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from datetime import datetime, timedelta
+from typing import List
 
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,7 +13,7 @@ from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
 from ldapdb.models import fields as ldap_fields
 from ldapdb.models.base import Model
 
-from account_helper.models import DeletedUser
+from account_helper.models import DeletedUser, Realm
 from account_manager.utils.dbldap import get_filterstr
 from account_manager.utils.mail_utils import send_welcome_mail
 
@@ -53,12 +54,25 @@ class LdapUser(Model):
 
     @staticmethod
     def create_with_django_user_creation_and_welcome_mail(realm, protocol, domain, username, email):
+        ldap_user, user = LdapUser.create_with_django_user(realm, username, email)
+        send_welcome_mail(domain, email, protocol, realm, user)
+        return ldap_user
+
+    @staticmethod
+    def create_with_django_user(realm, username, email, password=None):
         if not LdapUser.is_user_duplicate(username):
             LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}'
-            ldap_user = LdapUser.objects.create(username=username, email=email, first_name=" ", last_name=" ")
-            user, _ = User.objects.get_or_create(username=username, email=email)
-            send_welcome_mail(domain, email, protocol, realm, user)
-            return ldap_user
+            # TODO: rewrite
+            if password:
+                ldap_user = LdapUser.objects.create(username=username, email=email, first_name=" ", last_name=" ",
+                                                    password=password)
+            else:
+                ldap_user = LdapUser.objects.create(username=username, email=email, first_name=" ", last_name=" ")
+            if password:
+                user, _ = User.objects.get_or_create(username=username, email=email, password=password)
+            else:
+                user, _ = User.objects.get_or_create(username=username, email=email)
+            return ldap_user, user
         else:
             raise ALREADY_EXISTS('User already exists')
 
@@ -100,7 +114,7 @@ class LdapUser(Model):
         return LdapUser.objects.filter(query)
 
     @staticmethod
-    def is_user_duplicate(username):
+    def is_user_duplicate(username: str):
         LdapUser.base_dn = LdapUser.ROOT_DN
         try:
             LdapUser.objects.get(username=username)
@@ -136,6 +150,30 @@ class LdapUser(Model):
         return re.compile('(uid=[a-zA-Z0-9_-]*),(ou=[a-zA-Z_-]*),(.*)').match(self.dn).group(3)
 
     @staticmethod
+    def get_user(username: str, realm: Realm = None):
+        LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}' if realm else LdapUser.ROOT_DN
+        try:
+            return LdapUser.objects.get(username=username)
+        except Exception as e:
+            return None
+
+    @staticmethod
+    def get_user_by_dn(dn: str, realm: Realm = None):
+        LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}' if realm else LdapUser.ROOT_DN
+        try:
+            return LdapUser.objects.get(dn=dn)
+        except Exception as e:
+            return None
+
+    @staticmethod
+    def get_users(realm: Realm = None):
+        LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}' if realm else LdapUser.ROOT_DN
+        try:
+            return LdapUser.objects.all()
+        except Exception as e:
+            return None
+
+    @staticmethod
     def set_root_dn(realm):
         LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
 
@@ -154,10 +192,16 @@ class LdapGroup(Model):
     members = ldap_fields.ListField(db_column='member')
 
     @staticmethod
-    def get_user_groups(realm, user, group_base_dn):
+    def get_user_groups(realm, user):
         LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
-        LdapGroup.base_dn = group_base_dn
+        LdapGroup.base_dn = LdapGroup.ROOT_DN
         return LdapGroup.objects.filter(members=user.dn)
+
+    @staticmethod
+    def add_user_to_groups(ldap_user: LdapUser, ldap_groups: List):
+        for ldap_group in ldap_groups:
+            ldap_group.members.append(ldap_user)
+            ldap_group.save()
 
     @staticmethod
     def remove_user_from_groups(ldap_user_dn, user_groups=None):
@@ -172,6 +216,14 @@ class LdapGroup(Model):
     def get_django_group(self):
         django_group, _ = Group.objects.get_or_create(name=self.name)
         return django_group
+
+    @staticmethod
+    def get_group(group_name: str, realm: Realm = None):
+        LdapGroup.base_dn = f'ou=group, {realm.ldap_base_dn}' if realm else LdapGroup.ROOT_DN
+        try:
+            return LdapGroup.objects.get(name=group_name)
+        except Exception as e:
+            return None
 
     @staticmethod
     def set_root_dn(realm):
