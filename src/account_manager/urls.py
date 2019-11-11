@@ -1,5 +1,6 @@
 from django.urls import path
 
+import account_manager.utils.user_views
 from . import main_views
 from account_manager.views import user_views
 from account_manager.views import group_views
@@ -87,5 +88,5 @@ urlpatterns = [
 
     # Extra
     path('permission-denied/', main_views.permission_denied, name='permission-denied'),
-    path('accounts/deleted/<int:realm_id>/', user_views.user_deleted, name='account-deleted'),
+    path('accounts/deleted/<int:realm_id>/', account_manager.utils.user_views.user_deleted, name='account-deleted'),
 ]

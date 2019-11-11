@@ -9,7 +9,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetConfirmView, PasswordChangeView
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError
 from django.http import HttpRequest
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -22,9 +21,11 @@ from account_manager.forms import AddLDAPUserForm, UserDeleteListForm, UpdateLDA
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
 from account_manager.utils.django_user import update_dajngo_user
-from account_manager.utils.mail_utils import send_welcome_mail, send_deletion_mail
-from account_manager.utils.user_views import render_user_detail_view, get_rendered_user_details, get_realm_user_list, \
-    create_user, get_protocol
+from account_manager.utils.mail_utils import send_welcome_mail
+from account_manager.utils.user_views import render_user_detail_view, render_realm_user_detail_view, \
+    get_realm_user_list, \
+    create_user, get_protocol, user_update_controller, user_delete_controller, ldap_add_user_to_groups, \
+    get_available_given_groups, get_deletable_blocked_users, _is_deleteable_user
 
 logger = logging.getLogger(__name__)
 
@@ -57,16 +58,12 @@ def realm_user_list(request, realm_id):
 @is_realm_admin
 @protect_cross_realm_user_access
 def realm_user_detail(request, realm_id, user_dn):
-    return get_rendered_user_details(request, realm_id, user_dn)
+    return render_realm_user_detail_view(request, realm_id, user_dn)
 
 
 @login_required
 def user_detail(request, realm_id, user_dn):
-    realm = Realm.objects.get(id=realm_id)
-    LdapUser.base_dn = realm.ldap_base_dn
-    ldap_user = LdapUser.objects.get(dn=user_dn)
-
-    return render_user_detail_view(request, realm, ldap_user)
+    return render_user_detail_view(request, realm_id, user_dn)
 
 
 @login_required
@@ -92,7 +89,7 @@ def realm_user_update(request, realm_id, user_dn):
     return user_update_controller(request=request,
                                   realm=realm,
                                   ldap_user=ldap_user,
-                                  redirect_name='realm-user-detail',
+                                  user_detail_render_method=render_realm_user_detail_view,
                                   update_view='user/realm_user_detail.jinja2',
                                   form_class=AdminUpdateLDAPUserForm,
                                   form_attrs=[
@@ -146,11 +143,11 @@ def realm_user_resend_welcome_mail(request, realm_id, user_dn):
                       protocol=protocol,
                       realm=realm,
                       user=User.objects.get(username=ldap_user.username))
-    return get_rendered_user_details(request,
-                                     realm_id,
-                                     user_dn,
-                                     success_headline="Willkommensmail",
-                                     success_text="Willkommensmail erfolgreich versendet.")
+    return render_realm_user_detail_view(request,
+                                         realm_id,
+                                         user_dn,
+                                         success_headline="Willkommensmail",
+                                         success_text="Willkommensmail erfolgreich versendet.")
 
 
 @login_required
@@ -283,24 +280,6 @@ def realm_multiple_user_delete_confirm(request, realm_id):
                   {'form': form, 'realm': realm, 'users': users})
 
 
-def get_deletable_blocked_users(ldap_users, realm):
-    deletable_users = []
-    blocked_users = []
-    for ldap_user in ldap_users:
-        if _is_deleteable_user(realm, ldap_user):
-            deletable_users.append(ldap_user)
-        else:
-            blocked_users.append(ldap_user)
-    return blocked_users, deletable_users
-
-
-def _is_deleteable_user(realm, user):
-    user_groups = LdapGroup.get_user_groups(realm, user)
-    user_group_names = [group.name for group in user_groups]
-    user_admin_realms = Realm.objects.filter(id=realm.id).filter(admin_group__name__in=user_group_names)
-    return not len(user_admin_realms) > 0
-
-
 @login_required
 def user_update(request, realm_id, user_dn):
     realm_obj = Realm.objects.get(id=realm_id)
@@ -310,7 +289,7 @@ def user_update(request, realm_id, user_dn):
         return user_update_controller(request=request,
                                       realm=realm_obj,
                                       ldap_user=ldap_user,
-                                      redirect_name='user-detail',
+                                      user_detail_render_method=render_user_detail_view,
                                       update_view='user/user_detail.jinja2',
                                       form_class=UpdateLDAPUserForm,
                                       form_attrs=[
@@ -363,19 +342,6 @@ def realm_user_group_update(request, realm_id, user_dn, error=None):
                    'realm_groups': realm_groups_available, 'extra_error': error})
 
 
-def get_available_given_groups(realm, user_dn):
-    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
-    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-    ldap_user = LdapUser.objects.get(dn=user_dn)
-    user_groups = LdapGroup.objects.filter(members=ldap_user.dn)
-    realm_groups = LdapGroup.objects.all()
-    realm_groups_available = []
-    for realm_group in realm_groups:
-        if realm_group not in user_groups:
-            realm_groups_available.append(realm_group)
-    return ldap_user, realm_groups_available, user_groups
-
-
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
@@ -419,52 +385,6 @@ def realm_user_group_update_delete(request, realm_id, user_dn):
                                'realm_groups': realm_groups_available,
                                'extra_error': 'Bearbeiten fehlgeschlagen. Der Nutzer scheint der letzte in einer Gruppe zu sein. Bitte löschen Sie die Gruppe zuerst.'})
     return redirect('realm-user-group-update', realm.id, user_dn)
-
-
-def user_deleted(request, realm_id):
-    return render(request, 'user/account_deleted.jinja2', {'realm': Realm.objects.get(id=realm_id)})
-
-
-def user_update_controller(request, realm, ldap_user, redirect_name, update_view, form_class,
-                           form_attrs):
-    if request.method == 'POST':
-        form = form_class(request.POST)
-        if form.is_valid():
-            for form_attr in form_attrs:
-                # if form.cleaned_data[form_attr['form_field']]:
-                logger.info(form.cleaned_data[form_attr['form_field']])
-                ldap_user.__setattr__(form_attr['model_field'], form.cleaned_data[form_attr['form_field']])
-            ldap_user.display_name = f'{form.cleaned_data["first_name"]} {form.cleaned_data["last_name"]}'
-            logger.debug(form.data)
-            ldap_user.save()
-            return redirect(redirect_name, realm.id, ldap_user.dn)
-    else:
-        form_data = {'username': ldap_user.username, 'first_name': ldap_user.first_name,
-                     'last_name': ldap_user.last_name, 'email': ldap_user.email, 'phone': ldap_user.phone,
-                     'mobile_phone': ldap_user.mobile_phone}
-        form = form_class(initial=form_data)
-    return render(request, update_view, {'form': form, 'realm': realm, 'user': ldap_user})
-
-
-def user_delete_controller(ldap_user, realm):
-    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-    try:
-        django_user = User.objects.get(username=ldap_user.username)
-        try:
-            DeletedUser.objects.create(user=django_user, ldap_dn=ldap_user.dn)
-            send_deletion_mail(realm=realm, user=ldap_user)
-        except IntegrityError as err:
-            pass
-
-    except ObjectDoesNotExist:
-        pass
-    return
-
-
-def ldap_add_user_to_groups(ldap_user, user_groups):
-    for group in user_groups:
-        group.members.append(ldap_user)
-        group.save()
 
 
 @login_required
