@@ -200,7 +200,7 @@ class LdapGroup(Model):
     @staticmethod
     def add_user_to_groups(ldap_user: LdapUser, ldap_groups: List):
         for ldap_group in ldap_groups:
-            ldap_group.members.append(ldap_user)
+            ldap_group.members.append(ldap_user.dn)
             ldap_group.save()
 
     @staticmethod
@@ -219,10 +219,11 @@ class LdapGroup(Model):
 
     @staticmethod
     def get_group(group_name: str, realm: Realm = None):
-        LdapGroup.base_dn = f'ou=group, {realm.ldap_base_dn}' if realm else LdapGroup.ROOT_DN
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}' if realm else LdapGroup.ROOT_DN
         try:
             return LdapGroup.objects.get(name=group_name)
         except Exception as e:
+            logger.info(e)
             return None
 
     @staticmethod

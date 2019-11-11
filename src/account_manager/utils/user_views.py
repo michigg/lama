@@ -38,7 +38,7 @@ def get_rendered_user_details(request, realm_id, user_dn, success_headline=None,
                   }, )
 
 
-def get_realm_user_list(request, realm_id, status_code=200, extra_success=""):
+def get_realm_user_list(request, realm_id, status_code=200, success_headline="", success_text=""):
     realm = Realm.objects.get(id=realm_id)
     realm_users = LdapUser.get_users(realm=realm)
     user_wrappers = []
@@ -49,7 +49,8 @@ def get_realm_user_list(request, realm_id, status_code=200, extra_success=""):
                   {
                       'realm': realm,
                       'realm_user': user_wrappers,
-                      'extra_success': extra_success,
+                      'success_headline': success_headline,
+                      'success_text': success_text,
                   },
                   status=status_code,
                   )
@@ -74,8 +75,10 @@ def create_user(request, realm: Realm, form: AddLDAPUserForm):
         return get_realm_user_list(request=request,
                                    realm_id=realm.id,
                                    status_code=201,
-                                   extra_success=f'Nutzer {username} erfolgreich angelegt.')
-    except ALREADY_EXISTS as err:
+                                   success_headline='Aktion erfolgreich',
+                                   success_text=f'Nutzer {username} erfolgreich angelegt.',
+                                   )
+    except ALREADY_EXISTS:
         return render(request,
                       'user/realm_user_add.jinja2',
                       {

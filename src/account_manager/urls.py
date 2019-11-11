@@ -22,7 +22,7 @@ urlpatterns = [
 
     # Realm User
     path('realm/<int:realm_id>/users/', user_views.realm_user_list, name='realm-user-list'),
-    path('realm/<int:realm_id>/users/add/', user_views.user_add, name='realm-user-add'),
+    path('realm/<int:realm_id>/users/add/', user_views.realm_user_add, name='realm-user-add'),
     path('realm/<int:realm_id>/user/<str:user_dn>/', user_views.realm_user_detail,
          name='realm-user-detail'),
     path('realm/<int:realm_id>/user/<str:user_dn>/update/', user_views.realm_user_update,

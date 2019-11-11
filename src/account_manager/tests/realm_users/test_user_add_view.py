@@ -4,8 +4,11 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from account_manager.models import LdapUser
+from account_helper.models import Realm
+from account_manager.models import LdapUser, LdapGroup
 from account_manager.tests.utils.utils import get_realm, get_user, get_group, get_password
+
+logger = logging.getLogger(__name__)
 
 
 class RealmUserAddViewTest(TestCase):
@@ -61,19 +64,23 @@ class RealmUserAddViewTest(TestCase):
         self.django_superuser.delete()
         logging.disable(logging.NOTSET)
 
+    def clear_realm_user(self, realm: Realm):
+        LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+        for ldap_user in LdapUser.objects.all():
+            ldap_user.delete()
+
+    def clear_realm_group(self, realm: Realm):
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+        for ldap_group in LdapGroup.objects.all():
+            ldap_group.delete()
+
     def clear_ldap_objects(self):
+        self.clear_realm_user(self.realm_1)
+        self.clear_realm_user(self.realm_2)
+        self.clear_realm_group(self.realm_1)
+        self.clear_realm_group(self.realm_2)
         self.realm_1.delete()
         self.realm_2.delete()
-        self.ldap_user_1.delete()
-        self.ldap_user_2.delete()
-        self.ldap_user_realm_1_admin.delete()
-        self.ldap_user_realm_2_admin.delete()
-        self.ldap_user_multiple_realm_admin.delete()
-        self.ldap_user_super_user.delete()
-        self.ldap_group_1_realm_1_default.delete()
-        self.ldap_group_1_realm_2_default.delete()
-        self.ldap_group_1_realm_1_admin.delete()
-        self.ldap_group_1_realm_2_admin.delete()
 
     def test_without_login(self):
         response = self.client.get(reverse('realm-user-add', args=[self.realm_1.id, ]))
@@ -100,7 +107,8 @@ class RealmUserAddViewTest(TestCase):
         new_email = "test@test.de"
         response = self.client.post(reverse('realm-user-add', args=[self.realm_1.id, ]),
                                     data={'username': new_username, "email": new_email})
-        self.assertContains(response, f'Nutzer {new_username} wurde erfolgreich angelegt.', status_code=201)
+
+        self.assertContains(response, f'Nutzer {new_username} erfolgreich angelegt.', status_code=201)
         self.assertTrue(LdapUser.objects.filter(username=new_username, email=new_email).exists())
 
     def test_with_super_user_login(self):
@@ -114,5 +122,18 @@ class RealmUserAddViewTest(TestCase):
         new_email = "test@test.de"
         response = self.client.post(reverse('realm-user-add', args=[self.realm_1.id, ]),
                                     data={'username': new_username, "email": new_email})
-        self.assertContains(response, f'Nutzer {new_username} wurde erfolgreich angelegt.', status_code=201)
+        self.assertContains(response, f'Nutzer {new_username} erfolgreich angelegt.', status_code=201)
         self.assertTrue(LdapUser.objects.filter(username=new_username, email=new_email).exists())
+
+    def test_with_super_user_login_post_existent_user_data(self):
+        self.client.login(username=self.django_superuser.username, password=get_password())
+        response = self.client.post(reverse('realm-user-add', args=[self.realm_1.id, ]),
+                                    data={'username': self.ldap_user_1.username, "email": self.ldap_user_1.email})
+        self.assertContains(response, f'Nutzer {self.ldap_user_1.username} existiert bereits.', status_code=409)
+
+    def test_with_super_user_login_post_existent_user_different_email_data(self):
+        self.client.login(username=self.django_superuser.username, password=get_password())
+        response = self.client.post(reverse('realm-user-add', args=[self.realm_1.id, ]),
+                                    data={'username': self.ldap_user_1.username,
+                                          "email": "test_no_existent_email@test.de"})
+        self.assertContains(response, f'Nutzer {self.ldap_user_1.username} existiert bereits.', status_code=409)

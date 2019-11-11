@@ -71,7 +71,7 @@ def user_detail(request, realm_id, user_dn):
 
 @login_required
 @is_realm_admin
-def user_add(request, realm_id):
+def realm_user_add(request, realm_id):
     realm = Realm.objects.get(id=realm_id)
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
