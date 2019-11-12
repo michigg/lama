@@ -197,9 +197,13 @@ def realm_user_delete_cancel(request, realm_id, user_dn):
         deleted_user = DeletedUser.objects.get(ldap_dn=ldap_user.dn)
         deleted_user.delete()
     except ObjectDoesNotExist:
-        pass
+        return render_realm_user_detail_view(request=request, realm_id=realm_id, user_dn=user_dn,
+                                             error_headline="Fehlgeschlagen",
+                                             error_text="Nutzer ist nicht als gelöscht markiert.", status_code=409)
 
-    return redirect('realm-user-detail', realm_id, user_dn)
+    return render_realm_user_detail_view(request=request, realm_id=realm_id, user_dn=user_dn,
+                                         success_headline="Erfolgreich",
+                                         success_text="Nutzerlöschung wurde abgebrochen")
 
 
 @login_required
