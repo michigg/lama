@@ -140,12 +140,6 @@ class LdapUser(Model):
                 user_wrappers.append({'user': user, 'active': False})
         return user_wrappers
 
-    @staticmethod
-    def get_inactive_users():
-        last_semester = datetime.now() - timedelta(days=182)
-        return (LdapUser.objects.filter(last_login__lte=last_semester) | LdapUser.objects.exclude(
-            last_login__lte=datetime.now() + timedelta(days=1)))
-
     def get_users_realm_base_dn(self):
         return re.compile('(uid=[a-zA-Z0-9_-]*),(ou=[a-zA-Z_-]*),(.*)').match(self.dn).group(3)
 
@@ -174,6 +168,13 @@ class LdapUser(Model):
             return None
 
     @staticmethod
+    def get_inactive_users(realm: Realm = None):
+        LdapUser.base_dn = realm.ldap_base_dn if realm else LdapUser.ROOT_DN
+        last_semester = datetime.now() - timedelta(days=182)
+        return (LdapUser.objects.filter(last_login__lte=last_semester) | LdapUser.objects.exclude(
+            last_login__lte=datetime.now() + timedelta(days=1)))
+
+    @staticmethod
     def set_root_dn(realm):
         LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
 
@@ -192,10 +193,10 @@ class LdapGroup(Model):
     members = ldap_fields.ListField(db_column='member')
 
     @staticmethod
-    def get_user_groups(realm, user):
+    def get_user_groups(realm: Realm, ldap_user: LdapUser):
         LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
         LdapGroup.base_dn = LdapGroup.ROOT_DN
-        return LdapGroup.objects.filter(members=user.dn)
+        return LdapGroup.objects.filter(members=ldap_user.dn)
 
     @staticmethod
     def add_user_to_groups(ldap_user: LdapUser, ldap_groups: List):
@@ -223,7 +224,16 @@ class LdapGroup(Model):
         try:
             return LdapGroup.objects.get(name=group_name)
         except Exception as e:
-            logger.info(e)
+            logger.error(e)
+            return None
+
+    @staticmethod
+    def get_groups(realm: Realm = None):
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}' if realm else LdapGroup.ROOT_DN
+        try:
+            return LdapGroup.objects.all()
+        except Exception as e:
+            logger.error(e)
             return None
 
     @staticmethod

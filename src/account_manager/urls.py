@@ -1,6 +1,7 @@
 from django.urls import path
 
 import account_manager.utils.user_views
+import account_manager.views.realm_user_views
 from . import main_views
 from account_manager.views import user_views
 from account_manager.views import group_views
@@ -22,39 +23,44 @@ urlpatterns = [
     path('realm/<int:realm_id>/mail/test/', main_views.realm_email_test, name='realm-mail-test'),
 
     # Realm User
-    path('realm/<int:realm_id>/users/', user_views.realm_user_list, name='realm-user-list'),
-    path('realm/<int:realm_id>/users/add/', user_views.realm_user_add, name='realm-user-add'),
-    path('realm/<int:realm_id>/user/<str:user_dn>/', user_views.realm_user_detail,
+    path('realm/<int:realm_id>/users/', account_manager.views.realm_user_views.realm_user_list, name='realm-user-list'),
+    path('realm/<int:realm_id>/users/add/', account_manager.views.realm_user_views.realm_user_add, name='realm-user-add'),
+    path('realm/<int:realm_id>/user/<str:user_dn>/', account_manager.views.realm_user_views.realm_user_detail,
          name='realm-user-detail'),
-    path('realm/<int:realm_id>/user/<str:user_dn>/update/', user_views.realm_user_update,
+    path('realm/<int:realm_id>/user/<str:user_dn>/update/', account_manager.views.realm_user_views.realm_user_update,
          name='realm-user-update'),
-    path('realm/<int:realm_id>/user/<str:user_dn>/mail/password/', user_views.realm_user_resend_password_reset,
+    path('realm/<int:realm_id>/user/<str:user_dn>/mail/password/',
+         account_manager.views.realm_user_views.realm_user_resend_password_reset,
          name='realm-user-password-reset'),
-    path('realm/<int:realm_id>/user/<str:user_dn>/mail/welcome/', user_views.realm_user_resend_welcome_mail,
+    path('realm/<int:realm_id>/user/<str:user_dn>/mail/welcome/',
+         account_manager.views.realm_user_views.realm_user_resend_welcome_mail,
          name='realm-user-resend-welcome-mail'),
     path('realm/<int:realm_id>/user/<str:user_dn>/group/update/',
-         user_views.realm_user_group_update,
+         account_manager.views.realm_user_views.realm_user_group_update,
          name='realm-user-group-update'),
     path('realm/<int:realm_id>/user/<str:user_dn>/group/update/add/',
-         user_views.realm_user_group_update_add,
+         account_manager.views.realm_user_views.realm_user_group_update_add,
          name='realm-user-group-update-add'),
     path('realm/<int:realm_id>/user/<str:user_dn>/group/update/delete/',
-         user_views.realm_user_group_update_delete,
+         account_manager.views.realm_user_views.realm_user_group_update_delete,
          name='realm-user-group-update-delete'),
     path('realm/<int:realm_id>/user/delete/single/<str:user_dn>/confirm/',
-         user_views.realm_user_delete_confirm,
+         account_manager.views.realm_user_views.realm_user_delete_confirm,
          name='realm-user-delete-confirm'),
     path('realm/<int:realm_id>/user/delete/single/<str:user_dn>/',
-         user_views.realm_user_delete,
+         account_manager.views.realm_user_views.realm_user_delete,
          name='realm-user-delete'),
     path('realm/<int:realm_id>/user/delete/multiple/confirm/',
-         user_views.realm_multiple_user_delete_confirm,
+         account_manager.views.realm_user_views.realm_multiple_user_delete_confirm,
          name='realm-multiple-user-delete-confirm'),
-    path('realm/<int:realm_id>/user/delete/multiple/', user_views.realm_multiple_user_delete,
+    path('realm/<int:realm_id>/user/delete/multiple/',
+         account_manager.views.realm_user_views.realm_multiple_user_delete,
          name='realm-multiple-user-delete'),
-    path('realm/<int:realm_id>/user/delete/multiple/inactive/', user_views.realm_multiple_user_delete_inactive,
+    path('realm/<int:realm_id>/user/delete/multiple/inactive/',
+         account_manager.views.realm_user_views.realm_multiple_user_delete_inactive,
          name='realm-multiple-user-delete-inactive'),
-    path('realm/<int:realm_id>/user/delete/<str:user_dn>/cancel/', user_views.realm_user_delete_cancel,
+    path('realm/<int:realm_id>/user/delete/<str:user_dn>/cancel/',
+         account_manager.views.realm_user_views.realm_user_delete_cancel,
          name='realm-user-delete-cancel'),
 
     # Realm Group

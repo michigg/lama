@@ -7,6 +7,5 @@ WORKDIR /lama
 EXPOSE 80
 
 COPY entrypoint.sh /
-ENTRYPOINT ["python3", "manage.py"]
-CMD ["runserver", "0.0.0.0:80"]
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:80"]
 #CMD ["/entrypoint.sh"]

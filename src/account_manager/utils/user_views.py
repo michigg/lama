@@ -30,7 +30,8 @@ def render_user_detail_view(request, realm_id, user_dn):
                   }, )
 
 
-def render_realm_user_detail_view(request, realm_id, user_dn, success_headline=None, success_text=None):
+def render_realm_user_detail_view(request, realm_id, user_dn, success_headline=None, success_text=None,
+                                  error_headline=None, error_text=None, status_code=200):
     realm = Realm.objects.get(id=realm_id)
     LdapUser.base_dn = realm.ldap_base_dn
     LdapGroup.base_dn = LdapGroup.ROOT_DN
@@ -45,7 +46,9 @@ def render_realm_user_detail_view(request, realm_id, user_dn, success_headline=N
                       'realm': realm,
                       'success_headline': success_headline,
                       'success_text': success_text,
-                  }, )
+                      'error_headline': error_headline,
+                      'error_text': error_text,
+                  }, status=status_code)
 
 
 def get_realm_user_list(request, realm_id, status_code=200, success_headline="", success_text=""):
@@ -128,19 +131,28 @@ def user_deleted(request, realm_id):
     return render(request, 'user/account_deleted.jinja2', {'realm': Realm.objects.get(id=realm_id)})
 
 
-def user_delete_controller(ldap_user, realm):
+def user_delete_controller(request, ldap_user: LdapUser, realm: Realm):
     LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
     try:
         django_user = User.objects.get(username=ldap_user.username)
         try:
-            DeletedUser.objects.create(user=django_user, ldap_dn=ldap_user.dn)
+            user = DeletedUser.objects.create(user=django_user, ldap_dn=ldap_user.dn)
+            logger.warning(user)
             send_deletion_mail(realm=realm, user=ldap_user)
+            return render_realm_user_detail_view(request, realm.id, ldap_user.dn,
+                                                 success_headline="Erfolgreich",
+                                                 success_text="Nutzer wurde als gelöscht markiert.")
         except IntegrityError as err:
-            pass
-
-    except ObjectDoesNotExist:
-        pass
-    return
+            logger.error(err)
+            return render_realm_user_detail_view(request, realm.id, ldap_user.dn,
+                                                 error_headline="Fehlgeschlagen",
+                                                 error_text="Nutzer ist bereits als gelöscht markiert.",
+                                                 status_code=409)
+    except ObjectDoesNotExist as err:
+        logger.error(err)
+        return render_realm_user_detail_view(request, realm.id, ldap_user.dn,
+                                             error_headline="Fehlgeschlagen",
+                                             error_text="Nutzer existiert nicht.", status_code=409)
 
 
 def ldap_add_user_to_groups(ldap_user, user_groups):
@@ -150,31 +162,21 @@ def ldap_add_user_to_groups(ldap_user, user_groups):
 
 
 def get_available_given_groups(realm, user_dn):
-    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
-    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-    ldap_user = LdapUser.objects.get(dn=user_dn)
-    user_groups = LdapGroup.objects.filter(members=ldap_user.dn)
-    realm_groups = LdapGroup.objects.all()
-    realm_groups_available = []
-    for realm_group in realm_groups:
-        if realm_group not in user_groups:
-            realm_groups_available.append(realm_group)
+    ldap_user = LdapUser.get_user_by_dn(dn=user_dn, realm=realm)
+    user_groups = LdapGroup.get_user_groups(realm=realm, ldap_user=ldap_user)
+    realm_groups = LdapGroup.get_groups(realm=realm)
+    realm_groups_available = [realm_group for realm_group in realm_groups if realm_group not in user_groups]
     return ldap_user, realm_groups_available, user_groups
 
 
 def get_deletable_blocked_users(ldap_users, realm):
-    deletable_users = []
-    blocked_users = []
-    for ldap_user in ldap_users:
-        if _is_deleteable_user(realm, ldap_user):
-            deletable_users.append(ldap_user)
-        else:
-            blocked_users.append(ldap_user)
+    deletable_users = [ldap_user for ldap_user in ldap_users if _is_deleteable_user(realm=realm, ldap_user=ldap_user)]
+    blocked_users = [ldap_user for ldap_user in ldap_users if not _is_deleteable_user(realm=realm, ldap_user=ldap_user)]
     return blocked_users, deletable_users
 
 
-def _is_deleteable_user(realm, user):
-    user_groups = LdapGroup.get_user_groups(realm, user)
+def _is_deleteable_user(realm: Realm, ldap_user: LdapUser):
+    user_groups = LdapGroup.get_user_groups(realm, ldap_user)
     user_group_names = [group.name for group in user_groups]
     user_admin_realms = Realm.objects.filter(id=realm.id).filter(admin_group__name__in=user_group_names)
     return not len(user_admin_realms) > 0

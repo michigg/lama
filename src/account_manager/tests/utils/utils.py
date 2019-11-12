@@ -1,6 +1,7 @@
 import logging
 
 from _ldap import ALREADY_EXISTS
+from django.contrib.auth.models import User
 
 from account_helper.models import Realm
 from account_manager.models import LdapUser, LdapGroup
@@ -42,6 +43,8 @@ def get_user(id: int, realm: Realm, admin=False, multiple_admin=False, super_adm
                                                       password=PASSWORD,
                                                       first_name=first_name,
                                                       last_name=last_name)
+        User.objects.create(username=username, email=email, password=PASSWORD, first_name=first_name,
+                            last_name=last_name)
     except ALREADY_EXISTS:
         ldap_user = LdapUser.objects.get(username=username, )
 
@@ -60,3 +63,15 @@ def get_group(id: int, realm: Realm, ldap_groups):
 
 def get_password():
     return PASSWORD
+
+
+def clear_realm_user(realm: Realm):
+    LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+    for ldap_user in LdapUser.objects.all():
+        ldap_user.delete()
+
+
+def clear_realm_group(realm: Realm):
+    LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+    for ldap_group in LdapGroup.objects.all():
+        ldap_group.delete()
