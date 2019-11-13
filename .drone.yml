@@ -1,0 +1,60 @@
+kind: pipeline
+type: docker
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: fetch
+  image: alpine/git
+  commands:
+  - git fetch --tags
+  
+- name: build
+  image: docker:latest
+  volumes:
+  - name: docker_sock
+    path: /var/run/docker.sock
+  commands:
+  - docker-compose build
+
+- name: test
+  image: docker:latest
+ volumes:
+  - name: docker_sock
+    path: /var/run/docker.sock
+  commands:
+  - docker-compose exec lama python3 manage.py test
+
+- name: docker  
+  image: plugins/docker
+  settings:
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    repo: michigg/lama
+    tags: latest
+    
+- name: send telegram notification
+  image: appleboy/drone-telegram
+  settings:
+    token:
+      from_secret: telegram_token
+    to:
+      from_secret: telegram_chat_id
+  message: >
+   {{#success build.status}}
+     build {{build.number}} succeeded. Good job.
+   {{else}}
+     build {{build.number}} failed. Fix me please.
+   {{/success}}
+
+
+trigger:
+  branch:
+  - master
+  event:
+  - push
