@@ -22,7 +22,7 @@ steps:
 
 - name: test
   image: docker:latest
- volumes:
+  volumes:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
