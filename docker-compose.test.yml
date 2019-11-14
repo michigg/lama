@@ -2,7 +2,9 @@ version: "3"
 
 networks:
   pg_db:
-    internal: true
+    external: false
+  ldap_net:
+    external: false
 
 services:
   lama:
@@ -11,18 +13,46 @@ services:
       context: docker/lama
       dockerfile: Dockerfile.test
     networks:
-      - default
+      - ldap_net
       - pg_db
-    environment:
+    env_file:
       - docker/lama/test.env
+    volumes:
+      - ./src:/lama
+    depends_on:
+      - dblama
+      - ldap
     ports:
-      - 8888:80
-
+      - 0.0.0.0:8888:80
+  
   dblama:
     image: postgres:11.2-alpine
     networks:
       - pg_db
     volumes:
-      - ./data/pgdata/:/var/lib/postgresql/data/
+      - ./db/pgdata/:/var/lib/postgresql/data/
     env_file:
       - docker/lama/test.env
+
+  ldap:
+    image: docker.clkl.de/ldap/ldap:0.3-lama
+    build:
+      context: docker/ldap
+      dockerfile: Dockerfile.ldap
+    env_file: docker/ldap/ldap.env
+    volumes:
+      - ./docker/ldap/data/var/:/var/lib/openldap/
+    networks:
+      - ldap_net
+
+  ldap_admin:
+    image: docker.clkl.de/ldap/admin:0.1-lama
+    build:
+      context: docker/ldap
+      dockerfile: Dockerfile.admin
+    networks:
+      - ldap_net
+    depends_on:
+      - ldap
+    ports:
+      - 0.0.0.0:8080:80
