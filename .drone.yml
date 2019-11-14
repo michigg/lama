@@ -30,8 +30,7 @@ steps:
   commands:
   - docker-compose build
   - docker-compose up -d
-  - docker-compose exec lama sh
-  - python3 manage.py test
+  - docker-compose exec lama python3 manage.py test
  
 - name: docker  
   image: plugins/docker
