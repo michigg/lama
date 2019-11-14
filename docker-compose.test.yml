@@ -1,9 +1,9 @@
 version: "3"
 
 networks:
-  pg_db:
+  ci_pg_db:
     external: false
-  ldap_net:
+  ci_ldap_net:
     external: false
 
 services:
@@ -13,8 +13,8 @@ services:
       context: .
       dockerfile: docker/lama/Dockerfile.test
     networks:
-      - ldap_net
-      - pg_db
+      - ci_ldap_net
+      - ci_pg_db
     env_file:
       - docker/lama/test.env
     depends_on:
@@ -26,7 +26,7 @@ services:
   ci_dblama:
     image: postgres:11.2-alpine
     networks:
-      - pg_db
+      - ci_pg_db
     env_file:
       - docker/lama/test.env
 
@@ -37,16 +37,16 @@ services:
       dockerfile: Dockerfile.ldap
     env_file: docker/ldap/ldap.env
     networks:
-      - ldap_net
+      - ci_ldap_net
 
-  ci_ldap_admin:
-    image: docker.clkl.de/ldap/admin:0.1-lama
-    build:
-      context: docker/ldap
-      dockerfile: Dockerfile.admin
-    networks:
-      - ldap_net
-    depends_on:
-      - ci_ldap
-    ports:
-      - 0.0.0.0:8080:80
+#  ci_ldap_admin:
+#    image: docker.clkl.de/ldap/admin:0.1-lama
+#    build:
+#      context: docker/ldap
+#      dockerfile: Dockerfile.admin
+#    networks:
+#      - ci_ldap_net
+#    depends_on:
+#      - ci_ldap
+#    ports:
+#      - 0.0.0.0:8080:80
