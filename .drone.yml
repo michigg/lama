@@ -19,7 +19,7 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
-  - docker-compose -f docker-compose.test.yml build
+  - docker-compose -f docker-compose.test.yml build --no-cache
 
 - name: test
   image: docker/compose:1.24.1
@@ -28,14 +28,17 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
-  - docker-compose -f docker-compose.test.yml build
+#  - docker-compose -f docker-compose.test.yml build --no-cache
   - docker-compose -f docker-compose.test.yml run lama sh && ls -la
   - echo "-------- docker-compose ps --------"
   - docker-compose -f docker-compose.test.yml ps
-  - echo "-------- start test --------"
+  - echo "-------- docker-compose -f docker-compose.test.yml run lama sh --------"
   - docker-compose -f docker-compose.test.yml run lama sh
+  - echo "-------- python3 manage.py makemigrations account_helper --------"
   - python3 manage.py makemigrations account_helper
+  - echo "-------- python3 manage.py migrate --------"
   - python3 manage.py migrate
+  - echo "-------- python3 manage.py test --------"
   - python3 manage.py test
  
 - name: docker  
