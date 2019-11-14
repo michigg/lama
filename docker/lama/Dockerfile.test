@@ -7,5 +7,5 @@ WORKDIR /lama
 EXPOSE 80
 
 #ENTRYPOINT ["python3", "manage.py"]
-ADD ["./src", "/lama"]
+ADD ["./src/src", "/lama"]
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:80"]
