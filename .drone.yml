@@ -1,6 +1,6 @@
-workspace:
-  base: /lama
-  path: src/github.com/michigg/lama
+#workspace:
+#  base: /lama
+#  path: src/github.com/michigg/lama
 
 kind: pipeline
 type: docker
