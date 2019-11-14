@@ -9,7 +9,7 @@ services:
     image: lama:0.1
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/lama/Dockerfile
     networks:
       - default
       - pg_db
