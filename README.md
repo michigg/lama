@@ -1,10 +1,10 @@
 
 ![Drone (self-hosted)](https://img.shields.io/drone/build/michigg/lama?server=https%3A%2F%2Fdrone.github.michigg.de&style=for-the-badge)
-[![Contributors](https://img.shields.io/github/contributors/michigg/roofis2.svg?style=for-the-badge)](https://github.com/michigg/roofis2)
-[![Forks](https://img.shields.io/github/forks/michigg/roofis2.svg?style=for-the-badge)](https://github.com/michigg/roofis2)
-[![Stars](https://img.shields.io/github/stars/michigg/roofis2.svg?style=for-the-badge)](https://github.com/michigg/roofis2)
-[![Issues](https://img.shields.io/github/issues/michigg/roofis2.svg?style=for-the-badge)](https://github.com/michigg/roofis2)
-[![License](https://img.shields.io/github/license/michigg/roofis2.svg?style=for-the-badge)](https://github.com/michigg/roofis2)
+[![Contributors](https://img.shields.io/github/contributors/michigg/lama.svg?style=for-the-badge)](https://github.com/michigg/lama)
+[![Forks](https://img.shields.io/github/forks/michigg/lama.svg?style=for-the-badge)](https://github.com/michigg/lama)
+[![Stars](https://img.shields.io/github/stars/michigg/lama.svg?style=for-the-badge)](https://github.com/michigg/lama)
+[![Issues](https://img.shields.io/github/issues/michigg/lama.svg?style=for-the-badge)](https://github.com/michigg/lama)
+[![License](https://img.shields.io/github/license/michigg/lama.svg?style=for-the-badge)](https://github.com/michigg/lama)
 
 # LAMa (Ldap Account Manager)
 LAMa was developed for the student representation of the University of Bamberg in order to guarantee a simple account administration of the StuVe accounts. It should offer a simpler alternative to the Keycloak account management tool.
