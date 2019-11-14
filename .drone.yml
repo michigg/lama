@@ -23,7 +23,7 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
-  - docker-compose -f docker-compose.test.yml build
+  - docker-compose -f docker-compose.test.yml build --no-cache
 
 - name: test
   image: docker/compose:1.24.1
@@ -32,9 +32,8 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
-#  - docker-compose -f docker-compose.test.yml build --no-cache
-  - echo "-------- docker-compose logs --------"
-  - docker-compose -f docker-compose.test.yml logs ci_ldap
+  - echo "-------- docker-compose down --------"
+  - docker-compose -f docker-compose.test.yml down
   - echo "-------- docker-compose up -d --------"
   - docker-compose -f docker-compose.test.yml up -d
   - echo "-------- docker-compose ps --------"

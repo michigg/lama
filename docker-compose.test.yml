@@ -38,15 +38,3 @@ services:
     env_file: docker/ldap/ldap.env
     networks:
       - ci_ldap_net
-
-#  ci_ldap_admin:
-#    image: docker.clkl.de/ldap/admin:0.1-lama
-#    build:
-#      context: docker/ldap
-#      dockerfile: Dockerfile.admin
-#    networks:
-#      - ci_ldap_net
-#    depends_on:
-#      - ci_ldap
-#    ports:
-#      - 0.0.0.0:8080:80
