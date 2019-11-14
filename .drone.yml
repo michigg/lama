@@ -13,6 +13,7 @@ steps:
   - git fetch --tags
  
 - name: build
+  privileged: true
   image: docker/compose:1.24.1
   volumes:
   - name: docker_sock
@@ -22,6 +23,7 @@ steps:
 
 - name: test
   image: docker/compose:1.24.1
+  privileged: true
   volumes:
   - name: docker_sock
     path: /var/run/docker.sock
