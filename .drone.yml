@@ -3,10 +3,10 @@ kind: pipeline
 name: default
 
 steps:
-- name: fetch
-  image: alpine/git
-  commands:
-  - git fetch --tags
+#- name: fetch
+#  image: alpine/git
+#  commands:
+#  - git fetch --tags
   
 #- name: build
 #  image: docker:latest
