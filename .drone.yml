@@ -19,7 +19,7 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
-  - docker-compose -f docker-compose.prod.yml build
+  - docker-compose -f docker-compose.test.yml build
 
 - name: test
   image: docker/compose:1.24.1
@@ -28,7 +28,7 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
-  - docker-compose -f docker-compose.prod.yml run lama python3 manage.py test
+  - docker-compose -f docker-compose.test.yml run lama python3 manage.py test
  
 - name: docker  
   image: plugins/docker
