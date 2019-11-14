@@ -1,0 +1,28 @@
+version: "3"
+
+networks:
+  pg_db:
+    internal: true
+
+services:
+  lama:
+    image: lama:0.1
+    build:
+      context: docker/lama
+      dockerfile: Dockerfile.test
+    networks:
+      - default
+      - pg_db
+    environment:
+      - docker/lama/test.env
+    ports:
+      - 8888:80
+
+  dblama:
+    image: postgres:11.2-alpine
+    networks:
+      - pg_db
+    volumes:
+      - ./data/pgdata/:/var/lib/postgresql/data/
+    env_file:
+      - docker/lama/test.env
