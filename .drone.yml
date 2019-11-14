@@ -8,32 +8,32 @@ steps:
   commands:
   - git fetch --tags
   
-- name: build
-  image: docker:latest
-  volumes:
-  - name: docker_sock
-    path: /var/run/docker.sock
-  commands:
-  - docker-compose build
+#- name: build
+#  image: docker:latest
+#  volumes:
+#  - name: docker_sock
+#    path: /var/run/docker.sock
+#  commands:
+#  - docker-compose build
 
-- name: test
-  image: docker:latest
-  volumes:
-  - name: docker_sock
-    path: /var/run/docker.sock
-  commands:
-  - docker-compose exec lama python3 manage.py test
+#- name: test
+#  image: docker:latest
+#  volumes:
+#  - name: docker_sock
+#    path: /var/run/docker.sock
+#  commands:
+#  - docker-compose exec lama python3 manage.py test
 
-- name: docker  
-  image: plugins/docker
-  settings:
-    username:
-      from_secret: docker_username
-    password:
-      from_secret: docker_password
-    repo: michigg/lama
-    tags: latest
-    
+#- name: docker  
+#  image: plugins/docker
+#  settings:
+#    username:
+#      from_secret: docker_username
+#    password:
+#      from_secret: docker_password
+#    repo: michigg/lama
+#    tags: latest
+#    
 - name: send telegram notification
   image: appleboy/drone-telegram
   settings:
