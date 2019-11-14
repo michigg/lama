@@ -21,18 +21,21 @@ steps:
   commands:
   - docker-compose -f docker-compose.test.yml build
 
-#- name: test
-#  image: docker/compose:1.24.1
-#  privileged: true
-#  volumes:
-#  - name: docker_sock
-#    path: /var/run/docker.sock
-#  commands:
-#  - docker-compose build
-#  - docker-compose up -d
-#  - docker-compose ps
-#  - docker-compose logs
-#  - docker-compose exec lama python3 manage.py test
+- name: test
+  image: docker/compose:1.24.1
+  privileged: true
+  volumes:
+  - name: docker_sock
+    path: /var/run/docker.sock
+  commands:
+  - docker-compose -f docker-compose.test.yml build
+  - docker-compose -f docker-compose.test.yml up -d
+  - echo "------ docker compose ps ------"
+  - docker-compose ps
+  - echo "------ docker compose logs ------"
+  - docker-compose logs
+  - echo "------ docker compose start test ------"
+  - docker-compose -f docker-compose.test.yml exec lama python3 manage.py test
  
 - name: docker  
   image: plugins/docker
