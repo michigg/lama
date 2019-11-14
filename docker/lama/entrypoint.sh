@@ -1,4 +1,7 @@
 #!/bin/sh
-python3 /lama/manage.py makemigrations account_helper && \
-python3 /lama/manage.py migrate && \
+echo "-------- make migrations --------"
+python3 /lama/manage.py makemigrations account_helper
+echo "-------- migrate --------"
+python3 /lama/manage.py migrate
+echo "-------- start test --------"
 python3 /lama/manage.py runserver 0.0.0.0:80
