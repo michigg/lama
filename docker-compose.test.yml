@@ -18,8 +18,8 @@ services:
     env_file:
       - docker/lama/test.env
     depends_on:
-      - dblama
-      - ldap
+      - ci_dblama
+      - ci_ldap
     ports:
       - 0.0.0.0:8888:80
   
@@ -47,6 +47,6 @@ services:
     networks:
       - ldap_net
     depends_on:
-      - ldap
+      - ci_ldap
     ports:
       - 0.0.0.0:8080:80
