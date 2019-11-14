@@ -6,6 +6,6 @@ RUN apk upgrade --update && \
 WORKDIR /lama
 EXPOSE 80
 
-ENTRYPOINT ["python3", "manage.py"]
+#ENTRYPOINT ["python3", "manage.py"]
 ADD ["src", "/lama"]
-CMD ["runserver", "0.0.0.0:80"]
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:80"]
