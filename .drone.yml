@@ -23,6 +23,7 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
+  - ls -la
   - docker-compose -f docker-compose.test.yml build
 
 - name: test
