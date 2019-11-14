@@ -13,7 +13,7 @@ steps:
   - git fetch --tags
  
 - name: build
-  image: compose
+  image: docker/compose
   volumes:
   - name: docker_sock
     path: /var/run/docker.sock
@@ -21,7 +21,7 @@ steps:
   - docker-compose build
 
 - name: test
-  image: compose
+  image: docker/compose
   volumes:
   - name: docker_sock
     path: /var/run/docker.sock
