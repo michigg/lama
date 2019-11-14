@@ -29,13 +29,7 @@ steps:
     path: /var/run/docker.sock
   commands:
   - docker-compose -f docker-compose.test.yml build
-  - docker-compose -f docker-compose.test.yml up -d
-  - echo "------ docker compose ps ------"
-  - docker-compose ps
-  - echo "------ docker compose logs ------"
-  - docker-compose logs
-  - echo "------ docker compose start test ------"
-  - docker-compose -f docker-compose.test.yml exec lama python3 manage.py test
+  - docker-compose -f docker-compose.test.yml run lama python3 manage.py test
  
 - name: docker  
   image: plugins/docker
