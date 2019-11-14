@@ -23,7 +23,7 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
-  - docker-compose -f docker-compose.test.yml build --no-cache
+  - docker-compose -f docker-compose.test.yml build
 
 - name: test
   image: docker/compose:1.24.1
@@ -35,8 +35,11 @@ steps:
 #  - docker-compose -f docker-compose.test.yml build --no-cache
   - echo "-------- docker-compose logs --------"
   - docker-compose -f docker-compose.test.yml logs ldap
-  - echo "-------- docker-compose test --------"
+  - echo "-------- docker-compose up -d --------"
   - docker-compose -f docker-compose.test.yml up -d
+  - echo "-------- docker-compose ps --------"
+  - docker-compose -f docker-compose.test.yml ps
+  - echo "-------- docker-compose test --------"
   - docker-compose -f docker-compose.test.yml run lama /lama/entrypoint.sh
 
 - name: docker  
