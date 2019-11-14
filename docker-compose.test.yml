@@ -10,8 +10,8 @@ services:
   lama:
     image: lama:0.1
     build:
-      context: docker/lama
-      dockerfile: Dockerfile.test
+      context: .
+      dockerfile: docker/lama/Dockerfile.test
     networks:
       - ldap_net
       - pg_db
