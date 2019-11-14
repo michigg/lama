@@ -11,7 +11,7 @@ PASSWORD = "12345678"
 
 def get_realm(id: int, email=True):
     realm, _ = Realm.objects.get_or_create(name=f"test_realm_{id}",
-                                           ldap_base_dn=f"ou=test_{id},ou=fachschaften,dc=test,dc=de",
+                                           ldap_base_dn=f"ou=test_{id},dc=test,dc=de",
                                            email=f"test_{id}.realm@test.de" if email else "")
     return realm
 

@@ -37,6 +37,7 @@ steps:
   - echo "-------- docker-compose logs --------"
   - docker-compose -f docker-compose.test.yml logs ldap
   - echo "-------- docker-compose test --------"
+  - docker-compose -f docker-compose.test.yml up -d
   - docker-compose -f docker-compose.test.yml run lama /lama/entrypoint.sh
 #  - echo "-------- docker-compose ps --------"
 #  - docker-compose -f docker-compose.test.yml ps
