@@ -17,8 +17,8 @@ services:
       - pg_db
     env_file:
       - docker/lama/test.env
-    volumes:
-      - ./src:/lama
+#    volumes:
+#      - ./src:/lama
     depends_on:
       - dblama
       - ldap
