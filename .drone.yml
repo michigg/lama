@@ -18,7 +18,7 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
-  - docker-compose build
+  - build
 
 - name: test
   image: docker/compose:1.24.1
@@ -26,7 +26,7 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
-  - docker-compose exec lama python3 manage.py test
+  - exec lama python3 manage.py test
 
 - name: docker  
   image: plugins/docker
@@ -52,9 +52,13 @@ steps:
      build {{build.number}} failed. Fix me please.
    {{/success}}
 
-
 trigger:
   branch:
   - master
   event:
   - push
+
+volumes:
+  - name: docker_sock
+    host:
+      path: /var/run/docker.sock
