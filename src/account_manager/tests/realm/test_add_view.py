@@ -91,7 +91,7 @@ class RealmAddViewTest(TestCase):
         realm = Realm.objects.get(name=self.realm_1.name)
         realm.delete()
         new_name = 'test_add'
-        ldap_dn = 'ou=test_1,ou=fachschaften,dc=test,dc=de'
+        ldap_dn = 'ou=test_1,dc=test,dc=de'
         self.client.login(username=self.django_superuser.username, password=get_password())
         response = self.client.post(reverse('realm-add'),
                                     {'name': new_name, 'ldap_base_dn': ldap_dn})
