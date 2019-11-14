@@ -29,6 +29,7 @@ steps:
     path: /var/run/docker.sock
   commands:
   - docker-compose build
+  - docker-compose up -d
   - docker-compose exec lama sh
   - python3 manage.py test
  
