@@ -30,8 +30,13 @@ steps:
   commands:
   - docker-compose -f docker-compose.test.yml build
   - docker-compose -f docker-compose.test.yml run lama sh && ls -la
+  - echo "-------- docker-compose ps --------"
+  - docker-compose -f docker-compose.test.yml ps
   - echo "-------- start test --------"
-  - docker-compose -f docker-compose.test.yml run lama python3 manage.py test
+  - docker-compose -f docker-compose.test.yml run lama sh
+  - python3 manage.py makemigrations account_helper
+  - python3 manage.py migrate
+  - python3 manage.py test
  
 - name: docker  
   image: plugins/docker

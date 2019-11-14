@@ -17,8 +17,6 @@ services:
       - pg_db
     env_file:
       - docker/lama/test.env
-#    volumes:
-#      - ./src:/lama
     depends_on:
       - dblama
       - ldap
@@ -40,8 +38,8 @@ services:
       context: docker/ldap
       dockerfile: Dockerfile.ldap
     env_file: docker/ldap/ldap.env
-    volumes:
-      - ./docker/ldap/data/var/:/var/lib/openldap/
+#    volumes:
+#      - ./docker/ldap/data/var/:/var/lib/openldap/
     networks:
       - ldap_net
 
