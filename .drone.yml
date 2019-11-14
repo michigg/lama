@@ -28,7 +28,9 @@ steps:
   - name: docker_sock
     path: /var/run/docker.sock
   commands:
-  - docker-compose -f docker-compose.test.yml run lama sh && python3 manage.py test
+  - docker-compose build
+  - docker-compose exec lama sh
+  - python3 manage.py test
  
 - name: docker  
   image: plugins/docker
