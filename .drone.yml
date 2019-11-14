@@ -34,13 +34,13 @@ steps:
   commands:
 #  - docker-compose -f docker-compose.test.yml build --no-cache
   - echo "-------- docker-compose logs --------"
-  - docker-compose -f docker-compose.test.yml logs ldap
+  - docker-compose -f docker-compose.test.yml logs ci_ldap
   - echo "-------- docker-compose up -d --------"
   - docker-compose -f docker-compose.test.yml up -d
   - echo "-------- docker-compose ps --------"
   - docker-compose -f docker-compose.test.yml ps
   - echo "-------- docker-compose test --------"
-  - docker-compose -f docker-compose.test.yml run lama /lama/entrypoint.sh
+  - docker-compose -f docker-compose.test.yml run ci_lama /lama/entrypoint.sh
 
 - name: docker  
   image: plugins/docker
