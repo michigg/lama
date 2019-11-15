@@ -43,6 +43,9 @@ steps:
 
 - name: docker  
   image: plugins/docker
+  when:
+    branch: master
+    event: tag
   settings:
     username:
       from_secret: docker_username
@@ -50,9 +53,29 @@ steps:
       from_secret: docker_password
     repo: michigg/lama
     auto_tag: true
+
+- name: publish
+  image: plugins/github-release
+  settings:
+    api_key:
+      from_secret: github_release_token
+    checksum:
+      - md5
+      - sha1
+      - sha256
+      - sha512
+      - adler32
+      - crc32
+  when:
+    branch: master
+    event: tag
     
 - name: send telegram notification
   image: appleboy/drone-telegram
+  when:
+    status:
+      - success
+      - failure
   settings:
     token:
       from_secret: telegram_token
