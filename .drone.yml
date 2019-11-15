@@ -49,7 +49,7 @@ steps:
     password:
       from_secret: docker_password
     repo: michigg/lama
-    tags: latest
+    auto_tag: true
     
 - name: send telegram notification
   image: appleboy/drone-telegram
