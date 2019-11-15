@@ -40,6 +40,7 @@ steps:
   - docker-compose -f docker-compose.test.yml ps
   - echo "-------- docker-compose test --------"
   - docker-compose -f docker-compose.test.yml run ci_lama /lama/entrypoint.sh
+  - docker-compose -f docker-compose.test.yml down
 
 - name: docker  
   image: plugins/docker
