@@ -26,3 +26,5 @@ services:
       - ./data/pgdata/:/var/lib/postgresql/data/
     env_file:
       - production.env
+
+
