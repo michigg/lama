@@ -93,6 +93,7 @@ trigger:
   - master
   event:
   - push
+  - tag
 
 volumes:
   - name: docker_sock
