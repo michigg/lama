@@ -44,7 +44,6 @@ steps:
 - name: docker  
   image: plugins/docker
   when:
-    branch: master
     event: tag
   settings:
     username:
@@ -67,7 +66,6 @@ steps:
       - adler32
       - crc32
   when:
-    branch: master
     event: tag
     
 - name: send telegram notification
