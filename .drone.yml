@@ -89,8 +89,6 @@ steps:
    {{/success}}
 
 trigger:
-  branch:
-  - master
   event:
   - push
   - tag
