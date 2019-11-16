@@ -10,6 +10,6 @@ EXPOSE 80
 ENTRYPOINT ["python3", "manage.py"]
 ADD ["src", "/lama"]
 
-RUN rm -r /lama/account_manager/tests
+#RUN rm -r /lama/account_manager/tests
 
 CMD ["runserver", "0.0.0.0:80"]
