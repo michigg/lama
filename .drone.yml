@@ -49,8 +49,8 @@ steps:
 
 - name: publish_dockerhub
   image: plugins/docker
-#  when:
-#    event: tag
+  when:
+    event: tag
   settings:
     username:
       from_secret: docker_username
@@ -77,8 +77,8 @@ steps:
       - sha512
       - adler32
       - crc32
-#  when:
-#    event: tag
+  when:
+    event: tag
   depends_on:
   - fetch
   - build
