@@ -24,6 +24,8 @@ steps:
     path: /var/run/docker.sock
   commands:
   - docker-compose -f docker-compose.test.yml build --no-cache
+  depends_on:
+  - fetch
 
 - name: test
   image: docker/compose:1.24.1
@@ -41,11 +43,13 @@ steps:
   - echo "-------- docker-compose test --------"
   - docker-compose -f docker-compose.test.yml run ci_lama /lama/entrypoint.sh
   - docker-compose -f docker-compose.test.yml down
+  depends_on:
+  - fetch, build
 
-- name: docker  
+- name: publish_dockerhub
   image: plugins/docker
-  when:
-    event: tag
+#  when:
+#    event: tag
   settings:
     username:
       from_secret: docker_username
@@ -55,8 +59,10 @@ steps:
     tags:
       - latest
       - ${DRONE_TAG}
+  depends_on:
+  - fetch, build, test
 
-- name: publish
+- name: publish_github
   image: plugins/github-release
   settings:
     api_key:
@@ -68,8 +74,10 @@ steps:
       - sha512
       - adler32
       - crc32
-  when:
-    event: tag
+#  when:
+#    event: tag
+  depends_on:
+  - fetch, build, test
     
 - name: send telegram notification
   image: appleboy/drone-telegram
@@ -88,6 +96,8 @@ steps:
    {{else}}
      build {{build.number}} failed. Fix me please.
    {{/success}}
+  depends_on:
+  - fetch, build, test, publish_dockerhub, publish_github
 
 trigger:
   event:
