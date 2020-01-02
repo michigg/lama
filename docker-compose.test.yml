@@ -8,7 +8,7 @@ networks:
 
 services:
   ci_lama:
-    image: lama:0.1
+    image: ci_lama:0.1
     build:
       context: .
       dockerfile: docker/lama/Dockerfile.test
