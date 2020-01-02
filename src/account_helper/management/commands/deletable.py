@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--delete',
+            '-d', '--delete',
             action='store_true',
             help='Delete users which deletion time is lower than the current date',
         )
@@ -23,21 +23,42 @@ class Command(BaseCommand):
             help='Return an json encoded String',
         )
         parser.add_argument(
-            '--all',
+            '-a', '--all',
             action='store_true',
             help='Delete all marked user, --delete is required',
         )
 
+        parser.add_argument(
+            '--fduser',
+            type=str,
+            help='Force delete specified user',
+        )
+
+    @staticmethod
+    def get_json(deletable: DeletedUser):
+        return {'ldap_dn': deletable.ldap_dn, 'username': deletable.user.username}
+
     def handle(self, *args, **options):
-        if options['all']:
+        if options['all'] and not options['fduser']:
             deletables = DeletedUser.objects.all()
-        else:
+        elif not options['all'] and options['fduser']:
+            try:
+                deletable = DeletedUser.objects.get(user__username=options['fduser'])
+                LdapUser.base_dn = LdapUser.ROOT_DN
+                ldap_user = LdapUser.objects.get(dn=deletable.ldap_dn)
+                ldap_user.delete_complete()
+            except ObjectDoesNotExist as err:
+                self.stdout.write(self.style.ERROR(f"User with the username {options['fduser']} not found."))
+            return
+        elif not options['all'] and not options['fduser']:
             deletables = DeletedUser.objects.filter(deletion_date__lte=timezone.now())
+        else:
+            self.stdout.write(self.style.ERROR(f"The parameter combination is not processable"))
+            return
+
         output = ""
         if options['json']:
-            json_output = {'deletables': []}
-            for deletable in deletables:
-                json_output['deletables'].append({'ldap_dn': deletable.ldap_dn, 'username': deletable.user.username})
+            json_output = {'deletables': [self.get_json(deletable) for deletable in deletables]}
             output = json.dumps(json_output)
         else:
             for user in deletables:
