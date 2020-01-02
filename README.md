@@ -29,7 +29,20 @@ LAMa can be reached under `localhost:8888`.
 After the initial setup only steps 3, 5 are necessary.
 
 ## Production Setup
-- TODO
+> Important! first start without volumes line <br> 
+> `- ./mail_templates:/lama/templates/mails`
+
+- copy `docker-compose.prod.yml` to your favorite directory
+- comment line `- ./mail_templates:/lama/templates/mails`
+- `docker-compose up -d`
+- `docker cp <dir>_lama_1:/lama/templates/mails ./mail_templates`
+- `docker-compose down` and uncumment line `- ./mail_templates:/lama/templates/mails`
+- `docker-compose up -d`
+- Jump into the running container: `docker-compse exec lama sh`
+  - Make migrations: `python3 manage.py makemigrations account_helper`
+  - Make migrations: `python3 manage.py migrate account_helper`
+  - Create superuser: `python3 manage.py createsuperuser`
+- Update copied templates (files or in gui under `Einstellungen` with the super admin account)
 
 
 ## Used Libraries
