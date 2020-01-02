@@ -31,7 +31,7 @@ def realm_send_mail(realm, to, subject, message):
 
 def send_welcome_mail(domain, email, protocol, realm, user):
     mail_subject = 'Aktiviere deinen StuVe Account'
-    message = render_to_string('registration/welcome_email.jinja2', {
+    message = render_to_string('mails/welcome_email.jinja2', {
         'user': user,
         'domain': domain,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -47,7 +47,7 @@ def send_welcome_mail(domain, email, protocol, realm, user):
 
 def send_deletion_mail(realm, user):
     mail_subject = 'Aktiviere deinen StuVe Account'
-    message = render_to_string('registration/deletion_information_email.jinja2', {
+    message = render_to_string('mails/deletion_information_email.jinja2', {
         'user': user,
         'deletion_wait_days': settings.DELETION_WAIT_DAYS,
     })

@@ -17,6 +17,8 @@ services:
       - production.env
     ports:
       - 8888:80
+    volumes:
+      - ./mail_templates:/lama/templates/mails
 
   dblama:
     image: postgres:11.2-alpine
