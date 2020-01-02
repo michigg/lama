@@ -1,4 +1,5 @@
 import logging
+import os
 
 from django.core.mail import get_connection, send_mail
 from django.utils.html import strip_tags
@@ -54,3 +55,28 @@ def send_deletion_mail(realm, user):
     # TODO failure handling
     p1 = Process(target=realm_send_mail, args=(realm, user.email, mail_subject, message))
     p1.start()
+
+
+class TemplateController:
+    def __init__(self):
+        self.file_path = os.path.join(settings.BASE_DIR, 'templates/mails/welcome_email.jinja2')
+
+    def get_template(self):
+        with open(self.file_path, 'r') as f:
+            return f.read()
+
+    def save_template(self, template: str):
+        with open(self.file_path, 'w') as f:
+            f.write(template)
+
+
+class WelcomeMailTemplateController(TemplateController):
+    def __init__(self):
+        TemplateController.__init__(self)
+        self.file_path = os.path.join(settings.BASE_DIR, 'templates/mails/welcome_email.jinja2')
+
+
+class DeletionMailTemplateController(TemplateController):
+    def __init__(self):
+        TemplateController.__init__(self)
+        self.file_path = os.path.join(settings.BASE_DIR, 'templates/mails/deletion_information_email.jinja2')

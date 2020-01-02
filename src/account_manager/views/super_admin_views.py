@@ -1,13 +1,12 @@
-import os
+import logging
 
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
-import logging
+from django.shortcuts import render, redirect
 
 from account_manager.forms import EmailTemplateForm
+from account_manager.utils.mail_utils import WelcomeMailTemplateController, DeletionMailTemplateController
 
 logger = logging.getLogger(__name__)
 
@@ -91,26 +90,3 @@ def configuration_screen_deletion_mail(request):
         form_data = {'template': template}
         form = EmailTemplateForm(initial=form_data)
     return render(request, 'admin/configuration.jinja2', {"deletion_mail_form": form})
-
-
-class TemplateController:
-    def __init__(self):
-        self.file_path = os.path.join(settings.BASE_DIR, 'templates/mails/welcome_email.jinja2')
-
-    def get_template(self):
-        with open(self.file_path, 'r') as f:
-            return f.read()
-
-    def save_template(self, template: str):
-        with open(self.file_path, 'w') as f:
-            f.write(template)
-
-
-class WelcomeMailTemplateController(TemplateController):
-    def __init__(self):
-        self.file_path = os.path.join(settings.BASE_DIR, 'templates/mails/welcome_email.jinja2')
-
-
-class DeletionMailTemplateController(TemplateController):
-    def __init__(self):
-        self.file_path = os.path.join(settings.BASE_DIR, 'templates/mails/deletion_information_email.jinja2')
