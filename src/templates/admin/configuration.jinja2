@@ -1,0 +1,19 @@
+{% extends 'base_admin.jinja2' %}
+{% import 'macros/form_macros.jinja2' as mform %}
+{% import 'macros/utils_macros.jinja2' as mutils %}
+
+{% block admin_content %}
+    <div class="row">
+        <div class="col-12">
+            <h2>Einstellungen</h2>
+            <ul class="list-group list-group-flush w-100">
+                <li class="list-group-item">Willkommens E-Mail Template <a
+                        href="{{ url('admin-welcome-mail-configuration') }}"
+                        class="float-right">Ändern</a></li>
+                <li class="list-group-item">Nutzerlöschungs E-Mail Template <a
+                        href="{{ url('admin-delete-mail-configuration') }}"
+                        class="float-right">Ändern</a></li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

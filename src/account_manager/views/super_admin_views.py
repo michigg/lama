@@ -39,3 +39,18 @@ def remove_superuser(request, user_id):
     except ObjectDoesNotExist as err:
         return render(request, 'admin/list_user.jinja2',
                       {'users': _get_django_users(), 'extra_errors': 'Nutzer ist uns nicht bekannt'})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def configuration_screen(request):
+    return render(request, 'admin/configuration.jinja2', {})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def configuration_screen(request):
+    return render(request, 'admin/configuration.jinja2', {})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def configuration_screen(request):
+    return render(request, 'admin/configuration.jinja2', {})

@@ -72,6 +72,13 @@ class RealmUpdateForm(forms.Form):
                                            queryset=LdapGroup.objects.all(), required=False)
 
 
+class RealmUpdateForm(forms.Form):
+    ldap_base_dn = forms.CharField(label='LDAP Base DN',
+                                   help_text='TODO',
+                                   max_length=200)
+
+
+
 UserFormset = modelformset_factory(
     LdapUser,
     fields=('dn',),
