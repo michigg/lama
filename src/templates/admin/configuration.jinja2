@@ -6,17 +6,11 @@
     <div class="row">
         <div class="col-12">
             <h2>Einstellungen</h2>
-            <h3>Generelles</h3>
-            <ul class="list-group list-group-flush w-100 mb-3">
-                <li class="list-group-item">Servicename <a
-                        href="{{ url('admin-delete-mail-configuration') }}"
-                        class="float-right">Ändern</a></li>
-            </ul>
             <h3>Mail</h3>
             <ul class="list-group list-group-flush w-100">
-                <li class="list-group-item">Willkommens E-Mail Template <a
+                <li class="list-group-item">Willkommens E-Mail Template {% if not welcome_mail_form -%}<a
                         href="{{ url('admin-welcome-mail-configuration') }}"
-                        class="float-right">Ändern</a>
+                        class="float-right">Ändern</a>{%- endif %}
                     {% if welcome_mail_form -%}
                         <form method="post">
                             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
@@ -29,9 +23,9 @@
                         </form>
                     {%- endif %}
                 </li>
-                <li class="list-group-item">Nutzerlöschungs E-Mail Template <a
+                <li class="list-group-item">Nutzerlöschungs E-Mail Template {% if not deletion_mail_form -%}<a
                         href="{{ url('admin-delete-mail-configuration') }}"
-                        class="float-right">Ändern</a>
+                        class="float-right">Ändern</a>{%- endif %}
                     {% if deletion_mail_form -%}
                         <form method="post">
                             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
