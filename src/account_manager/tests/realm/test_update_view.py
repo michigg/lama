@@ -4,12 +4,11 @@ from django.contrib.auth.models import User, Group
 from django.test import TestCase
 from django.urls import reverse
 
-from account_helper.models import Realm
-from account_manager.models import LdapUser, LdapGroup
 from account_manager.tests.utils.utils import get_user, get_group, get_realm, get_password
 
 
 class RealmUpdateViewTest(TestCase):
+    databases = ["default", "ldap"]
 
     @classmethod
     def setUpTestData(cls):
@@ -34,14 +33,15 @@ class RealmUpdateViewTest(TestCase):
         self.ldap_user_super_user = get_user(1, self.realm_1, super_admin=True)
         self.ldap_group_1_realm_1_default = get_group(1, self.realm_1, [self.ldap_user_1, self.ldap_user_realm_1_admin,
                                                                         self.ldap_user_multiple_realm_admin])
-        self.ldap_group_1_realm_1_default_new = get_group(2, self.realm_1, [self.ldap_user_1, self.ldap_user_realm_1_admin,
-                                                                        self.ldap_user_multiple_realm_admin])
+        self.ldap_group_1_realm_1_default_new = get_group(2, self.realm_1,
+                                                          [self.ldap_user_1, self.ldap_user_realm_1_admin,
+                                                           self.ldap_user_multiple_realm_admin])
         self.ldap_group_1_realm_2_default = get_group(3, self.realm_2, [self.ldap_user_2, self.ldap_user_realm_2_admin,
                                                                         self.ldap_user_multiple_realm_admin])
         self.ldap_group_1_realm_1_admin = get_group(4, self.realm_1, [self.ldap_user_realm_1_admin,
                                                                       self.ldap_user_multiple_realm_admin])
         self.ldap_group_1_realm_1_admin_new = get_group(5, self.realm_1, [self.ldap_user_realm_1_admin,
-                                                                      self.ldap_user_multiple_realm_admin])
+                                                                          self.ldap_user_multiple_realm_admin])
         self.ldap_group_1_realm_2_admin = get_group(6, self.realm_2, [self.ldap_user_realm_2_admin,
                                                                       self.ldap_user_multiple_realm_admin])
 

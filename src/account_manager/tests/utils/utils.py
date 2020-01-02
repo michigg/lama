@@ -2,6 +2,7 @@ import logging
 
 from _ldap import ALREADY_EXISTS
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 
 from account_helper.models import Realm
 from account_manager.models import LdapUser, LdapGroup
@@ -45,7 +46,7 @@ def get_user(id: int, realm: Realm, admin=False, multiple_admin=False, super_adm
                                                       last_name=last_name)
         User.objects.create(username=username, email=email, password=PASSWORD, first_name=first_name,
                             last_name=last_name)
-    except ALREADY_EXISTS:
+    except (ALREADY_EXISTS, IntegrityError):
         ldap_user = LdapUser.objects.get(username=username, )
 
     return ldap_user

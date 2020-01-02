@@ -5,12 +5,12 @@ from django.test import TestCase
 from django.urls import reverse
 
 from account_helper.models import Realm
-from account_manager.models import LdapUser
 from account_manager.tests.utils.utils import get_realm, get_user, clear_realm_user, clear_realm_group, get_password, \
     get_group
 
 
 class RealmAddViewTest(TestCase):
+    databases = ["default", "ldap"]
 
     @classmethod
     def setUpTestData(cls):

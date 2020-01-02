@@ -8,6 +8,7 @@ from account_manager.tests.utils.utils import get_realm, get_user, get_group, ge
 
 
 class RealmUserDetailViewTest(TestCase):
+    databases = ["default", "ldap"]
 
     @classmethod
     def setUpTestData(cls):

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class RealmUserAddViewTest(TestCase):
+    databases = ["default", "ldap"]
 
     @classmethod
     def setUpTestData(cls):

@@ -56,7 +56,7 @@ def realm_add(request):
                     return render(request, 'realm/realm_add_failed.jinja2',
                                   {'realm_name': name, 'error': err}, status=409)
                 except LDAPError as err:
-                    logger.debug("Ldap Error", err)
+                    logger.debug(f"Ldap Error: {err}")
                     return render(request, 'realm/realm_add_failed.jinja2',
                                   {'realm_name': name}, status=409)
         else:

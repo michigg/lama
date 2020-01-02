@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.test import TestCase
 from django.urls import reverse
 
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class RealmUserUpdateViewTest(TestCase):
+    databases = ["default", "ldap"]
 
     @classmethod
     def setUpTestData(cls):
@@ -53,7 +55,10 @@ class RealmUserUpdateViewTest(TestCase):
 
     def setUp(self):
         self.create_ldap_objects()
-        self.django_superuser = User.objects.get(username="test_superuser")
+        try:
+            self.django_superuser = User.objects.create_superuser(username="test_superuser", password=get_password())
+        except IntegrityError:
+            self.django_superuser = User.objects.get(username="test_superuser")
 
     def tearDown(self):
         self.client.logout()

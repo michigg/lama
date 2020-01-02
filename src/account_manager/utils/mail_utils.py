@@ -34,7 +34,7 @@ def send_welcome_mail(domain, email, protocol, realm, user):
     message = render_to_string('registration/welcome_email.jinja2', {
         'user': user,
         'domain': domain,
-        'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
         'token': default_token_generator.make_token(user=user),
         'protocol': protocol,
         'email': email,

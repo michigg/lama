@@ -4,12 +4,11 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from account_helper.models import Realm
-from account_manager.models import LdapUser, LdapGroup
 from account_manager.tests.utils.utils import get_password, get_group, get_user, get_realm
 
 
 class RealmDetailViewTest(TestCase):
+    databases = ["default", "ldap"]
 
     @classmethod
     def setUpTestData(cls):

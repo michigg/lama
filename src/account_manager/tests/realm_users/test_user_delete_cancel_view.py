@@ -4,17 +4,15 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from account_helper.models import Realm, DeletedUser
-from account_manager.models import LdapUser, LdapGroup
+from account_helper.models import DeletedUser
 from account_manager.tests.utils.utils import get_realm, get_user, get_group, get_password, clear_realm_user, \
     clear_realm_group
-
-from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 
 class RealmUserDeleteCancelViewTest(TestCase):
+    databases = ["default", "ldap"]
 
     @classmethod
     def setUpTestData(cls):
