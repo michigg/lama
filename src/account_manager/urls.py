@@ -11,9 +11,9 @@ urlpatterns = [
     # Superadmin
     path('lama/admin/list', super_admin_views.user_list, name='django-additional-admin-list'),
     path('lama/admin/configuration/', super_admin_views.configuration_screen, name='admin-configuration-options'),
-    path('lama/admin/configuration/welcome-mail/', super_admin_views.configuration_screen,
+    path('lama/admin/configuration/welcome-mail/', super_admin_views.configuration_screen_welcome_mail,
          name='admin-welcome-mail-configuration'),
-    path('lama/admin/configuration/delete-mail/', super_admin_views.configuration_screen,
+    path('lama/admin/configuration/delete-mail/', super_admin_views.configuration_screen_deletion_mail,
          name='admin-delete-mail-configuration'),
     path('lama/admin/add/<int:user_id>/', super_admin_views.add_superuser, name='django-additional-admin-add'),
     path('lama/admin/remove/<int:user_id>/', super_admin_views.remove_superuser, name='django-additional-admin-remove'),

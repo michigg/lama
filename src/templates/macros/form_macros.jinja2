@@ -57,7 +57,7 @@
                 </ul>
             {% endif %}
             {% if field.help_text %}
-                <br/>{{ field.help_text() }}
+                <br/>{{ field.help_text }}
             {% endif %}
         </small>
     </div>
@@ -299,6 +299,7 @@
                            id="delete-all-checkbox"
                     >
                     <label class="
+
                             {% if checkbox_label_classes %}{{ checkbox_label_classes }}{% else %}table-checkbox-control-label table-checkbox-control-label-add{% endif %}"
                            for="delete-all-checkbox"></label>
                 {% endif %}
@@ -325,6 +326,7 @@
                            {% if field and field.value() and user.username in field.value() %}checked{% endif %}
                     >
                     <label class="
+
 
 
 

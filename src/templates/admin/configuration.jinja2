@@ -6,13 +6,44 @@
     <div class="row">
         <div class="col-12">
             <h2>Einstellungen</h2>
+            <h3>Generelles</h3>
+            <ul class="list-group list-group-flush w-100 mb-3">
+                <li class="list-group-item">Servicename <a
+                        href="{{ url('admin-delete-mail-configuration') }}"
+                        class="float-right">Ändern</a></li>
+            </ul>
+            <h3>Mail</h3>
             <ul class="list-group list-group-flush w-100">
                 <li class="list-group-item">Willkommens E-Mail Template <a
                         href="{{ url('admin-welcome-mail-configuration') }}"
-                        class="float-right">Ändern</a></li>
+                        class="float-right">Ändern</a>
+                    {% if welcome_mail_form -%}
+                        <form method="post">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            {{ mform.textarea_input(welcome_mail_form.template) }}
+                            <div class="d-flex mt-4">
+                                <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+                                <a href="{{ url('admin-configuration-options') }}"
+                                   class="btn btn-secondary p-2">Abbrechen</a>
+                            </div>
+                        </form>
+                    {%- endif %}
+                </li>
                 <li class="list-group-item">Nutzerlöschungs E-Mail Template <a
                         href="{{ url('admin-delete-mail-configuration') }}"
-                        class="float-right">Ändern</a></li>
+                        class="float-right">Ändern</a>
+                    {% if deletion_mail_form -%}
+                        <form method="post">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            {{ mform.textarea_input(deletion_mail_form.template) }}
+                            <div class="d-flex mt-4">
+                                <button type="submit" class="btn btn-primary mr-auto p-2">Speichern</button>
+                                <a href="{{ url('admin-configuration-options') }}"
+                                   class="btn btn-secondary p-2">Abbrechen</a>
+                            </div>
+                        </form>
+                    {%- endif %}
+                </li>
             </ul>
         </div>
     </div>

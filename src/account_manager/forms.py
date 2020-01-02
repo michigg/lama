@@ -72,6 +72,10 @@ class RealmUpdateForm(forms.Form):
                                            queryset=LdapGroup.objects.all(), required=False)
 
 
+class EmailTemplateForm(forms.Form):
+    template = forms.CharField(label='Template', help_text='', max_length=32000)
+
+
 UserFormset = modelformset_factory(
     LdapUser,
     fields=('dn',),
