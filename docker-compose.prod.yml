@@ -6,10 +6,7 @@ networks:
 
 services:
   lama:
-    image: lama:0.1
-    build:
-      context: .
-      dockerfile: docker/lama/Dockerfile
+    image: michigg/lama
     networks:
       - default
       - pg_db
