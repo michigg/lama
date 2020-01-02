@@ -4,6 +4,7 @@
     <div class="d-flex wrapper">
         <div class="bg-light border-right sidebar-wrapper">
             <div class="border-top w-100"></div>
+            <h2 class="sidebar-heading">Bereiche</h2>
             {% if realms %}
                 <h2 class="sidebar-heading">Bereiche</h2>
                 <div class="list-group list-group-flush">
@@ -13,7 +14,7 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="list-group-flush">
+                <div class="list-group list-group-flush">
                     <a href="{{ url('realm-home') }}" class="list-group-item list-group-item-action bg-light">
                         <i class="fas fa-list"></i> Bereichsübersicht</a>
                 </div>
@@ -35,8 +36,7 @@
             <div class="sidebar-bottom list-group-flush border-top">
 
                 {% if request.user.is_superuser and realms %}
-                    <div class="list-group-flush border-top">
-                        {#                        <div class="list-group-item bg-light border-0"></div>#}
+                    <div class="list-group list-group-flush">
                         <a href="{{ url('realm-add') }}"
                            class="list-group-item list-group-item-action bg-light"><i class="fas fa-plus-square"></i>
                             Bereich hinufügen</a>
