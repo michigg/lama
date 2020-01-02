@@ -85,10 +85,7 @@ class LdapUser(Model):
             wrapper['deleted_user'] = {}
         try:
             django_user = User.objects.get(username=ldap_user.username)
-            if django_user.last_login:
-                wrapper['active'] = True
-            else:
-                wrapper['active'] = False
+            wrapper['active'] = True if django_user.last_login else False
         except ObjectDoesNotExist:
             wrapper['active'] = False
         return wrapper
@@ -173,6 +170,28 @@ class LdapUser(Model):
         last_semester = datetime.now() - timedelta(days=182)
         return (LdapUser.objects.filter(last_login__lte=last_semester) | LdapUser.objects.exclude(
             last_login__lte=datetime.now() + timedelta(days=1)))
+
+    def get_django_user(self):
+        try:
+            return User.objects.get(username=self.username)
+        except ObjectDoesNotExist:
+            return None
+
+    def get_deletable(self):
+        try:
+            return DeletedUser.objects.get(ldap_dn=self.dn)
+        except ObjectDoesNotExist:
+            return None
+
+    def delete_complete(self):
+        django_user = self.get_django_user()
+        deletable_user = self.get_deletable()
+        LdapGroup.remove_user_from_groups(self.dn)
+        self.delete()
+        if django_user:
+            django_user.delete()
+        if deletable_user:
+            deletable_user.delete()
 
     @staticmethod
     def set_root_dn(realm):

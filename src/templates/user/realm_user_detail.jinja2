@@ -69,10 +69,13 @@
                 {% endif %}</li>
             {% if user.deleted_user.deletion_date %}
                 <li class="list-group-item text-danger">
-                    Löschvorgang: {{ user.deleted_user.deletion_date.strftime('%d.%m.%Y') }}
-                    <a href="{{ url('realm-user-delete-cancel', args=[realm.id, user.user.dn]) }}"
-                       class="float-right">
+                    <span>Löschvorgang: {{ user.deleted_user.deletion_date.strftime('%d.%m.%Y') }}</span>
+                    <span class="float-right">
+                    <a class="btn btn-danger rounded-0" href="{{ url('realm-user-direct-delete', args=[realm.id, user.user.dn]) }}">
+                        Sofort löschen</a>
+                    <a class="btn btn-outline-dark rounded-0" href="{{ url('realm-user-delete-cancel', args=[realm.id, user.user.dn]) }}">
                         Löschvorgang abbrechen</a>
+                        </span>
                 </li>
             {% endif %}
         </ul>

@@ -172,6 +172,25 @@ def realm_user_delete(request, realm_id, user_dn):
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
+def realm_user_direct_delete(request, realm_id, user_dn):
+    realm = Realm.objects.get(id=realm_id)
+    ldap_user = LdapUser.get_user_by_dn(dn=user_dn, realm=realm)
+    if _is_deleteable_user(realm, ldap_user):
+        username = ldap_user.username
+        ldap_user.delete_complete()
+        return get_realm_user_list(request=request, realm_id=realm_id, success_headline="Löschen erfolgreich",
+                                   success_text=f"Nutzer {username} wurde erfolgreich gelöscht.")
+    else:
+        return render(request, 'permission_denied.jinja2', {
+            'extra_errors': f'Der Nutzer, {ldap_user.username}, gehört anscheinend zu den Admins. '
+                            f'Solange der Nutzer dieser Gruppe angehört kann dieser nicht gelöscht werden. '
+                            f'Bitte trage vorher den Nutzer aus der Admin Gruppe aus.'
+        }, )
+
+
+@login_required
+@is_realm_admin
+@protect_cross_realm_user_access
 def realm_user_delete_confirm(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     ldap_user = LdapUser.get_user_by_dn(dn=user_dn, realm=realm)

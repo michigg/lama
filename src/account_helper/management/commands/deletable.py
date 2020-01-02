@@ -46,13 +46,7 @@ class Command(BaseCommand):
             LdapUser.base_dn = LdapUser.ROOT_DN
             for user in deletables:
                 ldap_user = LdapUser.objects.get(dn=user.ldap_dn)
-                LdapGroup.remove_user_from_groups(ldap_user.dn)
-                ldap_user.delete()
-                try:
-                    user.user.delete()
-                    user.delete()
-                except ObjectDoesNotExist:
-                    pass
+                ldap_user.delete_complete()
             if not options['json']:
                 output += '\nSuccessfully deleted all listed users'
         if output:
@@ -60,5 +54,3 @@ class Command(BaseCommand):
         else:
             for deletable in deletables:
                 self.stdout.write(self.style.SUCCESS(deletable))
-
-
