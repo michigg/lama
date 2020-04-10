@@ -6,20 +6,16 @@ from datetime import datetime, timedelta
 from typing import List
 
 from django.contrib.auth.models import User, Group
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import OperationalError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import Q
 from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
 from ldapdb.models import fields as ldap_fields
 from ldapdb.models.base import Model
 
 from account_helper.models import DeletedUser, Realm
-from account_manager.utils.dbldap import get_filterstr
 from account_manager.utils.mail_utils import send_welcome_mail
 
 logger = logging.getLogger(__name__)
-
-import ldap
 
 
 class LdapUser(Model):
@@ -53,6 +49,38 @@ class LdapUser(Model):
         return self.full_name
 
     @staticmethod
+    def creation_test(base_dn):
+        try:
+            LdapUser.base_dn = f'ou=people,{base_dn}'
+            user = LdapUser.objects.create(username='dummy', first_name=' ', last_name=' ')
+            user.save()
+            user.delete()
+        except:
+            raise ValidationError(
+                _('Realm user creation test failed. Please prove the provided dn'),
+            )
+
+    def is_deleteable(self, realm: Realm):
+        user_groups = LdapGroup.get_user_groups(realm, self)
+        user_group_names = [group.name for group in user_groups]
+        user_admin_realms = Realm.objects.filter(id=realm.id).filter(admin_group__name__in=user_group_names)
+        return not user_admin_realms.exists()
+
+    @staticmethod
+    def create_user(realm, username, email, password=None):
+        if not LdapUser.is_user_duplicate(username):
+            LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}'
+            if password:
+                ldap_user = LdapUser.objects.create(username=username, email=email, display_name=email, first_name=" ",
+                                                    last_name=" ", password=password)
+            else:
+                ldap_user = LdapUser.objects.create(username=username, email=email, display_name=email, first_name=" ",
+                                                    last_name=" ")
+            return ldap_user
+        else:
+            raise ALREADY_EXISTS('User already exists')
+
+    @staticmethod
     def create_with_django_user_creation_and_welcome_mail(realm, protocol, domain, username, email):
         ldap_user, user = LdapUser.create_with_django_user(realm, username, email)
         send_welcome_mail(domain, email, protocol, realm, user)
@@ -61,20 +89,34 @@ class LdapUser(Model):
     @staticmethod
     def create_with_django_user(realm, username, email, password=None):
         if not LdapUser.is_user_duplicate(username):
+            ldap_user = LdapUser.create_user(realm, username, email, password)
             LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}'
-            # TODO: rewrite
-            if password:
-                ldap_user = LdapUser.objects.create(username=username, email=email, first_name=" ", last_name=" ",
-                                                    password=password)
-            else:
-                ldap_user = LdapUser.objects.create(username=username, email=email, first_name=" ", last_name=" ")
             if password:
                 user, _ = User.objects.get_or_create(username=username, email=email, password=password)
             else:
                 user, _ = User.objects.get_or_create(username=username, email=email)
+            if realm.default_group:
+                ldap_default_group = LdapGroup.get_group(group_name=realm.default_group.name, realm=realm)
+                LdapGroup.add_user_to_groups(ldap_user=ldap_user, ldap_groups=[ldap_default_group, ])
             return ldap_user, user
         else:
             raise ALREADY_EXISTS('User already exists')
+
+    @staticmethod
+    def update_user(ldap_user, validated_data):
+        ldap_user.email = validated_data.get('email', ldap_user.email)
+        ldap_user.username = validated_data.get('username', ldap_user.username)
+        first_name = validated_data.get('first_name', ldap_user.first_name)
+        ldap_user.first_name = first_name if first_name else ' '
+        last_name = validated_data.get('last_name', ldap_user.last_name)
+        if first_name and last_name:
+            ldap_user.display_name = f'{first_name} {last_name}'
+        else:
+            ldap_user.display_name = ldap_user.email
+        ldap_user.last_name = last_name if last_name else ' '
+        ldap_user.phone = validated_data.get('phone', ldap_user.phone)
+        ldap_user.mobile_phone = validated_data.get('mobile_phone', ldap_user.mobile_phone)
+        ldap_user.save()
 
     @staticmethod
     def get_extended_user(ldap_user):
@@ -82,7 +124,7 @@ class LdapUser(Model):
         try:
             wrapper['deleted_user'] = DeletedUser.objects.get(ldap_dn=ldap_user.dn)
         except ObjectDoesNotExist:
-            wrapper['deleted_user'] = {}
+            wrapper['deleted_user'] = None
         try:
             django_user = User.objects.get(username=ldap_user.username)
             wrapper['active'] = True if django_user.last_login else False
@@ -101,7 +143,6 @@ class LdapUser(Model):
     @staticmethod
     def get_users_by_dn(realm, users):
         LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
-        # logger.debug(users)
         users = [re.compile('uid=([a-zA-Z0-9_-]*),(ou=[a-zA-Z_]*),(.*)').match(user).group(1) for
                  user in users]
         query = Q(username=users.pop())
@@ -254,6 +295,11 @@ class LdapGroup(Model):
         except Exception as e:
             logger.error(e)
             return None
+
+    @staticmethod
+    def group_exists(group_name: str, realm: Realm = None):
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}' if realm else LdapGroup.ROOT_DN
+        return LdapGroup.objects.filter(name=group_name).exists()
 
     @staticmethod
     def set_root_dn(realm):

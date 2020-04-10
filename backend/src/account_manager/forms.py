@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
 from django.core.validators import RegexValidator
 
-from account_manager.utils.django_user import update_dajngo_user
+from account_manager.utils.django_user import update_django_user
 from .models import LdapUser, LdapGroup
 from django.forms import modelformset_factory
 import logging
@@ -95,7 +95,7 @@ class LdapPasswordResetForm(PasswordResetForm):
         LdapUser.base_dn = LdapUser.ROOT_DN
         ldap_users = LdapUser.objects.filter(email=email)
         for ldap_user in ldap_users:
-            update_dajngo_user(ldap_user)
+            update_django_user(ldap_user)
         logger.debug('Pasword reset get users')
         active_users = UserModel._default_manager.filter(**{
             '%s__iexact' % UserModel.get_email_field_name(): email,

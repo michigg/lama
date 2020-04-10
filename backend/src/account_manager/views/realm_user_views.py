@@ -12,7 +12,7 @@ from account_helper.models import Realm, DeletedUser
 from account_manager.forms import AddLDAPUserForm, AdminUpdateLDAPUserForm, UserDeleteListForm, UserGroupListForm
 from account_manager.main_views import is_realm_admin
 from account_manager.models import LdapUser, LdapGroup
-from account_manager.utils.django_user import update_dajngo_user
+from account_manager.utils.django_user import update_django_user
 from account_manager.utils.mail_utils import send_welcome_mail
 from account_manager.utils.user_views import get_realm_user_list, render_realm_user_detail_view, create_user, \
     user_update_controller, get_protocol, _is_deleteable_user, user_delete_controller, get_deletable_blocked_users, \
@@ -20,12 +20,13 @@ from account_manager.utils.user_views import get_realm_user_list, render_realm_u
 from account_manager.views.user_views import protect_cross_realm_user_access, logger, multiple_user_delete_controller
 
 
+# DONE
 @login_required
 @is_realm_admin
 def realm_user_list(request, realm_id):
     return get_realm_user_list(request, realm_id)
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
@@ -33,6 +34,7 @@ def realm_user_detail(request, realm_id, user_dn):
     return render_realm_user_detail_view(request, realm_id, user_dn)
 
 
+# DONE
 @login_required
 @is_realm_admin
 def realm_user_add(request, realm_id):
@@ -46,7 +48,7 @@ def realm_user_add(request, realm_id):
         form = AddLDAPUserForm()
     return render(request, 'user/realm_user_add.jinja2', {'form': form, 'realm': realm})
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
@@ -65,7 +67,7 @@ def realm_user_update(request, realm_id, user_dn):
                                       {'model_field': 'last_name', 'form_field': 'last_name'},
                                       {'model_field': 'email', 'form_field': 'email'}, ])
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
@@ -116,7 +118,7 @@ def realm_user_resend_password_reset(request, realm_id, user_dn):
                                              error_headline="Fehlgeschlagen",
                                              error_text="Die Passwort zurücksetzen E-Mail konnte nicht versendet werden.")
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
@@ -124,7 +126,7 @@ def realm_user_resend_welcome_mail(request, realm_id, user_dn):
     realm = Realm.objects.get(id=realm_id)
     ldap_user = LdapUser.get_user_by_dn(dn=user_dn, realm=realm)
 
-    update_dajngo_user(ldap_user)
+    update_django_user(ldap_user)
     current_site = get_current_site(request)
     protocol = get_protocol(request)
     send_welcome_mail(domain=current_site.domain,
@@ -138,7 +140,7 @@ def realm_user_resend_welcome_mail(request, realm_id, user_dn):
                                          success_headline="Willkommensmail",
                                          success_text="Willkommensmail erfolgreich versendet.")
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
@@ -168,7 +170,7 @@ def realm_user_delete(request, realm_id, user_dn):
                             f'Bitte trage vorher den Nutzer aus der Admin Gruppe aus.'
         }, )
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
@@ -187,7 +189,7 @@ def realm_user_direct_delete(request, realm_id, user_dn):
                             f'Bitte trage vorher den Nutzer aus der Admin Gruppe aus.'
         }, )
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
@@ -205,7 +207,7 @@ def realm_user_delete_confirm(request, realm_id, user_dn):
                       'deletion_wait_days': settings.DELETION_WAIT_DAYS
                   })
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access

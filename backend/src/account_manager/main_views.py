@@ -5,7 +5,7 @@ from socket import timeout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.db import IntegrityError
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from ldap import LDAPError
 
 from account_helper.models import Realm
@@ -46,7 +46,7 @@ def realm_add(request):
                 name = form.cleaned_data['name']
                 ldap_base_dn = form.cleaned_data['ldap_base_dn']
                 try:
-                    base_dn_available(ldap_base_dn)
+                    # base_dn_available(ldap_base_dn)
 
                     realm = Realm.objects.create(name=name, ldap_base_dn=ldap_base_dn)
                     realm.save()
@@ -133,14 +133,10 @@ def realm_delete(request, realm_id):
             ldap_groupnames = [group.name for group in ldap_groups]
             django_user = User.objects.filter(username__contains=ldap_usernames)
             django_groups = Group.objects.filter(name__contains=ldap_groupnames)
-            for user in django_user:
-                user.delete()
-            for group in django_groups:
-                group.delete()
-            for user in ldap_users:
-                user.delete()
-            for group in ldap_groups:
-                group.delete()
+            django_user.delete()
+            django_groups.delete()
+            ldap_users.delete()
+            ldap_groups.delete()
         except LDAPError:
             # TODO: Save delete
             pass
