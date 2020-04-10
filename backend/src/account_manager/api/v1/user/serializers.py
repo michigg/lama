@@ -17,9 +17,6 @@ class LdapGroupSerializer(serializers.ModelSerializer):
         fields = ('dn', 'name', 'description', 'members')
         read_only_fields = ('dn', 'description', 'members')
 
-    def update(self, instance, validated_data):
-        logger.error(validated_data)
-
 
 class LdapUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -73,7 +70,6 @@ class UserGroupUpdateSerializer(serializers.Serializer):
     groups = LdapGroupSerializer(many=True)
     available_groups = LdapGroupSerializer(read_only=True, many=True)
 
-
     def validate(self, attrs):
         logger.error(attrs)
         return super().validate(attrs)
@@ -81,4 +77,3 @@ class UserGroupUpdateSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         groups = validated_data['groups']
         logger.error(groups)
-

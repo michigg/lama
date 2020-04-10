@@ -249,7 +249,7 @@ class LdapGroup(Model):
     object_classes = ['groupOfNames']
 
     name = ldap_fields.CharField(db_column='cn', max_length=200, primary_key=True)
-    description = ldap_fields.CharField(db_column='description', max_length=1024)
+    description = ldap_fields.CharField(db_column='description', max_length=1024, blank=True, null=True)
     members = ldap_fields.ListField(db_column='member')
 
     @staticmethod
@@ -274,15 +274,21 @@ class LdapGroup(Model):
             group.members.remove(ldap_user_dn)
             group.save()
 
-    def get_django_group(self):
+    def get_django_group(self) -> Group:
         django_group, _ = Group.objects.get_or_create(name=self.name)
         return django_group
 
     @staticmethod
-    def get_group(group_name: str, realm: Realm = None):
-        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}' if realm else LdapGroup.ROOT_DN
+    def get_group(group_name: str = None, group_dn: str = None, realm: Realm = None):
+        if not group_name and not group_dn:
+            raise ValidationError("group_name or group_dn required")
+        LdapGroup.set_root_dn(realm)
+        logger.error(group_dn)
         try:
-            return LdapGroup.objects.get(name=group_name)
+            if group_name:
+                return LdapGroup.objects.get(name=group_name)
+            else:
+                return LdapGroup.objects.get(dn=group_dn)
         except Exception as e:
             logger.error(e)
             return None
@@ -302,8 +308,44 @@ class LdapGroup(Model):
         return LdapGroup.objects.filter(name=group_name).exists()
 
     @staticmethod
-    def set_root_dn(realm):
-        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+    def set_root_dn(realm: Realm = None):
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}' if realm else LdapGroup.ROOT_DN
+
+    def full_update(self, instance, **validated_data):
+        django_group = self.get_django_group()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if django_group:
+            # TODO: implement User update
+            django_group.name = validated_data.get('name')
+            django_group.save()
+        return instance
+
+    @staticmethod
+    def full_create(realm, **kwargs):
+        logger.error(realm)
+        LdapGroup.set_root_dn(realm)
+        ldap_group = LdapGroup.objects.create(**kwargs)
+        del kwargs['description']
+        del kwargs['members']
+        logger.error('members')
+        Group.objects.get_or_create(**kwargs)
+        return ldap_group
+
+    def full_delete(self, realm):
+        if realm.admin_group and realm.admin_group.name == self.name:
+            realm.admin_group = None
+            realm.save()
+        if realm.default_group and realm.default_group.name == self.name:
+            realm.default_group = None
+            realm.save()
+        django_group = self.get_django_group()
+        if django_group:
+            django_group.delete()
+        return self.delete()
 
     def __str__(self):
         return self.name

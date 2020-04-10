@@ -26,7 +26,7 @@ def protect_cross_realm_group_access(view_func):
 
     return decorator
 
-
+# DONE
 @login_required
 @is_realm_admin
 def realm_groups(request, realm_id):
@@ -35,7 +35,7 @@ def realm_groups(request, realm_id):
     realm_groups_obj = LdapGroup.objects.all()
     return render(request, 'realm/realm_groups.jinja2', {'realm': realm_obj, 'realm_groups': realm_groups_obj})
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_group_access
@@ -47,7 +47,7 @@ def group_detail(request, realm_id, group_dn):
     user_wrapper = LdapUser.get_user_active_marked(users)
     return render(request, 'group/group_detail.jinja2', {'group': group, 'realm': realm, 'users': user_wrapper})
 
-
+# DONE
 @login_required
 @is_realm_admin
 def group_add(request, realm_id):
@@ -79,7 +79,7 @@ def group_add(request, realm_id):
         form = AddLDAPGroupForm()
     return render(request, 'group/group_add.jinja2', {'form': form, 'realm': realm, 'users': users})
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_group_access
@@ -113,7 +113,7 @@ def group_update(request, realm_id, group_dn):
     return render(request, 'group/group_detail.jinja2',
                   {'form': form, 'realm': realm, 'group': group, 'users': users})
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_group_access
@@ -131,7 +131,7 @@ def group_delete(request, realm_id, group_dn):
 
     return redirect('realm-group-list', realm_id)
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_group_access
