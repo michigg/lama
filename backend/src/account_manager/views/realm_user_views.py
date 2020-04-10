@@ -278,7 +278,7 @@ def realm_multiple_user_delete_confirm(request, realm_id):
     return render(request, 'realm/realm_user_multiple_delete_confirm.jinja2',
                   {'form': form, 'realm': realm, 'users': users})
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
@@ -290,7 +290,7 @@ def realm_user_group_update(request, realm_id, user_dn, error=None):
                   {'realm': realm, 'user': ldap_user, 'user_groups': user_groups,
                    'realm_groups': realm_groups_available, 'extra_error': error})
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access
@@ -309,7 +309,7 @@ def realm_user_group_update_add(request, realm_id, user_dn):
             ldap_add_user_to_groups(user_dn, groups)
     return redirect('realm-user-group-update', realm.id, user_dn)
 
-
+# DONE
 @login_required
 @is_realm_admin
 @protect_cross_realm_user_access

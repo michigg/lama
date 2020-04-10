@@ -9,13 +9,15 @@ from django.db import IntegrityError
 from django.http import Http404, HttpRequest
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
+from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from account_helper.models import Realm, DeletedUser
 from account_manager.api.v1.permissions import RealmAdminPermission
-from account_manager.api.v1.user.serializers import LdapUserSerializer, ExtendedUserSerializer
+from account_manager.api.v1.user.serializers import LdapUserSerializer, ExtendedUserSerializer, LdapGroupSerializer, \
+    UserGroupUpdateSerializer
 from account_manager.models import LdapUser, LdapGroup
 from account_manager.utils.django_user import update_django_user
 from account_manager.utils.mail_utils import send_welcome_mail, send_deletion_mail
@@ -197,8 +199,107 @@ class RealmUserDeleteCancel(APIView):
         user_dn = self.kwargs.get('user_dn')
 
         try:
-            deleted_user = DeletedUser.objects.get(ldap_dn=user_dn)
-            deleted_user.delete()
+            DeletedUser.objects.get(ldap_dn=user_dn).delete()
         except ObjectDoesNotExist:
             return Response({'msg': 'Nutzer ist nicht als gelöscht markiert.'}, status=status.HTTP_409_CONFLICT)
         return Response({'msg': 'Nutzerlöschung wurde abgebrochen.'}, status=status.HTTP_204_NO_CONTENT)
+
+
+def validate_requested_group_names(request):
+    groups = request.data.get('groups')
+    group_names = [group.get('name') for group in groups if group.get('name')]
+    logger.error(group_names)
+    if len(group_names) < len(groups):
+        raise ValidationError("Gruppenname einer oder mehrerer Gruppen fehlt")
+    return group_names
+
+
+def ldap_add_user_to_groups(ldap_user_dn, user_groups):
+    for group in user_groups:
+        group.members.append(ldap_user_dn)
+        group.save()
+
+
+def get_available_given_groups(realm, user_dn):
+    ldap_user = LdapUser.get_user_by_dn(dn=user_dn, realm=realm)
+    user_groups = LdapGroup.get_user_groups(realm=realm, ldap_user=ldap_user)
+    realm_groups = LdapGroup.get_groups(realm=realm)
+    realm_groups_available = [realm_group for realm_group in realm_groups if realm_group not in user_groups]
+    return ldap_user, realm_groups_available, user_groups
+
+
+class RealmUserGroupsApi(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated, RealmAdminPermission]
+    serializer_class = UserGroupUpdateSerializer
+    lookup_field = 'user_dn'
+
+    def get_user(self, realm):
+        user_dn = self.kwargs.get('user_dn')
+        ldap_user = LdapUser.get_user_by_dn(dn=user_dn, realm=realm)
+        if not ldap_user:
+            raise ValidationError("Could not retrieve user")
+        return ldap_user
+
+    def get_realm(self):
+        realm_id = self.kwargs.get('realm_id')
+        if not realm_id:
+            raise ValidationError("Realm Id is required")
+        realms = Realm.objects.filter(id=realm_id)
+        if not realms.exists():
+            raise ValidationError(f"Realm with {realm_id} not found")
+        return realms[0]
+
+    def get_queryset(self):
+        realm = self.get_realm()
+        user_dn = self.kwargs.get('user_dn')
+        _, realm_groups_available, user_groups = get_available_given_groups(realm, user_dn)
+        wrapper = {'groups': user_groups, 'available_groups': realm_groups_available}
+        return wrapper
+
+    def get_object(self):
+        realm = self.get_realm()
+        user_dn = self.kwargs.get('user_dn')
+        _, realm_groups_available, user_groups = get_available_given_groups(realm, user_dn)
+        wrapper = {'groups': user_groups, 'available_groups': realm_groups_available}
+        return wrapper
+
+    def retrieve(self, request, *args, **kwargs):
+        groups_wrapper = self.get_queryset()
+        serializer = self.get_serializer(groups_wrapper)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        # TODO implement in serializer
+        realm = self.get_realm()
+        ldap_user = self.get_user(realm)
+
+        ldap_groups = LdapGroup.get_user_groups(realm, ldap_user)
+        current_group_names = [group.name for group in ldap_groups]
+        group_names = validate_requested_group_names(request)
+
+        to_add = [group_name for group_name in group_names if group_name not in current_group_names]
+        logger.error(to_add)
+        if to_add:
+            try:
+                to_add_ldap_groups = [LdapGroup.get_group(group_name, realm) for group_name in to_add]
+                ldap_add_user_to_groups(ldap_user.dn, to_add_ldap_groups)
+            except OBJECT_CLASS_VIOLATION as err:
+                return Response({'msg': 'Bearbeiten fehlgeschlagen. '
+                                        'Der Nutzer konnte nicht zu den Gruppen hinzugefügt werden.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        to_remove = [group_name for group_name in current_group_names if group_name not in group_names]
+        logger.error(to_remove)
+        if to_remove:
+            try:
+                to_remove_ldap_groups = [LdapGroup.get_group(group_name, realm) for group_name in to_remove]
+                LdapGroup.remove_user_from_groups(ldap_user.dn, to_remove_ldap_groups)
+            except OBJECT_CLASS_VIOLATION as err:
+                return Response({'msg': 'Bearbeiten fehlgeschlagen. '
+                                        'Der Nutzer scheint der letzte in einer Gruppe zu sein. '
+                                        'Bitte tragen sie den Nutzer zuerst aus der Gruppe aus.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        groups_wrapper = self.get_queryset()
+        serializer = self.get_serializer(groups_wrapper)
+        return Response(serializer.data)

@@ -14,7 +14,11 @@ logger = logging.getLogger(__name__)
 class LdapGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = LdapGroup
-        fields = '__all__'
+        fields = ('dn', 'name', 'description', 'members')
+        read_only_fields = ('dn', 'description', 'members')
+
+    def update(self, instance, validated_data):
+        logger.error(validated_data)
 
 
 class LdapUserSerializer(serializers.ModelSerializer):
@@ -63,3 +67,18 @@ class ExtendedUserSerializer(serializers.Serializer):
 
         LdapUser.update_user(ldap_user, user_validated_data)
         return instance
+
+
+class UserGroupUpdateSerializer(serializers.Serializer):
+    groups = LdapGroupSerializer(many=True)
+    available_groups = LdapGroupSerializer(read_only=True, many=True)
+
+
+    def validate(self, attrs):
+        logger.error(attrs)
+        return super().validate(attrs)
+
+    def update(self, instance, validated_data):
+        groups = validated_data['groups']
+        logger.error(groups)
+
