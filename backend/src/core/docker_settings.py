@@ -30,6 +30,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'drf_yasg',
     'account_manager',
     'account_helper',
 ]
@@ -180,8 +184,8 @@ else:
     EMAIL_TIMEOUT = 15
     EMAIL_HOST = os.environ['EMAIL_HOST']
     EMAIL_PORT = int(os.environ['EMAIL_PORT'])
-    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER','')
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD','')
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
     EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'False') == 'True'
     EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
 

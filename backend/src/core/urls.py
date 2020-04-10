@@ -14,14 +14,32 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import user_passes_test
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+from rest_framework.authtoken import views
+
 from account_manager.forms import LdapPasswordResetForm
 from account_manager.views.user_views import LdapPasswordChangeView
 from .views import about
 
 login_forbidden = user_passes_test(lambda u: u.is_anonymous(), '/')
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="LAMa API",
+        default_version='0.1.0',
+        description="API for Ldap Account Manager",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="michael-guenther.goetz@stud.uni-bamberg.de"),
+        license=openapi.License(name="AGPL License"),
+    ),
+    public=True,
+    permission_classes=(permissions.IsAuthenticated,),
+)
 
 urlpatterns = [
     path('', include('account_manager.urls')),
@@ -34,4 +52,13 @@ urlpatterns = [
          name='password_reset'),
 
     path('accounts/', include('django.contrib.auth.urls')),
+
+    # API
+    path('api/auth/', include('rest_framework.urls')),
+    path('api/auth/token/', views.obtain_auth_token),
+    path('api/', include('account_manager.api.v1.urls')),
+    # drf yasg
+    re_path(r'api/docs/swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('api/docs/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('api/docs/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
