@@ -1,13 +1,15 @@
-FROM alpine:3.9
+FROM alpine:3.11
+
+ENV LDAP_PACKAGE_NAME OPENLDAP_REL_ENG_2_4_49
 
 RUN apk add --upgrade --no-cache build-base groff libtool openldap openssl-dev cyrus-sasl-dev util-linux-dev
 
 WORKDIR /openldap
-RUN wget https://github.com/openldap/openldap/archive/OPENLDAP_REL_ENG_2_4_47.zip\
-  && unzip -d /openldap OPENLDAP_REL_ENG_2_4_47.zip\
-  && rm OPENLDAP_REL_ENG_2_4_47.zip\
-  && mv openldap-OPENLDAP_REL_ENG_2_4_47/* .\
-  && rm -r openldap-OPENLDAP_REL_ENG_2_4_47/
+RUN wget https://github.com/openldap/openldap/archive/${LDAP_PACKAGE_NAME}.zip \
+  && unzip -d /openldap ${LDAP_PACKAGE_NAME}.zip\
+  && rm ${LDAP_PACKAGE_NAME}.zip\
+  && mv openldap-${LDAP_PACKAGE_NAME}/* .\
+  && rm -r openldap-${LDAP_PACKAGE_NAME}/
 
 RUN ./configure --prefix=/usr	\
 	--sysconfdir=/etc	\
@@ -37,7 +39,7 @@ RUN make depend \
 	&& make \
 	&& make prefix=/usr libexec=/usr/lib -C contrib/slapd-modules/lastbind \
 	&& make install \
-	&& make prefix=/usr libexec=/usr/lib -C contrib/slapd-modules/lastbind install 
+	&& make prefix=/usr libexec=/usr/lib -C contrib/slapd-modules/lastbind install
 
 
 #RUN adduser ldap -D
