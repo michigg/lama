@@ -11,7 +11,7 @@ from account_manager.utils.user_views import get_protocol
 logger = logging.getLogger(__name__)
 
 
-class LdapGroupSerializer(serializers.ModelSerializer):
+class LdapUserGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = LdapGroup
         fields = ('dn', 'name', 'description', 'members')
@@ -55,7 +55,7 @@ class DeletedUserSerializer(serializers.ModelSerializer):
 class ExtendedUserSerializer(serializers.Serializer):
     user = LdapUserSerializer()
     deleted_user = DeletedUserSerializer(read_only=True)
-    groups = LdapGroupSerializer(read_only=True, many=True)
+    groups = LdapUserGroupSerializer(read_only=True, many=True)
     active = serializers.BooleanField(read_only=True)
 
     def update(self, instance, validated_data):
@@ -67,8 +67,8 @@ class ExtendedUserSerializer(serializers.Serializer):
 
 
 class UserGroupUpdateSerializer(serializers.Serializer):
-    groups = LdapGroupSerializer(many=True)
-    available_groups = LdapGroupSerializer(read_only=True, many=True)
+    groups = LdapUserGroupSerializer(many=True)
+    available_groups = LdapUserGroupSerializer(read_only=True, many=True)
 
     def validate(self, attrs):
         logger.error(attrs)

@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 
 from account_helper.models import Realm, DeletedUser
 from account_manager.api.v1.permissions import RealmAdminPermission
-from account_manager.api.v1.user.serializers import LdapUserSerializer, ExtendedUserSerializer, LdapGroupSerializer, \
+from account_manager.api.v1.user.serializers import LdapUserSerializer, ExtendedUserSerializer, LdapUserGroupSerializer, \
     UserGroupUpdateSerializer
 from account_manager.models import LdapUser, LdapGroup
 from account_manager.utils.django_user import update_django_user
