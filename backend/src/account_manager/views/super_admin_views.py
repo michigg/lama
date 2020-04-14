@@ -10,17 +10,17 @@ from account_manager.utils.mail_utils import WelcomeMailTemplateController, Dele
 
 logger = logging.getLogger(__name__)
 
-
+# DONE
 @user_passes_test(lambda u: u.is_superuser)
 def user_list(request):
     return render(request, 'admin/list_user.jinja2', {'users': _get_django_users()})
 
-
+# DONE
 def _get_django_users():
     users = User.objects.all().order_by('username')
     return users
 
-
+# DONE
 @user_passes_test(lambda u: u.is_superuser)
 def add_superuser(request, user_id):
     try:
@@ -32,7 +32,7 @@ def add_superuser(request, user_id):
         return render(request, 'admin/list_user.jinja2',
                       {'users': _get_django_users(), 'extra_errors': 'Nutzer ist uns nicht bekannt'})
 
-
+# DONE
 @user_passes_test(lambda u: u.is_superuser)
 def remove_superuser(request, user_id):
     try:
@@ -44,7 +44,7 @@ def remove_superuser(request, user_id):
         return render(request, 'admin/list_user.jinja2',
                       {'users': _get_django_users(), 'extra_errors': 'Nutzer ist uns nicht bekannt'})
 
-
+# DONE
 @user_passes_test(lambda u: u.is_superuser)
 def configuration_screen(request):
     return render(request, 'admin/configuration.jinja2', {})
