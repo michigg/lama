@@ -16,8 +16,7 @@ const routes = [
     component: Realms,
     meta: {
       resource: 'Realm',
-      action: 'view',
-      hasPermission: () => ability.can('Realm', 'view')
+      action: 'view'
     }
   },
   {
@@ -26,7 +25,8 @@ const routes = [
     component: Realms,
     meta: {
       requiresAuth: true,
-      hasPermission: () => ability.can('Realm', 'view')
+      resource: 'Realm',
+      action: 'view'
     }
   },
   {
@@ -35,7 +35,8 @@ const routes = [
     component: Realm,
     meta: {
       requiresAuth: true,
-      hasPermission: () => ability.can('Realm', 'view')
+      resource: 'Realm',
+      action: 'view'
     }
   },
   {
