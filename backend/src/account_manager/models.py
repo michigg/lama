@@ -87,7 +87,7 @@ class LdapUser(Model):
         return ldap_user
 
     @staticmethod
-    def create_with_django_user(realm, username, email, password=None):
+    def create_with_django_user(realm, username, email, password=None) -> ('LdapUser', User):
         if not LdapUser.is_user_duplicate(username):
             ldap_user = LdapUser.create_user(realm, username, email, password)
             LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}'
@@ -329,7 +329,8 @@ class LdapGroup(Model):
         logger.error(realm)
         LdapGroup.set_root_dn(realm)
         ldap_group = LdapGroup.objects.create(**kwargs)
-        del kwargs['description']
+        if 'description' in kwargs:
+            del kwargs['description']
         del kwargs['members']
         logger.error('members')
         Group.objects.get_or_create(**kwargs)
