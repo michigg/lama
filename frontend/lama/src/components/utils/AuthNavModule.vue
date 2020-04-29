@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: 'AuthModule',
+  name: 'AuthNavModule',
   props: {
     msg: String
   },

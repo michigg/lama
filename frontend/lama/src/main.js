@@ -5,8 +5,6 @@ import store from './store'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import Axios from 'axios'
 import VueAxios from 'vue-axios'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
 import { abilitiesPlugin, Can } from '@casl/vue'
 import { ability } from './store/authentication'
 

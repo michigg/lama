@@ -2,7 +2,7 @@
   <div>
     <button v-on:click="active = !active" class="sidebar-activation-button btn btn-primary shadow"
             v-bind:class="{ active: active }">
-      <b-icon-layers></b-icon-layers>
+      <b-icon-layers/>
     </button>
     <div class="sidebar dynamic-sidebar border-right shadow" v-bind:class="{ active: active }">
       <div class="sidebar-top">
@@ -62,9 +62,7 @@ export default {
   .sidebar-activation-button {
     display: block;
     width: 50px;
-    margin-top: -1.5rem !important;
-    position: fixed;
-    /*margin-left: calc(50px + var(--admin-bar-width)) !important;*/
+    margin-top: var(--nav-height) !important;
     left: 0;
     border-radius: 0 !important;
     -webkit-transition: margin .25s ease-out;

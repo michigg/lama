@@ -1,0 +1,19 @@
+$enable-rounded: false;
+$enable-shadows: true;
+$bv-enable-table-stacked: true;
+$body-bg: #f6ffee;
+$body-color: #2f2f2f;
+$primary-color: #e97e2e;
+
+// Theme color default definitions
+$primary: #e97e2e !default;
+$secondary: #898886 !default;
+$success: #c6fad2 !default;
+//$info: $cyan !default;
+//$warning: $yellow !default;
+$danger: #f48882 !default;
+//$light: $gray-100 !default;
+//$dark: $gray-800 !default;
+
+
+@import "floatingLabels";

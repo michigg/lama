@@ -1,25 +1,35 @@
 <template>
   <b-container>
     <b-row align-h="center">
-      <b-col cols="12" sm=12 md="5" class="mt-3 p-4 shadow bg-dark">
+      <b-col cols="12" sm=12 md="10" lg="8" xl="5" class="mt-4 p-4 shadow">
         <b-form @submit.prevent="login">
-          <b-form-group>
-            <b-form-input
-              v-model="username"
+          <div class="floating-label-input-group">
+            <input
+              id="username-input"
+              class="form-control"
+              v-model="form.username"
               type="text"
               required
-              placeholder="Username"
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group>
-            <b-form-input
-              v-model="password"
+              autofocus
+              tabindex="1"
+              placeholder="Benutzername"
+            />
+            <label for="username-input">Benutzername</label>
+          </div>
+          <div class="floating-label-input-group">
+            <input
+              id="password-inputs"
+              class="form-control"
+              v-model="form.password"
               type="password"
               required
+              autofocus
+              tabindex="2"
               placeholder="Passwort"
-            ></b-form-input>
-          </b-form-group>
-          <b-button type="submit" variant="primary" class="w-75 rounded-0">Anmelden</b-button>
+            />
+            <label for="password-inputs">Passwort</label>
+          </div>
+          <b-button type="submit" variant="success" class="w-75">Anmelden</b-button>
         </b-form>
       </b-col>
     </b-row>
@@ -33,15 +43,17 @@ export default {
   name: 'Login',
   data () {
     return {
-      username: '',
-      password: ''
+      form: {
+        username: '',
+        password: ''
+      }
     }
   },
   methods: {
     login: function () {
       this.$store.dispatch('authentication/login', {
-        username: this.username,
-        password: this.password
+        username: this.form.username,
+        password: this.form.password
       })
         .then(() => {
           // if (this.$route.query.redirect) {
