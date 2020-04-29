@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <b-navbar toggleable="lg" type="light" variant="light" class="shadow">
+    <b-navbar toggleable="lg" type="light" variant="light" class="shadow fixed-top">
       <b-navbar-brand to="/">
         <img
           src="./assets/logo.svg"
@@ -112,12 +112,13 @@
 
   @media (max-width: 767px) {
     .content {
-      margin-top: 1.5rem;
+      margin-top: calc(var(--nav-height) + 1.5rem);
     }
   }
 
   @media (min-width: 768px) {
     .content {
+      margin-top: var(--nav-height);
       margin-left: var(--admin-bar-width);
     }
   }

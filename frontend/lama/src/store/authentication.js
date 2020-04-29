@@ -106,7 +106,7 @@ export const authentication = {
     }
   },
   getters: {
-    isLoggedIn: state => !!state.token,
+    isLoggedIn: state => !!state.token.access,
     rules: state => state.user.rules
   },
   modules: {}

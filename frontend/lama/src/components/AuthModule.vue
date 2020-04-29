@@ -24,12 +24,12 @@ export default {
   },
   computed: {
     isLoggedIn: function () {
-      return this.$store.getters.isLoggedIn
+      return this.$store.getters['authentication/isLoggedIn']
     }
   },
   methods: {
     logout: function () {
-      this.$store.dispatch('logout')
+      this.$store.dispatch('authentication/logout')
         .then(() => {
           this.$router.push({ name: 'Login' })
         })

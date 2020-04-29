@@ -62,7 +62,8 @@ export default {
   .sidebar-activation-button {
     display: block;
     width: 50px;
-    position: absolute;
+    margin-top: -1.5rem !important;
+    position: fixed;
     /*margin-left: calc(50px + var(--admin-bar-width)) !important;*/
     left: 0;
     border-radius: 0 !important;
@@ -80,10 +81,10 @@ export default {
     -webkit-box-orient: vertical !important;
     -webkit-box-direction: normal !important;
     flex-direction: column !important;
-
+    top: var(--nav-height);
     min-height: calc(100vh - var(--nav-height) - var(--footer-height));
     width: var(--admin-bar-width);
-    position: absolute;
+    position: fixed;
     left: 0;
     z-index: 8000;
     background-color: var(--sidbar-background-color);
