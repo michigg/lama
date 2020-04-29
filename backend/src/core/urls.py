@@ -21,6 +21,8 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.authtoken import views
+from rest_framework_simplejwt.views import TokenRefreshView
+from account_manager.api.v1.authentication.views import LamaTokenObtainPairView
 
 from account_manager.forms import LdapPasswordResetForm
 from account_manager.views.user_views import LdapPasswordChangeView
@@ -54,9 +56,13 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
 
     # API
-    path('api/auth/', include('rest_framework.urls')),
-    path('api/auth/token/', views.obtain_auth_token),
+    # path('api/auth/', include('rest_framework.urls')),
+    # path('api/auth/token/', views.obtain_auth_token),
     path('api/', include('account_manager.api.v1.urls')),
+    # Simple jwt
+    path('api/auth/token/', LamaTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
     # drf yasg
     re_path(r'api/docs/swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('api/docs/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
