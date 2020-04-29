@@ -6,13 +6,14 @@
     </button>
     <div class="sidebar dynamic-sidebar border-right shadow" v-bind:class="{ active: active }">
       <div class="sidebar-top">
-        Bereiche
+        <p class="h4 p-2 mb-0">Bereiche</p>
         <b-list-group>
-          <b-list-group-item href="#">Bereich 1 - 1</b-list-group-item>
-          <b-list-group-item href="#">Bereich 1 - 2</b-list-group-item>
-          <b-list-group-item href="#">Bereich 1 - 3</b-list-group-item>
+          <b-list-group-item v-for="realm in realms" :key="realm.realm.id"
+                             :to="{name: 'Realm', params: {realmId: realm.realm.id}}"
+          >{{realm.realm.name}}
+          </b-list-group-item>
         </b-list-group>
-        Bereich
+        <p class="h4 p-2 mb-0">Bereich</p>
         <b-list-group>
           <b-list-group-item href="#">Nutzer</b-list-group-item>
           <b-list-group-item href="#">Gruppen</b-list-group-item>
@@ -38,21 +39,15 @@ export default {
       active: false
     }
   },
+  mounted () {
+    this.$store.dispatch('realms/fetchRealms')
+  },
   computed: {
     permissions: function () {
       return 'SUPER_USER'
     },
     realms: function () {
-      return [{
-        name: 'Test Bereich1',
-        url: 'http://localhost:8000/api/v1/realm/1/'
-      }, {
-        name: 'Test Bereich2',
-        url: 'http://localhost:8000/api/v1/realm/2/'
-      }, {
-        name: 'Test Bereich3',
-        url: 'http://localhost:8000/api/v1/realm/3/'
-      }]
+      return this.$store.getters['realms/realms']
     }
   }
 }

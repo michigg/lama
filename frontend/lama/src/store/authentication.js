@@ -41,7 +41,6 @@ export const authentication = {
       state.token.expire = expire
     },
     SET_USER (state, { username, email, rules }) {
-      console.log('SET USER')
       state.user.username = username
       state.user.email = email
       state.user.rules = rules
@@ -68,11 +67,9 @@ export const authentication = {
           method: 'POST'
         })
           .then(response => {
-            console.log(response.data)
             const accessToken = response.data.access
             const refreshToken = response.data.refresh
             const decodedToken = jwtDecode(accessToken)
-            console.log(decodedToken)
             // TODO: better handling in production
             commit('SET_JWT', {
               accessToken: accessToken,
@@ -82,6 +79,20 @@ export const authentication = {
             // TODO: set axios auth header
             commit('SET_USER', decodedToken.user)
 
+            axios.interceptors.request.use(
+              async (config) => {
+                // TODO: implement access token auto refresh
+                if (accessToken) {
+                  config.headers.Authorization = `Bearer ${accessToken}`
+                } else {
+                  delete config.headers.Authorization
+                }
+                return config
+              },
+              (error) => {
+                return Promise.reject(error)
+              }
+            )
             // TODO: set casl rules
             commit('AUTH_SUCCESS')
             router.push({ name: 'Home' })
@@ -103,6 +114,7 @@ export const authentication = {
         email: '',
         rules: []
       })
+      delete axios.headers.common.Authorization
     }
   },
   getters: {

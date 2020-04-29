@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import store from '../store/index'
-import ability from '../store/authentication'
+import { ability } from '../store/authentication'
+import Realm from '../views/realm/Realm'
+import Realms from '../views/realm/Realms'
+import PermissionDenied from '../views/PermissionDenied'
 
 Vue.use(VueRouter)
 
@@ -11,21 +13,40 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Realms,
+    meta: {
+      resource: 'Realm',
+      action: 'view',
+      hasPermission: () => ability.can('Realm', 'view')
+    }
   },
   {
-    path: '/test',
-    name: 'Test',
-    component: Home,
+    path: '/realm',
+    name: 'Realms',
+    component: Realms,
     meta: {
       requiresAuth: true,
-      hasPerm: () => ability.can()
+      hasPermission: () => ability.can('Realm', 'view')
+    }
+  },
+  {
+    path: '/realm/:realmId',
+    name: 'Realm',
+    component: Realm,
+    meta: {
+      requiresAuth: true,
+      hasPermission: () => ability.can('Realm', 'view')
     }
   },
   {
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/permission-denied',
+    name: 'PermissionDenied',
+    component: PermissionDenied
   },
   {
     path: '/about',
@@ -43,14 +64,28 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!store.getters.isLoggedIn) {
-      next({
-        path: '/login',
-        query: { redirect: to.path }
-      })
-      return
+  console.log('hasPermission' in to.meta)
+  const canNavigate = to.matched.some(route => {
+    if ('action' in route.meta && 'resource' in route.meta) {
+      return ability.can(route.meta.action, route.meta.resource)
+    } else {
+      return true
     }
+  })
+  const authRequired = to.matched.some(record => record.meta.requiresAuth)
+  const isLoggedIn = store.getters['authentication/isLoggedIn']
+  console.log(canNavigate)
+  if (authRequired && !isLoggedIn) {
+    next({
+      path: '/login',
+      query: { redirect: to.path }
+    })
+    return
+  }
+  if (!canNavigate) {
+    console.log('PERMISSION DENIED')
+    next({ path: '/permission-denied' })
+    return
   }
   next()
 })

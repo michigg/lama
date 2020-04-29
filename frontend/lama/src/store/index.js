@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { authentication } from './authentication'
+import { realms } from './realms'
+import { realm } from './realm'
 
 Vue.use(Vuex)
 
@@ -26,6 +28,8 @@ export default new Vuex.Store({
     config: state => state.config
   },
   modules: {
-    authentication: authentication
+    authentication: authentication,
+    realms: realms,
+    realm: realm
   }
 })
