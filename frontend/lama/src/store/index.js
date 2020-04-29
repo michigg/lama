@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import Authentication from './authentication'
+import { authentication } from './authentication'
 
 Vue.use(Vuex)
 
@@ -26,6 +26,6 @@ export default new Vuex.Store({
     config: state => state.config
   },
   modules: {
-    authentication: Authentication
+    authentication: authentication
   }
 })

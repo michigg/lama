@@ -1,71 +1,113 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from 'axios'
+import jwtDecode from 'jwt-decode'
+import router from '../router/index'
+import { Ability } from '@casl/ability'
 
 Vue.use(Vuex)
 
-export default {
-  namespaced: false,
+export const ability = new Ability()
+
+export const abilityPlugin = (store) => {
+  ability.update(store.state.authentication.user.rules)
+  return store.subscribe((mutation) => {
+    if (mutation.type === 'SET_USER') {
+      ability.update(mutation.payload.rules)
+    }
+  })
+}
+
+export const authentication = {
+  namespaced: true,
   state: {
     status: '',
-    token: localStorage.getItem('token') || '',
-    user: {}
+    token: {
+      access: '',
+      refresh: '',
+      expire: -1
+    },
+    user: {
+      username: '',
+      rules: [],
+      email: ''
+    }
   },
+  plugins: [abilityPlugin],
   mutations: {
-    auth_request (state) {
+    SET_JWT (state, { accessToken, refreshToken, expire }) {
+      state.token.access = accessToken
+      state.token.refresh = refreshToken
+      state.token.expire = expire
+    },
+    SET_USER (state, { username, email, rules }) {
+      console.log('SET USER')
+      state.user.username = username
+      state.user.email = email
+      state.user.rules = rules
+      ability.update(rules)
+    },
+    AUTH_REQUEST (state) {
       state.status = 'loading'
     },
-    auth_success (state, token, user) {
+    AUTH_SUCCESS (state, token, user) {
       state.status = 'success'
-      state.token = token
-      state.user = user
     },
-    auth_error (state) {
+    AUTH_ERROR (state) {
       state.status = 'error'
-    },
-    logout (state) {
-      state.status = ''
-      state.token = ''
     }
   },
   actions: {
-    login ({ dispatch, commit, state }, user) {
+    login ({ dispatch, commit, rootState }, user) {
       return new Promise((resolve, reject) => {
-        commit('auth_request')
-        const url = state.config.fuel_mgmt_endpoint.concat('api/auth/token/')
-        this.axios({
+        commit('AUTH_REQUEST')
+        const url = rootState.config.lamaEndpoint.concat('/auth/token/')
+        axios({
           url: url,
           data: user,
           method: 'POST'
         })
-          .then(resp => {
-            const token = resp.data.token
-            const user = resp.data.user
-            const prefixedToken = 'Token '.concat(token)
-            localStorage.setItem('token', prefixedToken)
-            this.axios.defaults.headers.common.Authorization = prefixedToken
-            commit('auth_success', token, user)
-            dispatch('getStation')
-            resolve(resp)
+          .then(response => {
+            console.log(response.data)
+            const accessToken = response.data.access
+            const refreshToken = response.data.refresh
+            const decodedToken = jwtDecode(accessToken)
+            console.log(decodedToken)
+            // TODO: better handling in production
+            commit('SET_JWT', {
+              accessToken: accessToken,
+              refreshToken: refreshToken,
+              expire: decodedToken.exp
+            })
+            // TODO: set axios auth header
+            commit('SET_USER', decodedToken.user)
+
+            // TODO: set casl rules
+            commit('AUTH_SUCCESS')
+            router.push({ name: 'Home' })
           })
           .catch(err => {
-            commit('auth_error')
-            localStorage.removeItem('token')
+            commit('AUTH_ERROR')
             reject(err)
           })
       })
     },
     logout ({ commit }) {
-      return new Promise((resolve) => {
-        commit('logout')
-        localStorage.removeItem('token')
-        delete this.axios.defaults.headers.common.Authorization
-        resolve()
+      commit('SET_JWT', {
+        accessToken: '',
+        refreshToken: '',
+        expire: -1
+      })
+      commit('SET_USER', {
+        username: '',
+        email: '',
+        rules: []
       })
     }
   },
   getters: {
     isLoggedIn: state => !!state.token,
-    authStatus: state => state.status
+    rules: state => state.user.rules
   },
   modules: {}
 }

@@ -7,12 +7,16 @@ import Axios from 'axios'
 import VueAxios from 'vue-axios'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import { abilitiesPlugin, Can } from '@casl/vue'
+import { ability } from './store/authentication'
 
 Vue.config.productionTip = false
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(VueAxios, Axios)
+Vue.use(abilitiesPlugin, ability)
+Vue.component('Can', Can)
 
 const token = localStorage.getItem('token')
 if (token) {

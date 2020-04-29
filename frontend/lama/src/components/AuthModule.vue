@@ -1,6 +1,8 @@
 <template>
-  <b-nav-item v-if="this.isLoggedIn" @click="logout">Logout</b-nav-item>
-  <b-nav-item v-else to="/login">Login</b-nav-item>
+  <b-nav-item v-if="this.isLoggedIn" @click="logout">
+    Logout
+  </b-nav-item>
+  <b-nav-item v-else :to="{ name: 'Login' }">Login</b-nav-item>
 </template>
 
 <script>
@@ -29,7 +31,7 @@ export default {
     logout: function () {
       this.$store.dispatch('logout')
         .then(() => {
-          this.$router.push('/login')
+          this.$router.push({ name: 'Login' })
         })
     }
   }

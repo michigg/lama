@@ -1,74 +1,30 @@
 <template>
-  <div class="d-flex wrapper">
-    <div class="bg-light border-right sidebar-wrapper text-left">
-      <div class="border-top w-100"></div>
-      <div v-if="permissions === 'SUPER_USER' || permissions === 'MULTI_REALM_ADMIN'">
-        <div v-if="realms.length !== 1">
-          <h2 class="sidebar-heading">Bereiche</h2>
-          <div
-            class="list-group list-group-flush">
-            <a v-for="realm in realms" :key="realm.id"
-               :href="realm.url"
-               class="list-group-item list-group-item-action bg-light">
-              {{realm.name}}
-            </a>
-          </div>
-        </div>
-        <div v-else>
-          <div class="list-group list-group-flush">
-            <a class="list-group-item list-group-item-action bg-light">
-              <b-icon-inboxes></b-icon-inboxes>
-              Bereichsübersicht
-            </a>
-          </div>
-          <h2 class="sidebar-heading">Bereich {{ realms[0].name }}</h2>
-          <div class="list-group list-group-flush">
-            <a class="list-group-item list-group-item-action bg-light">
-              <b-icon-info-square></b-icon-info-square>
-              Bereichsinformationen
-            </a>
-            <a class="list-group-item list-group-item-action bg-light">
-              <b-icon-people-fill></b-icon-people-fill>
-              Nutzer
-            </a>
-            <a class="list-group-item list-group-item-action bg-light">Gruppen</a>
-          </div>
-        </div>
-        <div class="sidebar-bottom list-group-flush border-top">
-        </div>
+  <div>
+    <button v-on:click="active = !active" class="sidebar-activation-button btn btn-primary shadow"
+            v-bind:class="{ active: active }">
+      <b-icon-layers></b-icon-layers>
+    </button>
+    <div class="sidebar dynamic-sidebar border-right shadow" v-bind:class="{ active: active }">
+      <div class="sidebar-top">
+        Bereiche
+        <b-list-group>
+          <b-list-group-item href="#">Bereich 1 - 1</b-list-group-item>
+          <b-list-group-item href="#">Bereich 1 - 2</b-list-group-item>
+          <b-list-group-item href="#">Bereich 1 - 3</b-list-group-item>
+        </b-list-group>
+        Bereich
+        <b-list-group>
+          <b-list-group-item href="#">Nutzer</b-list-group-item>
+          <b-list-group-item href="#">Gruppen</b-list-group-item>
+        </b-list-group>
       </div>
-
-      <!--  BOTTOM-->
-      <div v-if="permissions === 'SUPER_USER' && realms" class="list-group list-group-flush">
-        <a class="list-group-item list-group-item-action bg-light">
-          <b-icon-plus-square-fill></b-icon-plus-square-fill>
-          Bereich hinufügen
-        </a>
-      </div>
-      <div v-if="permissions === 'SUPER_USER'"
-           class="list-group list-group-flush"
-      >
-        <a class="list-group-item list-group-item-action bg-light">
-          <b-icon-shield></b-icon-shield>
-          Adminbereich
-        </a>
-      </div>
-      <div v-if="permissions === 'SUPER_USER'"
-           class="list-group list-group-flush">
-        <a class="list-group-item list-group-item-action bg-light">
-          <b-icon-gear></b-icon-gear>
-          Konfigurationen
-        </a>
-      </div>
-      <a class="list-group-item list-group-item-action bg-light">
-        <b-icon-question-square></b-icon-question-square>
-        Über
-      </a>
-    </div>
-
-    <div class="page-content-wrapper">
-      <div class="container-fluid">
-        <router-view />
+      <div class="sidebar-bottom">
+        <b-list-group>
+          <b-list-group-item href="#" v-if="$can('add', 'realm')">Bereich hinzufügen</b-list-group-item>
+          <b-list-group-item href="#">Django Adminbereich</b-list-group-item>
+          <b-list-group-item href="#">Konfigurationen</b-list-group-item>
+          <b-list-group-item href="#">Über</b-list-group-item>
+        </b-list-group>
       </div>
     </div>
   </div>
@@ -77,6 +33,11 @@
 <script>
 export default {
   name: 'AdminSidebar',
+  data () {
+    return {
+      active: false
+    }
+  },
   computed: {
     permissions: function () {
       return 'SUPER_USER'
@@ -98,51 +59,81 @@ export default {
 </script>
 
 <style scoped>
-  .sidebar-bottom {
-    position: fixed;
-    width: 15rem;
-    bottom: 0;
-  }
-
-  .sidebar-wrapper {
-    min-height: calc(100vh - 56px);
-    margin-left: -15rem;
+  .sidebar-activation-button {
+    display: block;
+    width: 50px;
+    position: absolute;
+    /*margin-left: calc(50px + var(--admin-bar-width)) !important;*/
+    left: 0;
+    border-radius: 0 !important;
     -webkit-transition: margin .25s ease-out;
     -moz-transition: margin .25s ease-out;
     -o-transition: margin .25s ease-out;
     transition: margin .25s ease-out;
   }
 
-  .sidebar-wrapper .sidebar-heading {
-    padding: 0.875rem 1.25rem;
-    margin-bottom: 0;
-    font-size: 1.2rem;
+  .sidebar {
+    display: -ms-flexbox !important;
+    display: -webkit-box !important;
+    display: flex !important;
+    -ms-flex-direction: column !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-box-direction: normal !important;
+    flex-direction: column !important;
+
+    min-height: calc(100vh - var(--nav-height) - var(--footer-height));
+    width: var(--admin-bar-width);
+    position: absolute;
+    left: 0;
+    z-index: 8000;
+    background-color: var(--sidbar-background-color);
   }
 
-  .sidebar-wrapper .list-group {
-    width: 15rem;
+  .dynamic-sidebar {
+    margin-left: calc(0rem - var(--admin-bar-width));
+    -webkit-transition: margin .25s ease-out;
+    -moz-transition: margin .25s ease-out;
+    -o-transition: margin .25s ease-out;
+    transition: margin .25s ease-out;
+  }
+
+  .active.dynamic-sidebar {
+    margin-left: 0;
+  }
+
+  .active.sidebar-activation-button {
+    display: block;
+    margin-left: calc(var(--admin-bar-width));
   }
 
   @media (min-width: 768px) {
-    .sidebar-wrapper {
+    .dynamic-sidebar {
       margin-left: 0;
     }
 
-    .page-content-wrapper {
-      min-width: 0;
-      width: 100%;
-    }
-
-    .wrapper.toggled .sidebar-wrapper {
-      margin-left: -15rem;
+    .sidebar-activation-button {
+      display: none !important;
     }
   }
 
-  .page-content-wrapper {
-    width: 100vw;
+  .sidebar-bottom {
+    margin-top: auto !important;
   }
 
-  .wrapper.toggled .sidebar-wrapper {
-    margin-left: 0;
+  .list-group-item:first-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
+
+  .list-group-item:last-child {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .list-group-item {
+    border-right: 0;
+    text-align: left;
+    background-color: var(--sidbar-background-color);
+  }
+
 </style>
