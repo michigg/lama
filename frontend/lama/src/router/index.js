@@ -64,7 +64,6 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
-  console.log('hasPermission' in to.meta)
   const canNavigate = to.matched.some(route => {
     if ('action' in route.meta && 'resource' in route.meta) {
       return ability.can(route.meta.action, route.meta.resource)
@@ -74,7 +73,7 @@ router.beforeEach((to, from, next) => {
   })
   const authRequired = to.matched.some(record => record.meta.requiresAuth)
   const isLoggedIn = store.getters['authentication/isLoggedIn']
-  console.log(canNavigate)
+
   if (authRequired && !isLoggedIn) {
     next({
       path: '/login',
@@ -83,7 +82,6 @@ router.beforeEach((to, from, next) => {
     return
   }
   if (!canNavigate) {
-    console.log('PERMISSION DENIED')
     next({ path: '/permission-denied' })
     return
   }

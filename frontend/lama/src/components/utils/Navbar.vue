@@ -12,7 +12,6 @@
     </b-navbar-brand>
     <b-collapse id="nav-text-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item to="/account-management">Accounting</b-nav-item>
         <b-nav-item to="/about">About</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
