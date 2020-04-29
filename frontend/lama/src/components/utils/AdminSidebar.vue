@@ -13,11 +13,13 @@
           >{{realm.realm.name}}
           </b-list-group-item>
         </b-list-group>
-        <p class="h4 p-2 mb-0">Bereich</p>
-        <b-list-group>
-          <b-list-group-item href="#">Nutzer</b-list-group-item>
-          <b-list-group-item href="#">Gruppen</b-list-group-item>
-        </b-list-group>
+        <div v-if="realm">
+          <p class="h4 p-2 mb-0">Bereich</p>
+          <b-list-group>
+            <b-list-group-item :to="{name: 'Users', params: {realmId: realm.id}}">Nutzer</b-list-group-item>
+            <b-list-group-item :to="{name: 'Groups', params: {realmId: realm.id}}">Gruppen</b-list-group-item>
+          </b-list-group>
+        </div>
       </div>
       <div class="sidebar-bottom">
         <b-list-group>
@@ -43,11 +45,12 @@ export default {
     this.$store.dispatch('realms/fetchRealms')
   },
   computed: {
-    permissions: function () {
-      return 'SUPER_USER'
-    },
     realms: function () {
       return this.$store.getters['realms/realms']
+    },
+    realm: function () {
+      console.log(this.$store.getters['realm/realm'])
+      return this.$store.getters['realm/realm']
     }
   }
 }

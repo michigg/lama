@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 import { authentication } from './authentication'
 import { realms } from './realms'
 import { realm } from './realm'
+import { users } from './users'
+import { groups } from './groups'
 
 Vue.use(Vuex)
 
@@ -30,6 +32,8 @@ export default new Vuex.Store({
   modules: {
     authentication: authentication,
     realms: realms,
-    realm: realm
+    realm: realm,
+    users: users,
+    groups: groups
   }
 })

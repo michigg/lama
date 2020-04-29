@@ -6,6 +6,10 @@ import { ability } from '../store/authentication'
 import Realm from '../views/realm/Realm'
 import Realms from '../views/realm/Realms'
 import PermissionDenied from '../views/PermissionDenied'
+import Groups from '../views/group/Groups'
+import Users from '../views/user/Users'
+import User from '../views/user/User'
+import Group from '../views/group/Group'
 
 Vue.use(VueRouter)
 
@@ -36,6 +40,46 @@ const routes = [
     meta: {
       requiresAuth: true,
       resource: 'Realm',
+      action: 'view'
+    }
+  },
+  {
+    path: '/realm/:realmId/group',
+    name: 'Groups',
+    component: Groups,
+    meta: {
+      requiresAuth: true,
+      resource: 'Ldapgroup',
+      action: 'view'
+    }
+  },
+  {
+    path: '/realm/:realmId/group/:groupDn',
+    name: 'Group',
+    component: Group,
+    meta: {
+      requiresAuth: true,
+      resource: 'Ldapgroup',
+      action: 'view'
+    }
+  },
+  {
+    path: '/realm/:realmId/user',
+    name: 'Users',
+    component: Users,
+    meta: {
+      requiresAuth: true,
+      resource: 'Ldapuser',
+      action: 'view'
+    }
+  },
+  {
+    path: '/realm/:realmId/user/:userDn',
+    name: 'User',
+    component: User,
+    meta: {
+      requiresAuth: true,
+      resource: 'Ldapuser',
       action: 'view'
     }
   },
