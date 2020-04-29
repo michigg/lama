@@ -63,6 +63,7 @@ RUN sed -i s/dc:\ $dc/dc:\ $dcr/g /etc/openldap/start.ldif
 ADD slapd.conf /etc/openldap/slapd.conf
 RUN chown ldap:ldap -R /etc/openldap
 RUN chown ldap:ldap -R /var/lib/openldap
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 389
 
