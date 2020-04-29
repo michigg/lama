@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      target: 'develop-stage'
+    command: /bin/sh -c "npm run serve"
+    volumes:
+      - ./lama:/app
+    ports:
+      - 8080:80
