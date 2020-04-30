@@ -122,6 +122,11 @@ export default {
     rows: function () {
       return this.$store.getters['users/users'].length
     }
+  },
+  watch: {
+    '$route.params.realmId': function (realmId) {
+      this.$store.dispatch('users/fetchUsers', { realmId: realmId })
+    }
   }
 }
 </script>

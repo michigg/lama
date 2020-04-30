@@ -1,8 +1,64 @@
 <template>
   <b-container>
-    <headline title="User"/>
+    <headline :title="`Nutzer ${user.user.username}`"/>
     <b-row class="mb-0">
-      <b-col cols="12" md="3">
+      <b-col cols="12" class="shadow p-3">
+        <b-list-group class="text-left">
+          <b-list-group-item>Ldap Domain: <span class="float-right">{{ user.user.dn }}</span></b-list-group-item>
+          <b-list-group-item>
+            Anzeigename: <span v-if="user.user.display_name" class="float-right">{{ user.user.display_name }}</span>
+            <span v-else class="float-right text-warning">Noch nicht generiert</span>
+          </b-list-group-item>
+          <b-list-group-item v-if="user.user.first_name">Vorname: <span
+            class="float-right">{{ user.user.first_name }}</span></b-list-group-item>
+          <b-list-group-item v-if="user.user.last_name">Nachname: <span
+            class="float-right">{{ user.user.last_name }}</span></b-list-group-item>
+          <b-list-group-item>Email: <span class="float-right">{{ user.user.email }}</span></b-list-group-item>
+          <!--           TODO: add password reset href-->
+          <b-list-group-item>Passwort: <a href="#" class="float-right">Nutzerpasswort zurücksetzen</a>
+          </b-list-group-item>
+          <b-list-group-item v-if="user.user.phone">Telefon: <span class="float-right">{{ user.user.phone }}</span>
+          </b-list-group-item>
+          <b-list-group-item v-if="user.user.mobile_phone">Mobiltelefon: <span class="float-right">{{ user.user.mobile_phone }}</span>
+          </b-list-group-item>
+          <b-list-group-item>Gruppen:
+            <span v-if="user.groups.length !== 0" class="float-right">
+<!--                TODO: add group detail link-->
+                <router-link v-for="group in user.groups" :key="group.dn"
+                   :to="{name: 'Group', params: {realmId: realmId, groupDn: group.dn}}"
+                   class="badge badge-secondary p-1">
+                  {{ group.name }}
+                </router-link>
+              </span>
+            <span v-else class="text-warning">Keine zugewiesen</span>
+            <!--              TODO: add user gorup update view link-->
+            <a v-if="!user.deleted_user && $can('change', 'Ldapuser')" href="#">Gruppen zuweisen</a>
+          </b-list-group-item>
+          <b-list-group-item>Zuletzt eingeloggt:
+            <span v-if="user.user.last_login" class="float-right">{{ user.user.last_login }}</span>
+            <span v-else class="float-right">Kein login vorhanden<span
+              class="d-none">+</span></span>
+          </b-list-group-item>
+          <b-list-group-item v-if="user.deleted_user" class="text-danger">
+            <span>Löschvorgang: {{ user.deleted_user.deletion_date }}</span>
+            <span class="float-right">
+<!--                  TODO: user direkt delete link/action-->
+                <a v-if="$can('delete', 'Ldapuser')" class="btn btn-danger" href="#">Sofort löschen</a>
+              <!--             TODO: user delete cancel     -->
+                <a v-if="$can('change', 'Ldapuser')" class="btn btn-outline-dark"
+                   href="#">Löschvorgang abbrechen</a></span>
+          </b-list-group-item>
+        </b-list-group>
+        <div class="d-flex mt-3">
+          <!--          TODO: user update link-->
+          <a v-if="!user.deleted_user && $can('change', 'Ldapuser')" href="#" class="btn btn-primary mr-auto p-2">Nutzer
+            bearbeiten</a>
+          <!--TODO: user resend welcome mail-->
+          <a v-if="!user.user.last_login && $can('change', 'Ldapuser')" href="#" class="btn btn-secondary p-2 mr-2">Wilkommensmail
+            erneut senden</a>
+          <!--TODO: user delete confirm link-->
+          <a v-if="$can('delete', 'Ldapuser')" href="#" class="btn btn-danger p-2">Nutzer löschen</a>
+        </div>
       </b-col>
     </b-row>
   </b-container>
@@ -17,49 +73,25 @@ export default {
   components: { Headline },
   mounted () {
     const realmId = this.$route.params.realmId
-    this.$store.dispatch('users/fetchUsers', { realmId: realmId })
+    const userDn = this.$route.params.userDn
+    this.$store.dispatch('user/fetchUser', {
+      realmId: realmId,
+      userDn: userDn
+    })
+    this.realmId = realmId
   },
   data () {
     return {
-      filter: null,
-      perPage: 25,
-      currentPage: 1,
-      rowOptions: [
-        { text: '25 Zeilen', value: 25 },
-        { text: '50 Zeilen', value: 50 },
-        { text: '100 Zeilen', value: 100 },
-        { text: '----------', value: null }
-      ],
-      fields: [
-        { key: 'user.username', label: 'Nutzername', sortable: true },
-        { key: 'user.email', label: 'E-Mail', sortable: true },
-        { key: 'user.first_name', label: 'Vorname', sortable: true },
-        { key: 'user.last_name', abel: 'Nachname', sortable: true },
-        { key: 'active', label: 'Aktiv', sortable: true },
-        { key: 'user.last_login', label: 'Letzter Login', sortable: true },
-        { key: 'user.deleted_user', label: 'Löschdatum', sortable: true }
-      ]
+      realmId: -1
     }
   },
   computed: {
-    users: function () {
-      return this.$store.getters['users/users']
-    },
-    rows: function () {
-      return this.$store.getters['users/users'].length
+    user: function () {
+      return this.$store.getters['user/user']
     }
   }
 }
 </script>
 
 <style scoped>
-  .floating-label-input-group {
-    display: -webkit-box !important;
-    display: -ms-flexbox !important;
-    display: flex !important;
-  }
-
-  .floating-label-input-group > .form-control {
-    min-width: 0;
-  }
 </style>

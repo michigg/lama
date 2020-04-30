@@ -1,8 +1,20 @@
 <template>
   <b-container>
-    <headline title="Gruppe"/>
+    <headline :title="`Gruppe ${group.name}`"/>
     <b-row class="mb-0">
-      <b-col cols="12" md="3">
+      <b-col cols="12">
+        <b-list-group class="w-100 mb-3">
+          <b-list-group-item>Ldap Domain: <span class="float-right">{{ group.dn }}</span></b-list-group-item>
+          <b-list-group-item v-if="group.description">Beschreibung: <span class="float-right">{{ group.description }}</span></b-list-group-item>
+        </b-list-group>
+        <h3>Mitglieder</h3>
+<!--        TODO: render user table-->
+        <div class="d-flex mt-3">
+<!--          TODO: group update link-->
+            <a href="#" class="btn btn-primary mr-auto p-2">Gruppe bearbeiten</a>
+<!--          TODO: group delete action-->
+            <a href="#" class="btn btn-danger p-2"><span class="d-sm-none d-md-inline-block">Gruppe löschen</span></a>
+        </div>
       </b-col>
     </b-row>
   </b-container>
@@ -13,49 +25,23 @@
 import Headline from '../../components/utils/Headline'
 
 export default {
-  name: 'Realms',
+  name: 'Group',
   components: { Headline },
   mounted () {
     const realmId = this.$route.params.realmId
-    this.$store.dispatch('groups/fetchGroups', { realmId: realmId })
+    const groupDn = this.$route.params.groupDn
+    this.$store.dispatch('group/fetchGroup', { realmId: realmId, groupDn: groupDn })
   },
   data () {
-    return {
-      filter: null,
-      perPage: 25,
-      currentPage: 1,
-      rowOptions: [
-        { text: '25 Zeilen', value: 25 },
-        { text: '50 Zeilen', value: 50 },
-        { text: '100 Zeilen', value: 100 },
-        { text: '----------', value: null }
-      ],
-      fields: [
-        { key: 'name', label: 'Name', sortable: true },
-        { key: 'dn', label: 'Ldap Domain', sortable: true },
-        { key: 'members', label: 'Mitgliederzahl', sortable: true }
-      ]
-    }
+    return {}
   },
   computed: {
-    realms: function () {
-      return this.$store.getters['groups/groups']
-    },
-    rows: function () {
-      return this.$store.getters['groups/groups'].length
+    group: function () {
+      return this.$store.getters['group/group']
     }
   }
 }
 </script>
 
 <style scoped>
-  .floating-label-input-group {
-    display: -webkit-box !important;
-    display: -ms-flexbox !important;
-    display: flex !important;
-  }
-
-  .floating-label-input-group > .form-control {
-    min-width: 0;
-  }
 </style>

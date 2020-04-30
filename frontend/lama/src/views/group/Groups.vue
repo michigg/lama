@@ -105,6 +105,11 @@ export default {
       const preparedString = value.replace(/'/g, '"')
       return JSON.parse(preparedString).length
     }
+  },
+  watch: {
+    '$route.params.realmId': function (realmId) {
+      this.$store.dispatch('users/fetchGroups', { realmId: realmId })
+    }
   }
 }
 </script>

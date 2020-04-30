@@ -1,5 +1,5 @@
 <template>
-  <h1 class="shadow pt-2">{{title}}</h1>
+  <h1 class="shadow pl-3 pt-2 text-left">{{title}}</h1>
 </template>
 
 <script>

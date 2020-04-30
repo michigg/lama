@@ -5,6 +5,8 @@ import { realms } from './realms'
 import { realm } from './realm'
 import { users } from './users'
 import { groups } from './groups'
+import { user } from './user'
+import { group } from './group'
 
 Vue.use(Vuex)
 
@@ -34,6 +36,8 @@ export default new Vuex.Store({
     realms: realms,
     realm: realm,
     users: users,
-    groups: groups
+    user: user,
+    groups: groups,
+    group: group
   }
 })
