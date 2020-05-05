@@ -3,7 +3,7 @@
     <b-row align-h="center">
       <b-col cols="12" sm="8" md="7" lg="6" xl="5" class="shadow text-center p-3 mt-5">
         <p>Diese App wurde mit viel <b-icon-heart-fill animation="throb" variant="danger"/> von Michael Götz entwickelt.</p>
-        <a class="nav-item nav-link" href="https://github.com/michigg/lama" target="_blank">Fork me </a>
+        <a class="nav-item nav-link" href="https://github.com/michigg/lama" target="_blank" rel="noopener noreferrer">Fork me </a>
         <br>
         <h2>Icons</h2>
         Das App-Icon wurde von Freepik von <a href="https://www.flaticon.com">www.flaticon.com</a> erstellt.
@@ -17,7 +17,7 @@
           <b-list-group-item>
             <span class="font-weight-bold">Paket Version</span><span class="float-right font-weight-bold">Lizenz</span>
           </b-list-group-item>
-          <b-list-group-item v-for="item in frontendPackages" :key="item.package" :href="item.link">
+          <b-list-group-item v-for="item in frontendPackages" :key="item.package" :href="item.link" target="_blank">
             {{item.package}} {{item.version}} <span class="float-right">{{item.license}}</span>
           </b-list-group-item>
         </b-list-group>
@@ -28,7 +28,7 @@
           <b-list-group-item>
            <span class="font-weight-bold">Paket Version</span><span class="float-right font-weight-bold">Lizenz</span>
           </b-list-group-item>
-          <b-list-group-item v-for="item in backendPackages" :key="item.package" :href="item.link">
+          <b-list-group-item v-for="item in backendPackages" :key="item.package" :href="item.link" target="_blank">
             {{item.package}} {{item.version}} <span class="float-right">{{item.license}}</span>
           </b-list-group-item>
          </b-list-group>

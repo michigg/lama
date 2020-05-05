@@ -1,0 +1,76 @@
+<template>
+  <b-form @submit.prevent="login">
+    <div class="floating-label-input-group">
+      <input
+        id="ldap-base-dn-input"
+        class="form-control"
+        v-model="form.ldapBaseDn"
+        type="text"
+        placeholder="LDAP Base DN"
+      />
+      <label for="ldap-base-dn-input">LDAP Base DN</label>
+    </div>
+    <div class="floating-label-input-group">
+      <input
+        id="name-input"
+        class="form-control"
+        v-model="form.name"
+        type="text"
+        placeholder="Bereichsname"
+      />
+      <label for="name-input">Bereichsname</label>
+    </div>
+    <div class="floating-label-input-group">
+      <input
+        id="email-input"
+        class="form-control"
+        v-model="form.email"
+        type="email"
+        placeholder="Bereichs-E-Mail-Adresse"
+      />
+      <label for="email-input">Bereichs-E-Mail-Adresse</label>
+    </div>
+    Admin Gruppe
+    <b-form-select v-model="adminGroup" :options="adminGroupOptions"/>
+    Default Gruppe
+    <b-form-select v-model="defaultGroup" :options="defaultGroupOptions"/>
+    <div class="d-flex mt-4">
+      <b-btn type="submit" class="btn btn-primary mr-auto p-2">Speichern</b-btn>
+      <!--      TODO: abort-->
+      <a href="#" class="btn btn-secondary p-2">Abbrechen</a>
+    </div>
+  </b-form>
+</template>
+
+<script>
+export default {
+  name: 'UpdateRealm',
+  data () {
+    return {
+      form: {
+        ldapBaseDn: '',
+        name: '',
+        email: '',
+        adminGroup: null,
+        adminGroupOptions: [
+          {
+            value: null,
+            text: '----------'
+          }
+        ],
+        defaultGroup: null,
+        defaultGroupOptions: [
+          {
+            value: null,
+            text: '----------'
+          }
+        ]
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
