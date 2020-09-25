@@ -2,11 +2,13 @@ FROM alpine:3.9
 ADD ["docker/lama/requirements.txt", "/requirements.txt"]
 RUN apk upgrade --update && \
 	apk add --update python3 build-base openldap-dev python3-dev py3-psycopg2 && \
-	pip3 install -r /requirements.txt && rm /requirements.txt
+	pip3 install -r /requirements.txt && rm /requirements.txt && \
+	pip3 install coverage
 WORKDIR /lama
 EXPOSE 80
 
 #ENTRYPOINT ["python3", "manage.py"]
 ADD ["./src", "/lama"]
-ADD ["./docker/lama/entrypoint.sh", "/lama/entrypoint.sh"]
+ADD ["./docker/lama/entrypoint.test.sh", "/lama/entrypoint.sh"]
+RUN chmod +x /lama/entrypoint.sh
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:80"]

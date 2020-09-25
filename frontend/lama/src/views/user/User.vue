@@ -2,7 +2,7 @@
   <b-container>
     <headline :title="`Nutzer ${user.user.username}`"/>
     <b-row class="mb-0">
-      <b-col cols="12" class="shadow p-3">
+      <b-col cols="12" class="neo-morph p-3">
         <b-list-group class="text-left">
           <b-list-group-item>Ldap Domain: <span class="float-right">{{ user.user.dn }}</span></b-list-group-item>
           <b-list-group-item>

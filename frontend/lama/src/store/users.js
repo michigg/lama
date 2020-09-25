@@ -27,6 +27,7 @@ export const users = {
       commit('SET_LOADING_STATE', { loading: true, error: false })
       axios.get(url)
         .then((response) => {
+          console.log(response.data.results)
           commit('SET_USERS', { users: response.data.results })
           commit('SET_LOADING_STATE', { loading: false, error: false })
         })

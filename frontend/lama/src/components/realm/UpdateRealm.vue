@@ -45,6 +45,9 @@
 <script>
 export default {
   name: 'UpdateRealm',
+  props: {
+    realm: {}
+  },
   data () {
     return {
       form: {
@@ -67,6 +70,14 @@ export default {
         ]
       }
     }
+  },
+  created () {
+    this.form.name = this.realm.name
+    this.form.email = this.realm.email
+    this.form.ldapBaseDn = this.realm.ldap_base_dn
+    this.form.name = this.realm.name
+    this.form.name = this.realm.name
+    this.form.name = this.realm.name
   }
 }
 </script>

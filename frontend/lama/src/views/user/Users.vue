@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <headline title="Bereiche"/>
+    <headline title="Nutzer"/>
     <b-row class="mb-0">
       <b-col cols="12" md="3">
         <div class="floating-label-input-group">
@@ -38,7 +38,7 @@
         />
       </b-col>
     </b-row>
-    <b-row>
+    <b-row class="neo-morph">
       <b-col>
         <b-table
           id="users-table"

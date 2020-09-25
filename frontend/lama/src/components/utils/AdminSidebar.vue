@@ -16,8 +16,8 @@
         <div v-if="realm">
           <p class="h4 p-2 mb-0">Bereich</p>
           <b-list-group>
-            <b-list-group-item :to="{name: 'Users', params: {realmId: realm.id}}">Nutzer</b-list-group-item>
-            <b-list-group-item :to="{name: 'Groups', params: {realmId: realm.id}}">Gruppen</b-list-group-item>
+            <b-list-group-item :to="{name: 'Users', params: {realmId: realm.id}}"><b-icon-person/> Nutzer</b-list-group-item>
+            <b-list-group-item :to="{name: 'Groups', params: {realmId: realm.id}}"><b-icon-people/> Gruppen</b-list-group-item>
           </b-list-group>
         </div>
       </div>
@@ -49,7 +49,6 @@ export default {
       return this.$store.getters['realms/realms']
     },
     realm: function () {
-      console.log(this.$store.getters['realm/realm'])
       return this.$store.getters['realm/realm']
     }
   }

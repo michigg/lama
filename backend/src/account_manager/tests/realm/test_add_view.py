@@ -8,13 +8,16 @@ from account_helper.models import Realm
 from account_manager.tests.utils.utils import get_realm, get_user, clear_realm_user, clear_realm_group, get_password, \
     get_group
 
+REALM_ADD_ERROR_RESPONSE = 'Das hinzufügen des Bereichs ist fehlgeschlagen.'
+
+NEW_REALM_BASE_DN = 'ou=test,ou=fachschaften,dc=test,dc=de'
+
 
 class RealmAddViewTest(TestCase):
     databases = ["default", "ldap"]
 
     @classmethod
     def setUpTestData(cls):
-        # User.objects.get_or_create(username="test", email="test@test.de")
         User.objects.create_superuser(
             username='test_superuser',
             password=get_password(),
@@ -79,7 +82,7 @@ class RealmAddViewTest(TestCase):
     def test_with_login_and_post_valid_form(self):
         self.client.login(username=self.ldap_user_1.username, password=get_password())
         response = self.client.post(reverse('realm-add'),
-                                    {'name': 'test', 'ldap_base_dn': 'ou=test,ou=fachschaften,dc=test,dc=de'})
+                                    {'name': 'test', 'ldap_base_dn': NEW_REALM_BASE_DN})
         self.assertContains(response, 'Leider hast du keine Rechte', status_code=403)
 
     def test_with_super_user_login(self):
@@ -101,14 +104,14 @@ class RealmAddViewTest(TestCase):
     def test_with_super_user_login_add_extisting_realm(self):
         self.client.login(username=self.django_superuser.username, password=get_password())
         response = self.client.post(reverse('realm-add'),
-                                    {'name': 'test', 'ldap_base_dn': 'ou=test,ou=fachschaften,dc=test,dc=de'})
-        self.assertContains(response, 'Das hinzufügen des Bereichs ist fehlgeschlagen.', status_code=409)
+                                    {'name': 'test', 'ldap_base_dn': NEW_REALM_BASE_DN})
+        self.assertContains(response, REALM_ADD_ERROR_RESPONSE, status_code=409)
 
     def test_with_super_user_login_add_extisting_realm_with_different_name(self):
         self.client.login(username=self.django_superuser.username, password=get_password())
         response = self.client.post(reverse('realm-add'),
-                                    {'name': 'test_new', 'ldap_base_dn': 'ou=test,ou=fachschaften,dc=test,dc=de'})
-        self.assertContains(response, 'Das hinzufügen des Bereichs ist fehlgeschlagen.', status_code=409)
+                                    {'name': 'test_new', 'ldap_base_dn': NEW_REALM_BASE_DN})
+        self.assertContains(response, REALM_ADD_ERROR_RESPONSE, status_code=409)
 
     def test_with_super_user_login_add_realm_with_not_existing_ldap_base_dn(self):
         self.client.login(username=self.django_superuser.username, password=get_password())
@@ -116,4 +119,4 @@ class RealmAddViewTest(TestCase):
                                     {'name': 'test_not_extisting_ldap_dn',
                                      'ldap_base_dn': 'ou=not_exists,ou=fachschaften,dc=test,dc=de'})
 
-        self.assertContains(response, 'Das hinzufügen des Bereichs ist fehlgeschlagen.', status_code=409)
+        self.assertContains(response, REALM_ADD_ERROR_RESPONSE, status_code=409)

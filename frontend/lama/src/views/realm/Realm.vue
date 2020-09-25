@@ -6,22 +6,22 @@
         <b-icon-trash-fill/>
         <span class="d-none d-md-inline-block">Bereich löschen</span></a>
     </small>
-    <b-row>
+    <b-row v-if="!isEditMode" class="neo-morph">
       <b-col>
         <realm-detail :realm="realm"/>
         <div class="d-flex mt-3">
-          <a v-if="$can('change', 'Realm')" href="#" class="btn btn-primary mr-auto p-2">
+          <button v-if="$can('change', 'Realm')" @click="isEditMode = !isEditMode" href="#" class="btn btn-primary mr-auto p-2">
             Bereichsinformationen anpassen
-          </a>
+          </button>
           <a v-if="realm.email && $can('change', 'Realm')" href="#" class="btn btn-secondary p-2">
             Test Mail
           </a>
         </div>
       </b-col>
     </b-row>
-    <b-row>
+    <b-row v-else class="neo-morph">
       <b-col>
-       <update-realm></update-realm>
+       <update-realm :realm="realm"></update-realm>
       </b-col>
     </b-row>
   </b-container>
@@ -48,6 +48,11 @@ export default {
     RealmDetail,
     LoadingInfo,
     Headline
+  },
+  data () {
+    return {
+      isEditMode: false
+    }
   },
   mounted () {
     const realmId = this.$route.params.realmId

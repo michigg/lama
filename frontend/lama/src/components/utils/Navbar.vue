@@ -1,5 +1,5 @@
 <template>
-  <b-navbar toggleable="lg" type="light" variant="light" class="shadow fixed-top">
+  <b-navbar toggleable="lg" type="light" variant="light" class="fixed-top content">
     <b-navbar-brand to="/">
       <img
         src="../../assets/logo.svg"

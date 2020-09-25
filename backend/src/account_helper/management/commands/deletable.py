@@ -47,7 +47,7 @@ class Command(BaseCommand):
                 LdapUser.base_dn = LdapUser.ROOT_DN
                 ldap_user = LdapUser.objects.get(dn=deletable.ldap_dn)
                 ldap_user.delete_complete()
-            except ObjectDoesNotExist as err:
+            except ObjectDoesNotExist:
                 self.stdout.write(self.style.ERROR(f"User with the username {options['fduser']} not found."))
             return
         elif not options['all'] and not options['fduser']:

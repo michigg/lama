@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../views/Login.vue'
+import Login from '../views/auth/Login.vue'
 import store from '../store/index'
 import { ability } from '../store/authentication'
 import Realm from '../views/realm/Realm'
@@ -10,6 +10,8 @@ import Groups from '../views/group/Groups'
 import Users from '../views/user/Users'
 import User from '../views/user/User'
 import Group from '../views/group/Group'
+import ForgotPassword from '../views/auth/ForgotPassword'
+import ForgotPasswordConfirm from '../views/auth/ForgotPasswordConfirm'
 
 Vue.use(VueRouter)
 
@@ -19,6 +21,7 @@ const routes = [
     name: 'Home',
     component: Realms,
     meta: {
+      requiresAuth: true,
       resource: 'Realm',
       action: 'view'
     }
@@ -87,6 +90,16 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPassword
+  },
+  {
+    path: '/forgot-password-confirm',
+    name: 'ForgotPasswordConfirm',
+    component: ForgotPasswordConfirm
   },
   {
     path: '/permission-denied',

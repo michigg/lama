@@ -33,7 +33,6 @@ class UpdateLDAPUserForm(forms.Form):
     last_name = forms.CharField(label='Nachname', required=True)
     phone = forms.CharField(label='Festnetz', required=False)
     mobile_phone = forms.CharField(label='Mobiltelefon', required=False)
-    # photo = forms.ImageField(label='Profilfoto', required=False)
 
 
 class UserDeleteListForm(forms.Form):

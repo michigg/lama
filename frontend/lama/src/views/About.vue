@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
     <b-row align-h="center">
-      <b-col cols="12" sm="8" md="7" lg="6" xl="5" class="shadow text-center p-3 mt-5">
+      <b-col cols="12" sm="8" md="7" lg="6" xl="5" class="neo-morph text-center p-3 mt-5">
         <p>Diese App wurde mit viel <b-icon-heart-fill animation="throb" variant="danger"/> von Michael Götz entwickelt.</p>
         <a class="nav-item nav-link" href="https://github.com/michigg/lama" target="_blank" rel="noopener noreferrer">Fork me </a>
         <br>
@@ -11,7 +11,7 @@
       </b-col>
     </b-row>
     <b-row align-h="center">
-      <b-col sm="12" md="5" class="shadow text-center p-3 mx-1 mt-5">
+      <b-col sm="12" md="5" class="neo-morph text-center p-3 mx-2 mt-5">
         <h2>Frontend</h2>
         <b-list-group class="text-left">
           <b-list-group-item>
@@ -22,7 +22,7 @@
           </b-list-group-item>
         </b-list-group>
       </b-col>
-      <b-col sm="12" md="5" class="shadow text-center p-3 mx-1 mt-5">
+      <b-col sm="12" md="5" class="neo-morph text-center p-3 mx-2 mt-5">
         <h2>Backend</h2>
          <b-list-group class="text-left">
           <b-list-group-item>

@@ -20,9 +20,11 @@ services:
     depends_on:
       - ci_dblama
       - ci_ldap
+    volumes:
+      - ./coverage-reports:/coverage-reports
     ports:
       - 0.0.0.0:8888:80
-  
+
   ci_dblama:
     image: postgres:11.2-alpine
     networks:

@@ -14,8 +14,5 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class MailSerializer(serializers.Serializer):
-    def update(self, instance, validated_data):
-        pass
-
     subject = serializers.CharField()
     template = serializers.CharField(max_length=32000)

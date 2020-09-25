@@ -14,5 +14,7 @@ export default {
 <style scoped>
   .content {
     margin-top: var(--nav-height);
+    display: flex;
+    justify-content: center;
   }
 </style>

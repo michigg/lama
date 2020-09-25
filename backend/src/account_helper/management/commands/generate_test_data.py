@@ -8,9 +8,6 @@ from account_manager.models import LdapGroup, LdapUser
 class Command(BaseCommand):
     help = 'Generate test data'
 
-    def add_arguments(self, parser):
-        pass
-
     def handle(self, *args, **options):
         try:
             admin = User.objects.create_superuser(username="admin", email="admin@admin.de", password="2malDrei")
@@ -19,7 +16,7 @@ class Command(BaseCommand):
             admin.is_staff = True
             admin.is_admin = True
             admin.save()
-        except:
+        except Exception:
             admin = User.objects.get(username="admin")
 
         wiai = Realm.objects.create(name="WIAI", ldap_base_dn="ou=wiai,ou=fachschaften,dc=test,dc=de",

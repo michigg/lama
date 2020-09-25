@@ -1,11 +1,11 @@
 <template>
-  <b-container>
-    <b-row align-h="center">
-      <b-col cols="12" sm=12 md="10" lg="8" xl="5" class="mt-4 p-4 shadow">
-        <b-form @submit.prevent="login">
+  <div class="login neo-morph">
+    <h1>Login</h1>
+    <b-form @submit.prevent="login">
+          <b-alert v-if="loginError" show variant="danger">{{loginError}}</b-alert>
           <div class="floating-label-input-group">
             <input
-              id="username-input"
+              id="login-username-input"
               class="form-control"
               v-model="form.username"
               type="text"
@@ -14,11 +14,11 @@
               tabindex="1"
               placeholder="Benutzername"
             />
-            <label for="username-input">Benutzername</label>
+            <label for="login-username-input">Benutzername</label>
           </div>
           <div class="floating-label-input-group">
             <input
-              id="password-inputs"
+              id="login-password-input"
               class="form-control"
               v-model="form.password"
               type="password"
@@ -27,26 +27,29 @@
               tabindex="2"
               placeholder="Passwort"
             />
-            <label for="password-inputs">Passwort</label>
+            <label for="login-password-input">Passwort</label>
           </div>
           <b-button type="submit" variant="success" class="w-75">Anmelden</b-button>
         </b-form>
-      </b-col>
-    </b-row>
-  </b-container>
+  </div>
 </template>
 
 <script>
 // @ is an alias to /src
 
 export default {
-  name: 'Login',
+  name: 'ForgotPasswordConfirm',
   data () {
     return {
       form: {
         username: '',
         password: ''
       }
+    }
+  },
+  computed: {
+    loginError: function () {
+      return this.$store.getters['authentication/loginError']
     }
   },
   methods: {
@@ -62,8 +65,16 @@ export default {
           //   this.$router.push('/')
           // }
         })
-        .catch((error) => console.log(error))
+        .catch()
     }
   }
 }
 </script>
+<style lang="scss" scoped>
+  .login {
+    display: flex;
+    flex-flow: column;
+    padding: 2rem;
+    margin: 2rem;
+  }
+</style>

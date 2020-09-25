@@ -36,36 +36,11 @@ export default {
 
 <style lang="scss">
   @import './assets/styles/custom.scss';
-  @import '../node_modules/bootstrap/scss/bootstrap.scss';
-  @import '../node_modules/bootstrap-vue/src/index.scss';
 
   :root {
     --admin-bar-width: 15rem;
     --nav-height: 3rem;
     --footer-height: 2.5rem;
-  }
-
-  @media (prefers-color-scheme: light) {
-    :root {
-      --background-color: #ffffff;
-      --footer-background-color: #282828;
-      --secondary: #fbb071 !important;
-      --sidbar-background-color: #f6d76f;
-      --sidbar-activation-button-background-color: #f6d76f;
-      --sidbar-activation-button-color: #000;
-      --page-background: #fbb071;
-      --primary: #fbb071 !important;
-      --text-color: #343a40;
-    }
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background-color: #222831;
-      --page-background: #393e46;
-      --primary-color: #b55400;
-      --text-color: #eeeeee;
-    }
   }
 
   #app {
@@ -87,15 +62,6 @@ export default {
 
   #nav a.router-link-exact-active {
     color: #42b983;
-  }
-
-  footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: var(--footer-height) !important;
-    padding-top: 0.5rem;
-    background-color: var(--footer-background-color);
   }
 
   nav {

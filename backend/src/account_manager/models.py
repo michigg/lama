@@ -26,7 +26,6 @@ class LdapUser(Model):
     ROOT_DN = os.environ.get('LDAP_USER_ENTRY', 'dc=test,dc=de')
     base_dn = ROOT_DN
     object_classes = ['inetOrgPerson']
-    # last_modified = ldap_fields.DateTimeField(db_column='modifyTimestamp', blank=True)
 
     # inetOrgPerson
     username = ldap_fields.CharField(db_column='uid', primary_key=True)
@@ -39,8 +38,6 @@ class LdapUser(Model):
     mobile_phone = ldap_fields.CharField(db_column='mobile', blank=True)
     photo = ldap_fields.ImageField(db_column='photo')
     last_login = ldap_fields.DateTimeField(db_column='authTimestamp', blank=True)
-
-    # photo = ldap_fields.ImageField(db_column='jpegPhoto')
 
     def __str__(self):
         return self.username
@@ -55,9 +52,9 @@ class LdapUser(Model):
             user = LdapUser.objects.create(username='dummy', first_name=' ', last_name=' ')
             user.save()
             user.delete()
-        except:
+        except Exception:
             raise ValidationError(
-                _('Realm user creation test failed. Please prove the provided dn'),
+                'Realm user creation test failed. Please prove the provided dn',
             )
 
     def is_deleteable(self, realm: Realm):
@@ -157,7 +154,7 @@ class LdapUser(Model):
         try:
             LdapUser.objects.get(username=username)
             return True
-        except (NO_SUCH_OBJECT, ObjectDoesNotExist) as err:
+        except (NO_SUCH_OBJECT, ObjectDoesNotExist):
             return False
 
     @staticmethod
@@ -186,7 +183,7 @@ class LdapUser(Model):
         LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}' if realm else LdapUser.ROOT_DN
         try:
             return LdapUser.objects.get(username=username)
-        except Exception as e:
+        except Exception:
             return None
 
     @staticmethod
@@ -194,7 +191,7 @@ class LdapUser(Model):
         LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}' if realm else LdapUser.ROOT_DN
         try:
             return LdapUser.objects.get(dn=dn)
-        except Exception as e:
+        except Exception:
             return None
 
     @staticmethod
@@ -202,7 +199,7 @@ class LdapUser(Model):
         LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}' if realm else LdapUser.ROOT_DN
         try:
             return LdapUser.objects.all()
-        except Exception as e:
+        except Exception:
             return None
 
     @staticmethod

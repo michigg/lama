@@ -23,6 +23,8 @@ from account_manager.utils.django_user import update_django_user
 from account_manager.utils.mail_utils import send_welcome_mail, send_deletion_mail
 from account_manager.utils.user_views import get_protocol
 
+REALM_ID_IS_REQUIRED = "Realm Id is required"
+
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +41,7 @@ class RealmUsersApi(generics.ListCreateAPIView):
     def get_queryset(self):
         realm_id = self.kwargs.get('realm_id')
         if not realm_id:
-            raise ValidationError("Realm Id is required")
+            raise ValidationError(REALM_ID_IS_REQUIRED)
         realms = Realm.objects.filter(id=realm_id)
         if not realms.exists():
             raise ValidationError(f"Realm with {realm_id} not found")
@@ -61,7 +63,7 @@ class RealmUserApi(generics.RetrieveUpdateDestroyAPIView):
         user_dn = self.kwargs.get('user_dn')
 
         if not realm_id:
-            raise ValidationError("Realm Id is required")
+            raise ValidationError(REALM_ID_IS_REQUIRED)
         if not user_dn:
             raise ValidationError("User dn is required")
         realms = Realm.objects.filter(id=realm_id)
@@ -101,7 +103,7 @@ class RealmUserApi(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         realm_id = self.kwargs.get('realm_id')
         if not realm_id:
-            raise ValidationError("Realm Id is required")
+            raise ValidationError(REALM_ID_IS_REQUIRED)
         realms = Realm.objects.filter(id=realm_id)
         if not realms.exists():
             raise ValidationError(f"Realm with {realm_id} not found")
@@ -243,20 +245,19 @@ class RealmUserGroupsApi(generics.RetrieveUpdateAPIView):
     def get_realm(self):
         realm_id = self.kwargs.get('realm_id')
         if not realm_id:
-            raise ValidationError("Realm Id is required")
+            raise ValidationError(REALM_ID_IS_REQUIRED)
         realms = Realm.objects.filter(id=realm_id)
         if not realms.exists():
             raise ValidationError(f"Realm with {realm_id} not found")
         return realms[0]
 
     def get_queryset(self):
-        realm = self.get_realm()
-        user_dn = self.kwargs.get('user_dn')
-        _, realm_groups_available, user_groups = get_available_given_groups(realm, user_dn)
-        wrapper = {'groups': user_groups, 'available_groups': realm_groups_available}
-        return wrapper
+        return self._get_user_wrapper()
 
     def get_object(self):
+        return self._get_user_wrapper()
+
+    def _get_user_wrapper(self):
         realm = self.get_realm()
         user_dn = self.kwargs.get('user_dn')
         _, realm_groups_available, user_groups = get_available_given_groups(realm, user_dn)
@@ -283,7 +284,7 @@ class RealmUserGroupsApi(generics.RetrieveUpdateAPIView):
             try:
                 to_add_ldap_groups = [LdapGroup.get_group(group_name, realm) for group_name in to_add]
                 ldap_add_user_to_groups(ldap_user.dn, to_add_ldap_groups)
-            except OBJECT_CLASS_VIOLATION as err:
+            except OBJECT_CLASS_VIOLATION:
                 return Response({'msg': 'Bearbeiten fehlgeschlagen. '
                                         'Der Nutzer konnte nicht zu den Gruppen hinzugefügt werden.'},
                                 status=status.HTTP_400_BAD_REQUEST)
@@ -294,7 +295,7 @@ class RealmUserGroupsApi(generics.RetrieveUpdateAPIView):
             try:
                 to_remove_ldap_groups = [LdapGroup.get_group(group_name, realm) for group_name in to_remove]
                 LdapGroup.remove_user_from_groups(ldap_user.dn, to_remove_ldap_groups)
-            except OBJECT_CLASS_VIOLATION as err:
+            except OBJECT_CLASS_VIOLATION:
                 return Response({'msg': 'Bearbeiten fehlgeschlagen. '
                                         'Der Nutzer scheint der letzte in einer Gruppe zu sein. '
                                         'Bitte tragen sie den Nutzer zuerst aus der Gruppe aus.'},

@@ -8,7 +8,7 @@ networks:
     external: false
 
 services:
-  lama:
+  api:
     image: lama:0.1
     build:
       context: docker/lama
@@ -20,13 +20,14 @@ services:
       - docker/lama/dev.env
     volumes:
       - ./src:/lama
+      - ./coverage-reports:/coverage-reports
     depends_on:
-      - dblama
+      - db
       - ldap
     ports:
-      - 0.0.0.0:8888:80
-  
-  dblama:
+      - 0.0.0.0:8000:80
+
+  db:
     image: postgres:11.2-alpine
     networks:
       - pg_db
@@ -41,8 +42,6 @@ services:
       context: docker/ldap
       dockerfile: Dockerfile.ldap
     env_file: docker/ldap/ldap.env
-    volumes:
-      - ./docker/ldap/data/var/:/var/lib/openldap/
     networks:
       - ldap_net
 
@@ -56,4 +55,4 @@ services:
     depends_on:
       - ldap
     ports:
-      - 0.0.0.0:8080:80
+      - 0.0.0.0:8888:80
