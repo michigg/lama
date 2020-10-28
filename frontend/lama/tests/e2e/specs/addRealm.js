@@ -2,7 +2,8 @@
 
 describe('Add Realm Test', () => {
   beforeEach(() => {
-    cy.visit('/login')
+    cy.login('michigg', '2malDrei')
+    cy.visit('/realm-add')
   })
   it('elements exists', () => {
   })

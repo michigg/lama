@@ -23,16 +23,22 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
-Cypress.Commands.add('login', () => {
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:8080/api/auth/token/',
-    body: {
-      username: 'admin',
-      password: '2malDrei'
-    }
+Cypress.Commands.add('getBySel', (selector, ...args) => {
+  return cy.get(`[data-test=${selector}]`, ...args)
+})
+Cypress.Commands.add('vuex', () =>
+  cy.window().its('app.$store')
+)
+
+Cypress.Commands.add('vuex', () => {
+  cy.window().should('have.property', '__store__')
+  return cy.window().its('__store__')
+})
+
+Cypress.Commands.add('login', (username, password, rememberUser = false) => {
+  cy.visit('/')
+  cy.vuex().invoke('dispatch', 'authentication/login', {
+    username: username,
+    password: password
   })
-    .then((resp) => {
-      window.localStorage.setItem('jwt', resp.body.user.token)
-    })
 })
