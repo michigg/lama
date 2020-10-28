@@ -2,7 +2,7 @@
   <div class="home">
     <admin-sidebar v-if="isLoggedIn"/>
     <div class="content">
-      <router-view/>
+      <router-view-transistion/>
     </div>
   </div>
 </template>
@@ -10,10 +10,12 @@
 <script>
 // @ is an alias to /src
 import AdminSidebar from '../../components/utils/AdminSidebar'
+import RouterViewTransistion from '@/views/base/RouterViewTransistion'
 
 export default {
   name: 'AdminBasePage',
   components: {
+    RouterViewTransistion,
     AdminSidebar
   },
   computed: {

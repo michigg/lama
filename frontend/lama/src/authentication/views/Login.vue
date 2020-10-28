@@ -1,9 +1,9 @@
 <template>
-  <div class="login neo-morph">
+  <div class="login neo-morph bg-light">
     <h1>Login</h1>
     <b-form @submit.prevent="login">
-      <b-alert v-if="loginError" show variant="danger">{{loginError}}</b-alert>
-      <div class="floating-label-input-group">
+      <b-alert :show="!!loginError" variant="danger" data-test="signin-error">{{loginError}}</b-alert>
+      <div class="floating-label-input-group" data-test="signin-username">
         <input
           id="login-username-input"
           class="form-control"
@@ -16,7 +16,7 @@
         />
         <label for="login-username-input">Benutzername</label>
       </div>
-      <div class="floating-label-input-group">
+      <div class="floating-label-input-group" data-test="signin-password">
         <input
           id="login-password-input"
           class="form-control"
@@ -29,9 +29,11 @@
         />
         <label for="login-password-input">Passwort</label>
       </div>
-      <b-button type="submit" variant="success" class="w-75">Anmelden</b-button>
+      <b-button type="submit" variant="success" class="w-75" data-test="signin-submit">Anmelden</b-button>
     </b-form>
-    <router-link :to="{name: 'ForgotPassword'}" class="forgot-password-link">Passwort vergessen?</router-link>
+    <router-link :to="{name: 'ForgotPassword'}" class="forgot-password-link" data-test="forgot-password-link">
+      Passwort vergessen?
+    </router-link>
   </div>
 </template>
 
@@ -77,6 +79,7 @@ export default {
     flex-flow: column;
     padding: 2rem;
     margin: 2rem;
+    transition: all;
 
     .forgot-password-link {
       margin-top: 1rem;

@@ -10,10 +10,11 @@
             type="search"
             id="table-search-input"
             placeholder="Suche"
+            data-test="realms-table-search-input"
           />
           <label for="table-search-input" class="pr-5">Suche</label>
           <b-input-group-append>
-            <b-button variant="danger" :disabled="!filter" @click="filter = ''">
+            <b-button variant="danger" :disabled="!filter" @click="filter = ''" data-test="realms-table-search-input-clear-button">
               <b-icon-x/>
             </b-button>
           </b-input-group-append>
@@ -22,7 +23,7 @@
     </b-row>
     <b-row class="mb-2" align-h="between">
       <b-col cols="12" md="3" class="mb-2">
-        <b-select v-model="perPage" :options="rowOptions" size="sm"/>
+        <b-select v-model="perPage" :options="rowOptions" size="sm" data-test="realms-table-page-count-selector"/>
       </b-col>
       <b-col cols="12" md="3" class="mb-2">
         <b-pagination
@@ -35,6 +36,7 @@
           size="sm"
           align="fill"
           class="mb-0"
+          data-test="realms-table-pagination"
         />
       </b-col>
     </b-row>
@@ -51,6 +53,7 @@
           sort-by="realm.name"
           stacked="md"
           small
+          data-test="realms-table"
         >
           <template v-slot:cell(realm.name)="data">
             <router-link :to="{name: 'Realm', params: {realmId: data.item.realm.id}}">{{data.value}}</router-link>

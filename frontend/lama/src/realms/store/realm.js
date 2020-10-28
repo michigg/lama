@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
+import { RepositoryFactory } from '@/authentication/repositories/RepositoryFactory'
+
+const RealmRepository = RepositoryFactory.get('realm')
 
 Vue.use(Vuex)
 
@@ -22,31 +24,28 @@ export const realm = {
     }
   },
   actions: {
-    fetchRealm ({ dispatch, commit, rootState }, { realmId }) {
-      const url = rootState.config.lamaEndpoint.concat('/v1/realm/').concat(realmId).concat('/')
+    async fetchRealm ({ commit }, { realmId }) {
       commit('SET_LOADING_STATE', {
         loading: true,
         error: false
       })
-      axios.get(url)
-        .then((response) => {
-          commit('SET_REALM', { realm: response.data })
-          commit('SET_LOADING_STATE', {
-            loading: false,
-            error: false
-          })
+      try {
+        const realm = await RealmRepository.getRealm(realmId)
+        commit('SET_REALM', { realm: realm })
+        commit('SET_LOADING_STATE', {
+          loading: false,
+          error: false
         })
-        .catch(() => {
-          commit('SET_LOADING_STATE', {
-            loading: false,
-            error: true
-          })
+      } catch (error) {
+        commit('SET_LOADING_STATE', {
+          loading: false,
+          error: true
         })
+      }
     }
   },
   getters: {
     realm: state => state.realm,
     loading: state => state.loading
-  },
-  modules: {}
+  }
 }

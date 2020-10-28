@@ -1,21 +1,22 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../views/auth/Login.vue'
-import store from '../store/index'
-import { ability } from '../store/authentication'
-import Realm from '../views/realm/Realm'
-import Realms from '../views/realm/Realms'
-import PermissionDenied from '../views/PermissionDenied'
-import Groups from '../views/group/Groups'
-import Users from '../views/user/Users'
-import User from '../views/user/User'
-import Group from '../views/group/Group'
-import ForgotPassword from '../views/auth/ForgotPassword'
-import ForgotPasswordConfirm from '../views/auth/ForgotPasswordConfirm'
+import { ability } from '@/authentication/store'
+import Realm from '@/realms/views/Realm'
+import Realms from '../realms/views/Realms'
+import PermissionDenied from '@/views/PermissionDenied'
+import Groups from '@/views/group/Groups'
+import Users from '@/views/user/Users'
+import User from '@/views/user/User'
+import Group from '@/views/group/Group'
+import authenticationRoutes from '@/authentication/routes'
+import CreateRealm from '@/realms/views/CreateRealm'
+import { RepositoryFactory } from '@/authentication/repositories/RepositoryFactory'
+
+const AuthenticationRepository = RepositoryFactory.get('authentication')
 
 Vue.use(VueRouter)
 
-const routes = [
+let routes = [
   {
     path: '/',
     name: 'Home',
@@ -30,6 +31,16 @@ const routes = [
     path: '/realm',
     name: 'Realms',
     component: Realms,
+    meta: {
+      requiresAuth: true,
+      resource: 'Realm',
+      action: 'view'
+    }
+  },
+  {
+    path: '/realm-add',
+    name: 'CreateRealms',
+    component: CreateRealm,
     meta: {
       requiresAuth: true,
       resource: 'Realm',
@@ -87,21 +98,6 @@ const routes = [
     }
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: Login
-  },
-  {
-    path: '/forgot-password',
-    name: 'ForgotPassword',
-    component: ForgotPassword
-  },
-  {
-    path: '/forgot-password-confirm',
-    name: 'ForgotPasswordConfirm',
-    component: ForgotPasswordConfirm
-  },
-  {
     path: '/permission-denied',
     name: 'PermissionDenied',
     component: PermissionDenied
@@ -115,6 +111,7 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   }
 ]
+routes = [...routes, ...authenticationRoutes]
 
 const router = new VueRouter({
   mode: 'history',
@@ -130,9 +127,8 @@ router.beforeEach((to, from, next) => {
     }
   })
   const authRequired = to.matched.some(record => record.meta.requiresAuth)
-  const isLoggedIn = store.getters['authentication/isLoggedIn']
 
-  if (authRequired && !isLoggedIn) {
+  if (authRequired && !AuthenticationRepository.isLoggedIn()) {
     next({
       path: '/login',
       query: { redirect: to.path }

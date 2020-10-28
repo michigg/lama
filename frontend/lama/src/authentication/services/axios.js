@@ -1,5 +1,5 @@
 import axios from 'axios'
-import AuthTokenService from './auth_token_service'
+import AuthTokenService from './authentication_token'
 
 const AxiosExtraUtils = (
   function () {
@@ -12,10 +12,10 @@ const AxiosExtraUtils = (
           const originalRequest = error.config
           if (error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true
-            const data = { refreshToken: AuthTokenService.getRefreshToken() }
+            const data = { refresh: AuthTokenService.getRefreshToken() }
             return axios.post(tokenApiEnpoint, data)
               .then(response => {
-                if (response.status === 201) {
+                if (response.status === 200) {
                   AuthTokenService.setToken(response.data)
                   axios.defaults.headers.common.Authorization = `Bearer ${AuthTokenService.getAccessToken()}`
                   return axios(originalRequest)

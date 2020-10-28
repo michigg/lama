@@ -1,14 +1,17 @@
 <template>
   <div class="content">
-    <router-view/>
+    <router-view-transistion/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 
+import RouterViewTransistion from '@/views/base/RouterViewTransistion'
+
 export default {
-  name: 'UserBasePage'
+  name: 'UserBasePage',
+  components: { RouterViewTransistion }
 }
 </script>
 <style scoped>
