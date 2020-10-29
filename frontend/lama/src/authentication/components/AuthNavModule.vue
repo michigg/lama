@@ -1,15 +1,33 @@
 <template>
-  <b-nav-item v-if="this.isLoggedIn" @click="logout">
+  <b-nav-item
+    v-if="this.isLoggedIn"
+    @click="logout"
+  >
     Logout
   </b-nav-item>
-  <b-nav-item v-else :to="{ name: 'Login' }">Login</b-nav-item>
+  <b-nav-item
+    v-else
+    :to="{ name: 'Login' }"
+  >
+    Login
+  </b-nav-item>
 </template>
 
 <script>
+import { RepositoryFactory } from '../repositories/RepositoryFactory'
+console.log(RepositoryFactory)
+// const AuthenticationRepository = RepositoryFactory.get('authentication')
+
 export default {
   name: 'AuthNavModule',
   props: {
     msg: String
+  },
+  computed: {
+    isLoggedIn: function () {
+      // return AuthenticationRepository.isLoggedIn()
+      return true
+    }
   },
   created: function () {
     // Used in term of an expired Token case
@@ -21,11 +39,6 @@ export default {
         throw err
       })
     })
-  },
-  computed: {
-    isLoggedIn: function () {
-      return this.$store.getters['authentication/isLoggedIn']
-    }
   },
   methods: {
     logout: function () {

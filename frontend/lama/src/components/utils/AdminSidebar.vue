@@ -1,32 +1,60 @@
 <template>
   <div>
-    <button v-on:click="active = !active" class="sidebar-activation-button btn btn-primary shadow"
-            v-bind:class="{ active: active }">
-      <b-icon-layers/>
+    <button
+      class="sidebar-activation-button btn btn-primary shadow"
+      :class="{ active: active }"
+      @click="active = !active"
+    >
+      <b-icon-layers />
     </button>
-    <div class="sidebar dynamic-sidebar border-right shadow" v-bind:class="{ active: active }">
+    <div
+      class="sidebar dynamic-sidebar border-right shadow"
+      :class="{ active: active }"
+    >
       <div class="sidebar-top">
-        <p class="h4 p-2 mb-0">Bereiche</p>
+        <p class="h4 p-2 mb-0">
+          Bereiche
+        </p>
         <b-list-group>
-          <b-list-group-item v-for="realm in realms" :key="realm.realm.id"
-                             :to="{name: 'Realm', params: {realmId: realm.realm.id}}"
-          >{{realm.realm.name}}
+          <b-list-group-item
+            v-for="realm in realms"
+            :key="realm.realm.id"
+            :to="{name: 'Realm', params: {realmId: realm.realm.id}}"
+          >
+            {{ realm.realm.name }}
           </b-list-group-item>
         </b-list-group>
         <div v-if="realm">
-          <p class="h4 p-2 mb-0">Bereich</p>
+          <p class="h4 p-2 mb-0">
+            Bereich
+          </p>
           <b-list-group>
-            <b-list-group-item :to="{name: 'Users', params: {realmId: realm.id}}"><b-icon-person/> Nutzer</b-list-group-item>
-            <b-list-group-item :to="{name: 'Groups', params: {realmId: realm.id}}"><b-icon-people/> Gruppen</b-list-group-item>
+            <b-list-group-item :to="{name: 'Users', params: {realmId: realm.id}}">
+              <b-icon-person /> Nutzer
+            </b-list-group-item>
+            <b-list-group-item :to="{name: 'Groups', params: {realmId: realm.id}}">
+              <b-icon-people /> Gruppen
+            </b-list-group-item>
           </b-list-group>
         </div>
       </div>
       <div class="sidebar-bottom">
         <b-list-group>
-          <b-list-group-item href="#" v-if="$can('add', 'realm')">Bereich hinzufügen</b-list-group-item>
-          <b-list-group-item href="#">Django Adminbereich</b-list-group-item>
-          <b-list-group-item href="#">Konfigurationen</b-list-group-item>
-          <b-list-group-item href="#">Über</b-list-group-item>
+          <b-list-group-item
+            v-if="$can('add', 'realm')"
+            href="#"
+          >
+            Bereich hinzufügen
+          </b-list-group-item>
+          <b-list-group-item href="#">
+            Django Adminbereich
+          </b-list-group-item>
+          <b-list-group-item href="#">
+            Konfigurationen
+          </b-list-group-item>
+          <b-list-group-item href="#">
+            Über
+          </b-list-group-item>
         </b-list-group>
       </div>
     </div>
@@ -41,9 +69,6 @@ export default {
       active: false
     }
   },
-  mounted () {
-    this.$store.dispatch('realms/fetchRealms')
-  },
   computed: {
     realms: function () {
       return this.$store.getters['realms/realms']
@@ -51,6 +76,9 @@ export default {
     realm: function () {
       return this.$store.getters['realm/realm']
     }
+  },
+  mounted () {
+    this.$store.dispatch('realms/fetchRealms')
   }
 }
 </script>

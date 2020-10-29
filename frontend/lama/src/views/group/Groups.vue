@@ -1,30 +1,55 @@
 <template>
   <b-container>
-    <headline title="Gruppen"/>
+    <headline title="Gruppen" />
     <b-row class="mb-0">
-      <b-col cols="12" md="3">
+      <b-col
+        cols="12"
+        md="3"
+      >
         <div class="floating-label-input-group">
           <input
-            class="form-control"
-            v-model="filter"
-            type="search"
             id="table-search-input"
+            v-model="filter"
+            class="form-control"
+            type="search"
             placeholder="Suche"
-          />
-          <label for="table-search-input" class="pr-5">Suche</label>
+          >
+          <label
+            for="table-search-input"
+            class="pr-5"
+          >Suche</label>
           <b-input-group-append>
-            <b-button variant="danger" :disabled="!filter" @click="filter = ''">
-              <b-icon-x/>
+            <b-button
+              variant="danger"
+              :disabled="!filter"
+              @click="filter = ''"
+            >
+              <b-icon-x />
             </b-button>
           </b-input-group-append>
         </div>
       </b-col>
     </b-row>
-    <b-row class="mb-2" align-h="between">
-      <b-col cols="12" md="3" class="mb-2">
-        <b-select v-model="perPage" :options="rowOptions" size="sm"/>
+    <b-row
+      class="mb-2"
+      align-h="between"
+    >
+      <b-col
+        cols="12"
+        md="3"
+        class="mb-2"
+      >
+        <b-select
+          v-model="perPage"
+          :options="rowOptions"
+          size="sm"
+        />
       </b-col>
-      <b-col cols="12" md="3" class="mb-2">
+      <b-col
+        cols="12"
+        md="3"
+        class="mb-2"
+      >
         <b-pagination
           v-if="perPage && (rows - perPage) > 0"
           v-model="currentPage"
@@ -53,7 +78,9 @@
           small
         >
           <template v-slot:cell(name)="data">
-            <router-link :to="{name: 'Group', params: {realmId: realmId, groupDn: data.item.dn}}">{{data.value}}</router-link>
+            <router-link :to="{name: 'Group', params: {realmId: realmId, groupDn: data.item.dn}}">
+              {{ data.value }}
+            </router-link>
           </template>
         </b-table>
       </b-col>
@@ -68,11 +95,6 @@ import Headline from '../../components/utils/Headline'
 export default {
   name: 'Realms',
   components: { Headline },
-  mounted () {
-    const realmId = this.$route.params.realmId
-    this.$store.dispatch('groups/fetchGroups', { realmId: realmId })
-    this.realmId = realmId
-  },
   data () {
     return {
       realmId: -1,
@@ -100,15 +122,20 @@ export default {
       return this.$store.getters['groups/groups'].length
     }
   },
+  watch: {
+    '$route.params.realmId': function (realmId) {
+      this.$store.dispatch('users/fetchGroups', { realmId: realmId })
+    }
+  },
+  mounted () {
+    const realmId = this.$route.params.realmId
+    this.$store.dispatch('groups/fetchGroups', { realmId: realmId })
+    this.realmId = realmId
+  },
   methods: {
     getMemberCount (value, key, item) {
       const preparedString = value.replace(/'/g, '"')
       return JSON.parse(preparedString).length
-    }
-  },
-  watch: {
-    '$route.params.realmId': function (realmId) {
-      this.$store.dispatch('users/fetchGroups', { realmId: realmId })
     }
   }
 }

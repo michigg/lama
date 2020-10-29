@@ -1,11 +1,11 @@
 <template>
   <transition :name="transitionName">
-    <router-view class="child-view"/>
+    <router-view class="child-view" />
   </transition>
 </template>
 <script>
 export default {
-  name: 'router-view-transistion',
+  name: 'RouterViewTransistion',
   data () {
     return {
       transitionName: 'slide-left'

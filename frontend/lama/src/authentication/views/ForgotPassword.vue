@@ -2,23 +2,37 @@
   <div class="forgot-password neo-morph">
     <h1>Passwort zurücksetzen</h1>
     <b-form @submit.prevent="passwordReset">
-      <b-alert v-if="passwordResetError" show variant="danger">{{passwordResetError}}</b-alert>
+      <b-alert
+        v-if="passwordResetError"
+        show
+        variant="danger"
+      >
+        {{ passwordResetError }}
+      </b-alert>
       <div class="floating-label-input-group">
         <input
           id="forgot-password-input"
-          class="form-control"
           v-model="form.email"
+          class="form-control"
           type="text"
           required
           autofocus
           tabindex="1"
           placeholder="E-Mail-Adresse"
-        />
+        >
         <label for="forgot-password-input">E-Mail-Adresse</label>
       </div>
-      <b-button type="submit" variant="success" class="w-75">Zurücksetzen</b-button>
+      <b-button
+        type="submit"
+        variant="success"
+        class="w-75"
+      >
+        Zurücksetzen
+      </b-button>
     </b-form>
-    <router-link :to="{name: 'Login'}">Zurück zum Login</router-link>
+    <router-link :to="{name: 'Login'}">
+      Zurück zum Login
+    </router-link>
   </div>
 </template>
 

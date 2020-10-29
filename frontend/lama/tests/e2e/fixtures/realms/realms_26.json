@@ -1,0 +1,319 @@
+{
+  "count": 26,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "realm": {
+        "id": 26,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 25,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 24,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 23,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 22,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 21,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 20,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 19,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 18,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 17,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 16,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 15,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 14,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 13,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 12,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 11,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 10,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 9,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 8,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 7,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 6,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 5,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 4,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 3,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 2,
+        "name": "SOWI",
+        "email": "",
+        "ldap_base_dn": "ou=sowi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 1,
+        "name": "WIAI",
+        "email": "test@root.de",
+        "ldap_base_dn": "ou=wiai,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 1,
+      "group_count": 1
+    }
+  ]
+}

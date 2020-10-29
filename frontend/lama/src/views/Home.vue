@@ -1,7 +1,12 @@
 <template>
   <div class="home">
-    <div v-for="rule in rules" :key="rule.description">
-      <b-list-group-item v-if="$can(rule.action, rule.subject)">{{rule.description}}</b-list-group-item>
+    <div
+      v-for="rule in rules"
+      :key="rule.description"
+    >
+      <b-list-group-item v-if="$can(rule.action, rule.subject)">
+        {{ rule.description }}
+      </b-list-group-item>
     </div>
   </div>
 </template>

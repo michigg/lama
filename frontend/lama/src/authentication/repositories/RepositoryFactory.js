@@ -7,7 +7,7 @@ const repositories = {
   realms: RealmsRepository,
   realm: RealmRepository
 }
-
-export const RepositoryFactory = {
+const RepositoryFactory = {
   get: name => repositories[name]
 }
+export { RepositoryFactory }

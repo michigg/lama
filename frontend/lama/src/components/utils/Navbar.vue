@@ -1,5 +1,10 @@
 <template>
-  <b-navbar toggleable="lg" type="light" variant="light" class="fixed-top content">
+  <b-navbar
+    toggleable="lg"
+    type="light"
+    variant="light"
+    class="fixed-top content"
+  >
     <b-navbar-brand to="/">
       <img
         src="../../assets/logo.svg"
@@ -10,19 +15,24 @@
       >
       Lama
     </b-navbar-brand>
-    <b-collapse id="nav-text-collapse" is-nav>
+    <b-collapse
+      id="nav-text-collapse"
+      is-nav
+    >
       <b-navbar-nav>
-        <b-nav-item to="/about">About</b-nav-item>
+        <b-nav-item to="/about">
+          About
+        </b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <auth-nav-module/>
+        <auth-nav-module />
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
 </template>
 
 <script>
-import AuthNavModule from './AuthNavModule'
+import AuthNavModule from '../../authentication/components/AuthNavModule'
 
 export default {
   name: 'Navbar',

@@ -2,35 +2,47 @@
   <div class="login neo-morph">
     <h1>Login</h1>
     <b-form @submit.prevent="login">
-          <b-alert v-if="loginError" show variant="danger">{{loginError}}</b-alert>
-          <div class="floating-label-input-group">
-            <input
-              id="login-username-input"
-              class="form-control"
-              v-model="form.username"
-              type="text"
-              required
-              autofocus
-              tabindex="1"
-              placeholder="Benutzername"
-            />
-            <label for="login-username-input">Benutzername</label>
-          </div>
-          <div class="floating-label-input-group">
-            <input
-              id="login-password-input"
-              class="form-control"
-              v-model="form.password"
-              type="password"
-              required
-              autofocus
-              tabindex="2"
-              placeholder="Passwort"
-            />
-            <label for="login-password-input">Passwort</label>
-          </div>
-          <b-button type="submit" variant="success" class="w-75">Anmelden</b-button>
-        </b-form>
+      <b-alert
+        v-if="loginError"
+        show
+        variant="danger"
+      >
+        {{ loginError }}
+      </b-alert>
+      <div class="floating-label-input-group">
+        <input
+          id="login-username-input"
+          v-model="form.username"
+          class="form-control"
+          type="text"
+          required
+          autofocus
+          tabindex="1"
+          placeholder="Benutzername"
+        >
+        <label for="login-username-input">Benutzername</label>
+      </div>
+      <div class="floating-label-input-group">
+        <input
+          id="login-password-input"
+          v-model="form.password"
+          class="form-control"
+          type="password"
+          required
+          autofocus
+          tabindex="2"
+          placeholder="Passwort"
+        >
+        <label for="login-password-input">Passwort</label>
+      </div>
+      <b-button
+        type="submit"
+        variant="success"
+        class="w-75"
+      >
+        Anmelden
+      </b-button>
+    </b-form>
   </div>
 </template>
 

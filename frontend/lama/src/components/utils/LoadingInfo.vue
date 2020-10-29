@@ -1,5 +1,5 @@
 <template>
-<b-spinner></b-spinner>
+  <b-spinner />
 </template>
 
 <script>

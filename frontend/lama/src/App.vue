@@ -1,11 +1,11 @@
 <template>
   <div id="app">
-    <navbar/>
+    <navbar />
     <div v-if="isLoggedIn">
-      <admin-base-page/>
+      <admin-base-page />
     </div>
     <div v-else>
-      <user-base-page/>
+      <user-base-page />
     </div>
 
     <footer class="footer bg-dark">

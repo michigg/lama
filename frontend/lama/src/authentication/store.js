@@ -2,8 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import router from '../router'
 import { Ability } from '@casl/ability'
-import { RepositoryFactory } from '@/authentication/repositories/RepositoryFactory'
-
+import { RepositoryFactory } from './repositories/RepositoryFactory'
+console.log(RepositoryFactory)
 const AuthenticationRepository = RepositoryFactory.get('authentication')
 
 Vue.use(Vuex)

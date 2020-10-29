@@ -1,34 +1,53 @@
 <template>
   <b-container v-if="!loading">
-    <headline :title="`Bereich ${realm.name}`"/>
+    <headline :title="`Bereich ${realm.name}`" />
     <small>
-      <a v-if="$can('delete', 'Realm')" href="#" class="h5 realm-delete-link">
-        <b-icon-trash-fill/>
+      <a
+        v-if="$can('delete', 'Realm')"
+        href="#"
+        class="h5 realm-delete-link"
+      >
+        <b-icon-trash-fill />
         <span class="d-none d-md-inline-block">Bereich löschen</span></a>
     </small>
-    <b-row v-if="!isEditMode" class="neo-morph">
+    <b-row
+      v-if="!isEditMode"
+      class="neo-morph"
+    >
       <b-col>
-        <realm-detail :realm="realm"/>
+        <realm-detail :realm="realm" />
         <div class="d-flex mt-3">
-          <button v-if="$can('change', 'Realm')" @click="isEditMode = !isEditMode" href="#" class="btn btn-primary mr-auto p-2">
+          <button
+            v-if="$can('change', 'Realm')"
+            href="#"
+            class="btn btn-primary mr-auto p-2"
+            @click="isEditMode = !isEditMode"
+          >
             Bereichsinformationen anpassen
           </button>
-          <a v-if="realm.email && $can('change', 'Realm')" href="#" class="btn btn-secondary p-2">
+          <a
+            v-if="realm.email && $can('change', 'Realm')"
+            href="#"
+            class="btn btn-secondary p-2"
+          >
             Test Mail
           </a>
         </div>
       </b-col>
     </b-row>
-    <b-row v-else class="neo-morph">
+    <b-row
+      v-else
+      class="neo-morph"
+    >
       <b-col>
-       <update-realm :realm="realm"></update-realm>
+        <update-realm :realm="realm" />
       </b-col>
     </b-row>
   </b-container>
   <b-container v-else>
     <b-row>
       <b-col>
-        <loading-info/>
+        <loading-info />
       </b-col>
     </b-row>
   </b-container>
@@ -54,10 +73,6 @@ export default {
       isEditMode: false
     }
   },
-  mounted () {
-    const realmId = this.$route.params.realmId
-    this.$store.dispatch('realm/fetchRealm', { realmId: realmId })
-  },
   computed: {
     realm: function () {
       return this.$store.getters['realm/realm']
@@ -70,6 +85,10 @@ export default {
     '$route.params.realmId': function (realmId) {
       this.$store.dispatch('realm/fetchRealm', { realmId: realmId })
     }
+  },
+  mounted () {
+    const realmId = this.$route.params.realmId
+    this.$store.dispatch('realm/fetchRealm', { realmId: realmId })
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <h1 class="neo-morph">{{title}}</h1>
+  <h1>{{ title }}</h1>
 </template>
 
 <script>
