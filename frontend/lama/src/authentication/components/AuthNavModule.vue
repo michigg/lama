@@ -1,6 +1,6 @@
 <template>
   <b-nav-item
-    v-if="this.isLoggedIn"
+    v-if="isLoggedIn"
     @click="logout"
   >
     Logout
@@ -14,19 +14,15 @@
 </template>
 
 <script>
-import { RepositoryFactory } from '../repositories/RepositoryFactory'
-console.log(RepositoryFactory)
-// const AuthenticationRepository = RepositoryFactory.get('authentication')
+import RepositoryFactory from '../repositories/RepositoryFactory'
+
+const AuthenticationRepository = RepositoryFactory.get('authentication')
 
 export default {
   name: 'AuthNavModule',
-  props: {
-    msg: String
-  },
   computed: {
     isLoggedIn: function () {
-      // return AuthenticationRepository.isLoggedIn()
-      return true
+      return AuthenticationRepository.isLoggedIn()
     }
   },
   created: function () {

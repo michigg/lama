@@ -1,33 +1,40 @@
-import axios from 'axios'
 import jwtDecode from 'jwt-decode'
-import AxiosExtraUtils from '../services/axios'
 import AuthTokenService from '../clients/tokenClient'
-import { ability } from '../store'
+import { Ability } from '@casl/ability'
 import { AuthenticationEnpoint } from '../api/lama'
 import { AuthReposioryException } from '../exceptions/repository'
+import httpClient from '@/authentication/clients/httpClient'
 
-export default {
+class AuthRepository {
+  constructor () {
+    this.ability = new Ability()
+    this.httpClient = httpClient
+  }
+
   async isLoggedIn () {
     return !!AuthTokenService.getAccessToken()
-  },
+  }
+
   async fetchLocalUser () {
     const token = AuthTokenService.getAccessToken()
     if (token) {
       const decodedToken = jwtDecode(token)
-      this.initializeAuthenticationComponents(decodedToken)
+      await this.initializeAuthenticationComponents(decodedToken)
       return decodedToken.user
     } else {
       return {}
     }
-  },
-  initializeAuthenticationComponents: function (decodedToken) {
-    AxiosExtraUtils.setRequestInterceptor()
-    AxiosExtraUtils.setResponseInterceptor(AuthenticationEnpoint.RefreshToken)
-    ability.update(decodedToken.user.rules)
-  },
+  }
+
+  initializeAuthenticationComponents (decodedToken) {
+    this.httpClient.setRequestInterceptor()
+    this.httpClient.setResponseInterceptor(AuthenticationEnpoint.RefreshToken)
+    this.ability.update(decodedToken.user.rules)
+  }
+
   async login (username, password) {
     try {
-      const response = await axios.post(AuthenticationEnpoint.Token, {
+      const response = await httpClient.client.post(AuthenticationEnpoint.Token, {
         username: username,
         password: password
       })
@@ -52,28 +59,39 @@ export default {
         }
       }
     }
-  },
+  }
+
   async logout () {
-    delete axios.headers.common.Authorization
+    this.httpClient.clearAuthorizationHeader()
     AuthTokenService.clearToken()
-    ability.update([])
-  },
+    this.ability.update([])
+  }
+
   async resetPassword (email) {
-    await axios.post(AuthenticationEnpoint.Token, { email: email })
-  },
+    await httpClient.client.post(AuthenticationEnpoint.Token, { email: email })
+  }
+
   async resetPasswordConfirm (uid, token, newPassword) {
-    const response = await axios.post(AuthenticationEnpoint.Token, {
+    const response = await httpClient.client.post(AuthenticationEnpoint.Token, {
       uid: uid,
       token: token,
       newPassword: newPassword
     })
     return response
-  },
+  }
+
   async changePassword (password, newPassword) {
-    const response = await axios.post(AuthenticationEnpoint.Token, {
+    const response = await httpClient.client.post(AuthenticationEnpoint.Token, {
       password: password,
       newPassword: newPassword
     })
     return response
   }
+
+  getAbility () {
+    return this.ability
+  }
 }
+
+const authRepository = new AuthRepository()
+export default authRepository

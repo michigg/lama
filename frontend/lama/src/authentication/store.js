@@ -1,23 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import router from '../router'
-import { Ability } from '@casl/ability'
-import { RepositoryFactory } from './repositories/RepositoryFactory'
-console.log(RepositoryFactory)
+
+import RepositoryFactory from './repositories/RepositoryFactory'
+
 const AuthenticationRepository = RepositoryFactory.get('authentication')
 
 Vue.use(Vuex)
-
-export const ability = new Ability()
-
-export const abilityPlugin = (store) => {
-  ability.update(store.state.authentication.user.rules)
-  return store.subscribe((mutation) => {
-    if (mutation.type === 'SET_USER') {
-      ability.update(mutation.payload.rules)
-    }
-  })
-}
 
 export const store = {
   namespaced: true,
@@ -30,7 +19,6 @@ export const store = {
       email: ''
     }
   },
-  plugins: [abilityPlugin],
   mutations: {
     SET_USER (state, { username, email, rules }) {
       state.user.username = username

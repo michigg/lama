@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { RepositoryFactory } from '@/authentication/repositories/RepositoryFactory'
+import RepositoryFactory from '@/authentication/repositories/RepositoryFactory'
 
 const RealmsRepository = RepositoryFactory.get('realms')
 

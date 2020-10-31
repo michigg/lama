@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { ability } from '@/authentication/store'
 import Realm from '@/realms/views/Realm'
 import Realms from '../realms/views/Realms'
 import PermissionDenied from '@/views/PermissionDenied'
@@ -10,7 +9,7 @@ import User from '@/views/user/User'
 import Group from '@/views/group/Group'
 import authenticationRoutes from '@/authentication/routes'
 import CreateRealm from '@/realms/views/CreateRealm'
-import { RepositoryFactory } from '@/authentication/repositories/RepositoryFactory'
+import RepositoryFactory from '@/authentication/repositories/RepositoryFactory'
 
 const AuthenticationRepository = RepositoryFactory.get('authentication')
 
@@ -121,7 +120,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const canNavigate = to.matched.some(route => {
     if ('action' in route.meta && 'resource' in route.meta) {
-      return ability.can(route.meta.action, route.meta.resource)
+      return AuthenticationRepository.getAbility().can(route.meta.action, route.meta.resource)
     } else {
       return true
     }

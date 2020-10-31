@@ -2,12 +2,20 @@ import AuthRepository from '@/authentication/repositories/authRepository'
 import RealmsRepository from '@/realms/repositories/realmsRepository'
 import RealmRepository from '@/realms/repositories/realmRepository'
 
-const repositories = {
-  authentication: AuthRepository,
-  realms: RealmsRepository,
-  realm: RealmRepository
+class RepositoryFactory {
+  constructor () {
+    this.repositoryMap = {
+      authentication: AuthRepository,
+      realm: RealmRepository,
+      realms: RealmsRepository
+    }
+  }
+
+  get (id) {
+    return this.repositoryMap[id]
+  }
 }
-const RepositoryFactory = {
-  get: name => repositories[name]
-}
-export { RepositoryFactory }
+
+const instance = new RepositoryFactory()
+Object.freeze(instance)
+export default instance

@@ -6,25 +6,22 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import Axios from 'axios'
 import VueAxios from 'vue-axios'
 import { abilitiesPlugin, Can } from '@casl/vue'
-import { ability } from '@/authentication/store'
+import RepositoryFactory from '@/authentication/repositories/RepositoryFactory'
+
+const AuthenticationRepository = RepositoryFactory.get('authentication')
+AuthenticationRepository.httpClient.tokenInvalidProcedureFunction = router.push({ name: 'Login' })
 
 Vue.config.productionTip = false
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(VueAxios, Axios)
-Vue.use(abilitiesPlugin, ability)
+Vue.use(abilitiesPlugin, AuthenticationRepository.getAbility())
 Vue.component('Can', Can)
 
 if (window.Cypress) {
   // only available during E2E tests
   window.__store__ = store
-}
-
-// TODO: use repository
-const token = localStorage.getItem('token')
-if (token) {
-  Vue.axios.defaults.headers.common.Authorization = token
 }
 
 const getRuntimeConfig = async () => {

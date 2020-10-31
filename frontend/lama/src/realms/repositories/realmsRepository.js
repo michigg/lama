@@ -1,11 +1,11 @@
-import axios from 'axios'
 import { RealmEndpoint } from '@/realms/api/lama'
 import { RealmReposioryException } from '@/realms/exceptions/repository'
+import httpClient from '@/authentication/clients/httpClient'
 
 export default {
   async getRealms () {
     try {
-      const response = await axios.get(RealmEndpoint.Realms)
+      const response = await httpClient.client.get(RealmEndpoint.Realms)
       return response.data.results
     } catch (error) {
       throw new RealmReposioryException(error.message)
@@ -13,7 +13,7 @@ export default {
   },
   async addRealm (name, ldapBaseDn) {
     try {
-      const response = await axios.post(RealmEndpoint.Realms, {
+      const response = await httpClient.client.post(RealmEndpoint.Realms, {
         name: name,
         ldap_base_dn: ldapBaseDn
       })
