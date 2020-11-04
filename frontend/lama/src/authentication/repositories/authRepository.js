@@ -8,8 +8,10 @@ class AuthRepository {
   #httpClient
   #tokenClient
   #user
+  #ability
 
   constructor () {
+    this.#ability = new Ability([])
     this.#user = this.getEmptyUser()
     this.#httpClient = httpClient
     this.#tokenClient = authTokenClient
@@ -56,7 +58,8 @@ class AuthRepository {
       refreshToken
     })
     this.#httpClient.setAuthorizationHeader(token.accessToken)
-    this.#user = new User(token.user.username, token.user.email, new Ability(token.user.rules), token.sessionExpirationTime)
+    this.#ability.update(token.user.rules)
+    this.#user = new User(token.user.username, token.user.email, this.#ability, token.sessionExpirationTime)
     return this.#user
   }
 
@@ -76,11 +79,11 @@ class AuthRepository {
   }
 
   getAbility () {
-    return !this.#user.isEmpty() ? this.#user.ability : new Ability([])
+    return this.#ability
   }
 
   getEmptyUser () {
-    return new User(null, null, new Ability([]), new Date())
+    return new User(null, null, this.#ability, new Date())
   }
 }
 

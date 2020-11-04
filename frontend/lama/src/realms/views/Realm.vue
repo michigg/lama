@@ -12,7 +12,6 @@
     </small>
     <b-row
       v-if="!isEditMode"
-      class="neo-morph"
     >
       <b-col>
         <realm-detail :realm="realm" />
