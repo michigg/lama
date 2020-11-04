@@ -17,7 +17,6 @@ export default {
   name: 'Home',
   computed: {
     rules: function () {
-      console.log('Rules', this.$store.getters['authentication/rules'])
       return this.$store.getters['authentication/rules']
     }
   }

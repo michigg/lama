@@ -12,10 +12,8 @@ class AuthTokenClient {
   }
 
   async saveToken ({ accessToken, refreshToken }) {
-    if (accessToken) {
-      localStorage.setItem(this.#accessTokenKey, accessToken)
-      localStorage.setItem(this.#refreshTokenKey, refreshToken)
-    }
+    localStorage.setItem(this.#accessTokenKey, accessToken)
+    localStorage.setItem(this.#refreshTokenKey, refreshToken)
     this.#token = await this.getToken()
     return this.#token
   }
@@ -28,7 +26,7 @@ class AuthTokenClient {
 
   async getToken () {
     if (this.#token.isEmpty()) {
-      await this.loadToken
+      this.#token = await this.loadToken()
     }
     return this.#token
   }
@@ -36,7 +34,7 @@ class AuthTokenClient {
   async loadToken () {
     const accessToken = localStorage.getItem(this.#accessTokenKey)
     const refreshToken = localStorage.getItem(this.#refreshTokenKey)
-    if (accessToken) {
+    if (accessToken && refreshToken) {
       try {
         const decodedToken = await jwtDecode(accessToken)
         return new Token(accessToken, refreshToken, decodedToken.user, new Date(decodedToken.exp))

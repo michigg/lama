@@ -40,7 +40,7 @@ export const store = {
     },
     async loadUser ({ commit, state }) {
       const user = await AuthenticationRepository.loadUser()
-      if (user) {
+      if (!user.isEmpty()) {
         commit('SET_USER', user)
       } else if (!state.user.username) {
         commit('INIT_USER')

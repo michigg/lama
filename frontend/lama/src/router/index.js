@@ -116,8 +116,6 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
-  // eslint-disable-next-line no-console
-  console.log('Router User', store.getters['authentication/user'].username)
   const canNavigate = to.matched.some(route => {
     if ('action' in route.meta && 'resource' in route.meta) {
       const ability = store.getters['authentication/user'].ability
@@ -127,11 +125,7 @@ router.beforeEach((to, from, next) => {
     }
   })
   const authRequired = to.matched.some(record => record.meta.requiresAuth)
-  // eslint-disable-next-line no-console
-  console.log('Router  is logged in ', store.getters['authentication/isLoggedIn'])
   if (authRequired && !store.getters['authentication/isLoggedIn']) {
-    // eslint-disable-next-line no-console
-    console.log('Router', 'not Logged in')
     next({
       path: '/login',
       query: { redirect: to.path }
@@ -139,8 +133,6 @@ router.beforeEach((to, from, next) => {
     return
   }
   if (!canNavigate) {
-    // eslint-disable-next-line no-console
-    console.log('Router', 'no permission')
     next({ path: '/permission-denied' })
     return
   }

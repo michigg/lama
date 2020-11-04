@@ -63,8 +63,6 @@
 <script>
 // @ is an alias to /src
 
-import { Ability } from '@casl/ability'
-
 export default {
   name: 'Login',
   data () {
@@ -87,20 +85,15 @@ export default {
       this.error = ''
       this.loading = true
       try {
-        // await this.$store.dispatch('authentication/login', {
-        //   username: this.form.username,
-        //   password: this.form.password
-        // })
-        this.$store.commit('authentication/SET_USER', {
-          username: 'admin',
-          email: 'test@example.com',
-          ability: new Ability([])
+        await this.$store.dispatch('authentication/login', {
+          username: this.form.username,
+          password: this.form.password
         })
-        // if (this.$route.query.redirect) {
-        //   await this.$router.push({ path: this.$route.query.redirect })
-        // } else {
-        //   await this.$router.push({ name: 'Home' })
-        // }
+        if (this.$route.query.redirect) {
+          await this.$router.push({ path: this.$route.query.redirect })
+        } else {
+          await this.$router.push({ name: 'Home' })
+        }
       } catch (error) {
         this.error = error.message
       } finally {

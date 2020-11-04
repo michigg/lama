@@ -5,7 +5,6 @@ import httpClient from '@/authentication/clients/httpClient'
 import { authTokenClient } from '../clients/tokenClient'
 
 class AuthRepository {
-  #ability
   #httpClient
   #tokenClient
   #user
@@ -47,7 +46,6 @@ class AuthRepository {
         })
       }
       this.#user = this.getEmptyUser()
-      return null
     }
     return this.#user
   }
@@ -78,7 +76,7 @@ class AuthRepository {
   }
 
   getAbility () {
-    return !this.#user.isEmpty() ? new Ability([]) : this.#user.ability
+    return !this.#user.isEmpty() ? this.#user.ability : new Ability([])
   }
 
   getEmptyUser () {
@@ -95,7 +93,7 @@ export class User {
   }
 
   isEmpty () {
-    return !!this.username
+    return !this.username
   }
 }
 
