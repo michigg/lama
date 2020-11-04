@@ -5,7 +5,7 @@
       :class="{ active: active }"
       @click="active = !active"
     >
-      <b-icon-layers />
+      <b-icon-layers/>
     </button>
     <div
       class="sidebar dynamic-sidebar border-right shadow"
@@ -26,14 +26,20 @@
         </b-list-group>
         <div v-if="realm">
           <p class="h4 p-2 mb-0">
-            Bereich
+            Bereich {{ realm.name }}
           </p>
           <b-list-group>
+            <b-list-group-item :to="{name: 'Realm', params: {realmId: realm.id}}">
+              <b-icon-gear/>
+              Einstellungen
+            </b-list-group-item>
             <b-list-group-item :to="{name: 'Users', params: {realmId: realm.id}}">
-              <b-icon-person /> Nutzer
+              <b-icon-person/>
+              Nutzer
             </b-list-group-item>
             <b-list-group-item :to="{name: 'Groups', params: {realmId: realm.id}}">
-              <b-icon-people /> Gruppen
+              <b-icon-people/>
+              Gruppen
             </b-list-group-item>
           </b-list-group>
         </div>
@@ -78,86 +84,87 @@ export default {
     }
   },
   mounted () {
-    // this.$store.dispatch('realms/fetchRealms')
+    this.$store.dispatch('realms/fetchRealms')
   }
 }
 </script>
 
-<style scoped>
-  .sidebar-activation-button {
-    display: block;
-    width: 50px;
-    margin-top: var(--nav-height) !important;
-    left: 0;
-    border-radius: 0 !important;
-    -webkit-transition: margin .25s ease-out;
-    -moz-transition: margin .25s ease-out;
-    -o-transition: margin .25s ease-out;
-    transition: margin .25s ease-out;
-  }
+<style lang="scss" scoped>
+@import "src/assets/styles/variables";
 
-  .sidebar {
-    display: -ms-flexbox !important;
-    display: -webkit-box !important;
-    display: flex !important;
-    -ms-flex-direction: column !important;
-    -webkit-box-orient: vertical !important;
-    -webkit-box-direction: normal !important;
-    flex-direction: column !important;
-    top: var(--nav-height);
-    min-height: calc(100vh - var(--nav-height) - var(--footer-height));
-    width: var(--admin-bar-width);
-    position: fixed;
-    left: 0;
-    z-index: 8000;
-    background-color: var(--sidbar-background-color);
-  }
+.sidebar-activation-button {
+  display: block;
+  width: 50px;
+  margin-top: var(--nav-height) !important;
+  left: 0;
+  border-radius: 0 !important;
+  -webkit-transition: margin .25s ease-out;
+  -moz-transition: margin .25s ease-out;
+  -o-transition: margin .25s ease-out;
+  transition: margin .25s ease-out;
 
-  .dynamic-sidebar {
-    margin-left: calc(0rem - var(--admin-bar-width));
-    -webkit-transition: margin .25s ease-out;
-    -moz-transition: margin .25s ease-out;
-    -o-transition: margin .25s ease-out;
-    transition: margin .25s ease-out;
-  }
-
-  .active.dynamic-sidebar {
-    margin-left: 0;
-  }
-
-  .active.sidebar-activation-button {
+  &.active {
     display: block;
     margin-left: calc(var(--admin-bar-width));
   }
+}
 
-  @media (min-width: 768px) {
-    .dynamic-sidebar {
-      margin-left: 0;
+.dynamic-sidebar {
+  margin-left: calc(0rem - var(--admin-bar-width));
+  -webkit-transition: margin .25s ease-out;
+  -moz-transition: margin .25s ease-out;
+  -o-transition: margin .25s ease-out;
+  transition: margin .25s ease-out;
+
+  &.active {
+    margin-left: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .dynamic-sidebar {
+    margin-left: 0;
+  }
+
+  .sidebar-activation-button {
+    display: none !important;
+  }
+}
+
+.sidebar {
+  display: -ms-flexbox !important;
+  display: -webkit-box !important;
+  display: flex !important;
+  -ms-flex-direction: column !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-box-direction: normal !important;
+  flex-direction: column !important;
+  top: var(--nav-height);
+  min-height: calc(100vh - var(--nav-height) - var(--footer-height));
+  width: var(--admin-bar-width);
+  position: fixed;
+  left: 0;
+  z-index: 8000;
+  background-color: $body-bg;
+
+  .list-group-item {
+    border-right: 0;
+    text-align: left;
+    background-color: $body-bg;
+
+    &:first-child {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
     }
 
-    .sidebar-activation-button {
-      display: none !important;
+    &:last-child {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
     }
   }
 
   .sidebar-bottom {
     margin-top: auto !important;
   }
-
-  .list-group-item:first-child {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-
-  .list-group-item:last-child {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .list-group-item {
-    border-right: 0;
-    text-align: left;
-    background-color: var(--sidbar-background-color);
-  }
-
+}
 </style>
