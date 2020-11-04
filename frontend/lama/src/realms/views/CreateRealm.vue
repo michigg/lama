@@ -57,8 +57,8 @@
 // @ is an alias to /src
 import Headline from '../../components/utils/Headline'
 import LoadingInfo from '../../components/utils/LoadingInfo'
-import RealmDetail from '../../components/realm/RealmDetail'
-import UpdateRealm from '../../components/realm/UpdateRealm'
+import RealmDetail from '../components/RealmDetail'
+import UpdateRealm from '../components/UpdateRealm'
 
 export default {
   name: 'Realm',
