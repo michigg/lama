@@ -21,28 +21,28 @@ export default {
 }
 </script>
 <style>
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .75s ease;
-}
+/*.fade-enter-active, .fade-leave-active {*/
+/*  transition: opacity .75s ease;*/
+/*}*/
 
-.fade-enter, .fade-leave-active {
-  opacity: 0;
-}
+/*.fade-enter, .fade-leave-active {*/
+/*  opacity: 0;*/
+/*}*/
 
-.child-view {
-  position: absolute;
-  transition: all .75s cubic-bezier(.55, 0, .1, 1);
-}
+/*.child-view {*/
+/*  position: absolute;*/
+/*  transition: all .75s cubic-bezier(.55, 0, .1, 1);*/
+/*}*/
 
-.slide-left-enter, .slide-right-leave-active {
-  opacity: 0;
-  -webkit-transform: translate(50%, 0);
-  transform: translate(250%, 0);
-}
+/*.slide-left-enter, .slide-right-leave-active {*/
+/*  opacity: 0;*/
+/*  -webkit-transform: translate(50%, 0);*/
+/*  transform: translate(250%, 0);*/
+/*}*/
 
-.slide-left-leave-active, .slide-right-enter {
-  opacity: 0;
-  -webkit-transform: translate(-50%, 0);
-  transform: translate(-250%, 0);
-}
+/*.slide-left-leave-active, .slide-right-enter {*/
+/*  opacity: 0;*/
+/*  -webkit-transform: translate(-50%, 0);*/
+/*  transform: translate(-250%, 0);*/
+/*}*/
 </style>

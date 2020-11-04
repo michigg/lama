@@ -1,10 +1,6 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
 import RepositoryFactory from '@/authentication/repositories/RepositoryFactory'
 
 const RealmRepository = RepositoryFactory.get('realm')
-
-Vue.use(Vuex)
 
 export const realm = {
   namespaced: true,

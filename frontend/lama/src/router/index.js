@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '@/store/index'
 import Realm from '@/realms/views/Realm'
 import Realms from '../realms/views/Realms'
 import PermissionDenied from '@/views/PermissionDenied'
@@ -9,9 +10,6 @@ import User from '@/views/user/User'
 import Group from '@/views/group/Group'
 import authenticationRoutes from '@/authentication/routes'
 import CreateRealm from '@/realms/views/CreateRealm'
-import RepositoryFactory from '@/authentication/repositories/RepositoryFactory'
-
-const AuthenticationRepository = RepositoryFactory.get('authentication')
 
 Vue.use(VueRouter)
 
@@ -118,16 +116,22 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
+  // eslint-disable-next-line no-console
+  console.log('Router User', store.getters['authentication/user'].username)
   const canNavigate = to.matched.some(route => {
     if ('action' in route.meta && 'resource' in route.meta) {
-      return AuthenticationRepository.getAbility().can(route.meta.action, route.meta.resource)
+      const ability = store.getters['authentication/user'].ability
+      return ability.can(route.meta.action, route.meta.resource)
     } else {
       return true
     }
   })
   const authRequired = to.matched.some(record => record.meta.requiresAuth)
-
-  if (authRequired && !AuthenticationRepository.isLoggedIn()) {
+  // eslint-disable-next-line no-console
+  console.log('Router  is logged in ', store.getters['authentication/isLoggedIn'])
+  if (authRequired && !store.getters['authentication/isLoggedIn']) {
+    // eslint-disable-next-line no-console
+    console.log('Router', 'not Logged in')
     next({
       path: '/login',
       query: { redirect: to.path }
@@ -135,6 +139,8 @@ router.beforeEach((to, from, next) => {
     return
   }
   if (!canNavigate) {
+    // eslint-disable-next-line no-console
+    console.log('Router', 'no permission')
     next({ path: '/permission-denied' })
     return
   }

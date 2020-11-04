@@ -3,11 +3,11 @@
     <h1>Login</h1>
     <b-form @submit.prevent="login">
       <b-alert
-        :show="!!loginError"
+        :show="!!error"
         variant="danger"
         data-test="signin-error"
       >
-        {{ loginError }}
+        {{ error }}
       </b-alert>
       <div
         class="floating-label-input-group"
@@ -63,6 +63,8 @@
 <script>
 // @ is an alias to /src
 
+import { Ability } from '@casl/ability'
+
 export default {
   name: 'Login',
   data () {
@@ -70,7 +72,9 @@ export default {
       form: {
         username: '',
         password: ''
-      }
+      },
+      error: '',
+      loading: false
     }
   },
   computed: {
@@ -79,33 +83,43 @@ export default {
     }
   },
   methods: {
-    login: function () {
-      this.$store.dispatch('authentication/login', {
-        username: this.form.username,
-        password: this.form.password
-      })
-        .then(() => {
-          // if (this.$route.query.redirect) {
-          //   this.$router.push(this.$route.query.redirect)
-          // } else {
-          //   this.$router.push('/')
-          // }
+    async login () {
+      this.error = ''
+      this.loading = true
+      try {
+        // await this.$store.dispatch('authentication/login', {
+        //   username: this.form.username,
+        //   password: this.form.password
+        // })
+        this.$store.commit('authentication/SET_USER', {
+          username: 'admin',
+          email: 'test@example.com',
+          ability: new Ability([])
         })
-        .catch()
+        // if (this.$route.query.redirect) {
+        //   await this.$router.push({ path: this.$route.query.redirect })
+        // } else {
+        //   await this.$router.push({ name: 'Home' })
+        // }
+      } catch (error) {
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
     }
   }
 }
 </script>
 <style lang="scss" scoped>
-  .login {
-    display: flex;
-    flex-flow: column;
-    padding: 2rem;
-    margin: 2rem;
-    transition: all;
+.login {
+  display: flex;
+  flex-flow: column;
+  padding: 2rem;
+  margin: 2rem;
+  transition: all;
 
-    .forgot-password-link {
-      margin-top: 1rem;
-    }
+  .forgot-password-link {
+    margin-top: 1rem;
   }
+}
 </style>

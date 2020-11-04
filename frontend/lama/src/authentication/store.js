@@ -1,8 +1,8 @@
-import Vue from 'vue'
 import Vuex from 'vuex'
-import router from '../router'
-
-import RepositoryFactory from './repositories/RepositoryFactory'
+import Vue from 'vue'
+import router from '@/router'
+import RepositoryFactory from '@/authentication/repositories/RepositoryFactory'
+import { Ability } from '@casl/ability'
 
 const AuthenticationRepository = RepositoryFactory.get('authentication')
 
@@ -11,76 +11,52 @@ Vue.use(Vuex)
 export const store = {
   namespaced: true,
   state: {
-    loading: false,
-    error: '',
     user: {
       username: '',
-      rules: [],
-      email: ''
+      email: '',
+      ability: new Ability([])
     }
   },
+  getters: {
+    user: state => state.user,
+    isLoggedIn: state => !!state.user.username
+  },
   mutations: {
-    SET_USER (state, { username, email, rules }) {
+    SET_USER (state, { username, email, ability }) {
       state.user.username = username
       state.user.email = email
-      state.user.rules = rules
+      state.user.ability = ability
     },
     INIT_USER (state) {
       state.user.username = null
       state.user.email = null
-      state.user.rules = []
-    },
-    AUTH_LOADING (state) {
-      state.error = ''
-      state.loading = true
-    },
-    AUTH_SUCCESS (state) {
-      state.loading = false
-    },
-    AUTH_ERROR (state, { message }) {
-      state.error = message
-      state.loading = false
+      state.user.ability = new Ability([])
     }
   },
   actions: {
-    async login ({ dispatch, commit, rootState }, { username, password }) {
-      commit('AUTH_LOADING')
-      try {
-        const user = await AuthenticationRepository.login(username, password)
+    async login ({ commit }, { username, password }) {
+      const user = await AuthenticationRepository.login(username, password)
+      commit('SET_USER', user)
+    },
+    async loadUser ({ commit, state }) {
+      const user = await AuthenticationRepository.loadUser()
+      if (user) {
         commit('SET_USER', user)
-        commit('AUTH_SUCCESS')
-        await router.push({ name: 'Realms' })
-      } catch (error) {
-        commit('AUTH_ERROR', { message: error.message })
+      } else if (!state.user.username) {
+        commit('INIT_USER')
       }
+    },
+    async loginWithToken ({ commit, dispatch }, token) {
+      const user = await AuthenticationRepository.initializeAuthenticationComponents({
+        access: token.accessToken,
+        refresh: token.refreshToken
+      })
+      commit('SET_USER', user)
     },
     async logout ({ commit }) {
       await AuthenticationRepository.logout()
       commit('INIT_USER')
-    },
-    async resetPassword ({ dispatch, commit, rootState }, { email }) {
-      await AuthenticationRepository.resetPassword(email)
-    },
-    async resetPasswordConfirm ({ dispatch, commit, rootState }, { uid, token, newPassword }) {
-      await AuthenticationRepository.resetPasswordConfirm(uid, token, newPassword)
-    },
-    async changePassword ({ commit, rootState }, { password, newPassword }) {
-      await AuthenticationRepository.changePassword(password, newPassword)
-    },
-    async fetchLocalUser ({ commit }) {
-      commit('AUTH_LOADING')
-      try {
-        const user = await AuthenticationRepository.fetchLocalUser()
-        commit('SET_USER', user)
-        commit('AUTH_SUCCESS')
-      } catch (error) {
-        commit('AUTH_ERROR', { message: error.message })
-      }
+      await router.push({ name: 'Login' })
     }
-  },
-  getters: {
-    userLoading: state => state.loading,
-    loginError: state => state.error,
-    user: state => state.user
   }
 }

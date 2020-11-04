@@ -1,71 +1,101 @@
 import axios from 'axios'
-import AuthTokenService from '../clients/tokenClient'
+import { authTokenClient } from '../clients/tokenClient'
+import { AuthenticationEnpoint } from '@/authentication/api/lama'
 
-// import router from '../../router'
+import store from '@/store/index'
 
 class HttpClient {
   constructor () {
     this.client = axios
-    this.tokenInvalidProcedureFunction = null
-  }
-
-  setRequestInterceptor () {
-    this.client.interceptors.request.use(
-      (config) => {
-        // TODO: implement access token auto refresh
-        const token = AuthTokenService.getAccessToken()
-        if (token) {
-          config.headers.Authorization = `Bearer ${AuthTokenService.getAccessToken()}`
-        }
-        config.headers['Content-Type'] = 'application/json'
-        return config
-      },
-      (error) => {
-        return Promise.reject(error)
-      }
-    )
-  }
-
-  setResponseInterceptor (tokenApiEndpoint) {
-    this.client.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        if (error.response.status !== 401) {
-          return Promise.reject(error)
-        }
-
-        // Logout user if token refresh didn't work or user is disabled
-        if (error.config.url === '/api/token/refresh/' || error.response.data.code === 'token_not_valid') {
-          AuthTokenService.clearToken()
-          if (this.tokenInvalidProcedureFunction) {
-            await this.tokenInvalidProcedureFunction()
-          }
-
-          return Promise.reject(error)
-        }
-        return await this.refreshLogin(error, error.config, tokenApiEndpoint)
-      })
-  }
-
-  async refreshLogin (originalError, originalRequest, tokenApiEndpoint) {
-    originalRequest._retry = true
-    const data = { refresh: AuthTokenService.getRefreshToken() }
-    try {
-      const response = await this.client.post(tokenApiEndpoint, data)
-      if (response.status === 200) {
-        AuthTokenService.setToken(response.data)
-        this.client.defaults.headers.common.Authorization = `Bearer ${AuthTokenService.getAccessToken()}`
-        return this.client(originalRequest)
-      } else {
-        return Promise.reject(originalError)
-      }
-    } catch (error) {
-      return Promise.reject(error)
-    }
+    this.isAlreadyFetchingAccessToken = false
+    this.subscribers = []
+    this.setResponseInterceptor()
+    this.client.defaults.headers['Content-Type'] = 'application/json'
   }
 
   clearAuthorizationHeader () {
     delete this.client.defaults.headers.common.Authorization
+  }
+
+  setAuthorizationHeader (accessToken) {
+    if (accessToken) {
+      this.client.defaults.headers.common.Authorization = `Bearer ${accessToken}`
+    } else {
+      this.clearAuthorizationHeader()
+    }
+  }
+
+  setResponseInterceptor () {
+    this.client.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const errorResponse = error.response
+        if (this.isTokenExpiredError(errorResponse)) {
+          return this.resetTokenAndReattemptRequest(error)
+        }
+        return Promise.reject(error)
+      })
+  }
+
+  isTokenExpiredError (errorResponse) {
+    return errorResponse.data.code === 'token_not_valid'
+  }
+
+  async resetTokenAndReattemptRequest (error) {
+    try {
+      const { response: errorResponse } = error
+      const token = await authTokenClient.getToken().refreshToken
+      if (token.isEmpty()) {
+        // Refresh not possible
+        return Promise.reject(error)
+      }
+      const retryOriginalRequest = new Promise((resolve, reject) => {
+        this.addSubscriber(accessToken => {
+          if (accessToken) {
+            errorResponse.config.headers.Authorization = 'Bearer ' + accessToken
+            resolve(this.client(errorResponse.config))
+          } else {
+            reject(error)
+          }
+        })
+      })
+      if (!this.isAlreadyFetchingAccessToken) {
+        this.isAlreadyFetchingAccessToken = true
+        const data = { refresh: token.refreshToken }
+        const response = await this.client.post(AuthenticationEnpoint.RefreshToken, data)
+        if (!response.data) {
+          return Promise.reject(error)
+        }
+        const newRawToken = response.data
+        this.isAlreadyFetchingAccessToken = false
+        await this.onAccessTokenFetched(newRawToken)
+      }
+      return retryOriginalRequest
+    } catch (error) {
+      await this.onAccessTokenFetchedFailed()
+
+      return Promise.reject(error)
+    }
+  }
+
+  async onAccessTokenFetched (rawToken) {
+    const token = await authTokenClient.saveToken({
+      accessToken: rawToken.access,
+      refreshToken: rawToken.refresh
+    })
+    this.subscribers.forEach(callback => callback(token.accessToken))
+    this.subscribers = []
+    await store.dispatch('authentication/loginWithToken', token)
+  }
+
+  async onAccessTokenFetchedFailed () {
+    this.subscribers.forEach(callback => callback(null))
+    this.subscribers = []
+    await store.dispatch('authentication/logout')
+  }
+
+  addSubscriber (callback) {
+    this.subscribers.push(callback)
   }
 }
 

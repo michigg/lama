@@ -4,14 +4,13 @@ const emptyRealmResponseMessage = 'Ihrem Account scheinen noch keine Bereiche zu
 
 describe('Realm Overview Test', () => {
   beforeEach(() => {
-    cy.login('michigg', '2malDrei')
+    cy.login()
     cy.server()
     cy.fixture('realms/realms_3.json').as('realmsSmall')
     cy.route('GET', '/api/v1/realm/', '@realmsSmall')
-    cy.visit('/realm')
   })
   it('elements exists', () => {
-    cy.visit('realm')
+    cy.visit('/realm')
     cy.getBySel('realms-table').should('exist')
     cy.getBySel('realms-table-search-input').should('exist')
     cy.getBySel('realms-table-search-input-clear-button').should('exist')

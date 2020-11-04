@@ -1,54 +1,30 @@
-import jwtDecode from 'jwt-decode'
-import AuthTokenService from '../clients/tokenClient'
 import { Ability } from '@casl/ability'
 import { AuthenticationEnpoint } from '../api/lama'
 import { AuthReposioryException } from '../exceptions/repository'
 import httpClient from '@/authentication/clients/httpClient'
+import { authTokenClient } from '../clients/tokenClient'
 
 class AuthRepository {
+  #ability
+  #httpClient
+  #tokenClient
+  #user
+
   constructor () {
-    this.ability = new Ability()
-    this.httpClient = httpClient
-  }
-
-  async isLoggedIn () {
-    return !!AuthTokenService.getAccessToken()
-  }
-
-  async fetchLocalUser () {
-    const token = AuthTokenService.getAccessToken()
-    if (token) {
-      const decodedToken = jwtDecode(token)
-      await this.initializeAuthenticationComponents(decodedToken)
-      return decodedToken.user
-    } else {
-      return {}
-    }
-  }
-
-  initializeAuthenticationComponents (decodedToken) {
-    this.httpClient.setRequestInterceptor()
-    this.httpClient.setResponseInterceptor(AuthenticationEnpoint.RefreshToken)
-    this.ability.update(decodedToken.user.rules)
+    this.#user = this.getEmptyUser()
+    this.#httpClient = httpClient
+    this.#tokenClient = authTokenClient
   }
 
   async login (username, password) {
     try {
-      const response = await httpClient.client.post(AuthenticationEnpoint.Token, {
+      const response = await this.#httpClient.client.post(AuthenticationEnpoint.Token, {
         username: username,
         password: password
       })
-      const accessToken = response.data.access
-      const decodedToken = jwtDecode(accessToken)
-      const token = {
-        access: accessToken,
-        refresh: response.data.refresh,
-        expire: decodedToken.exp
-      }
-      AuthTokenService.setToken(token)
-      this.initializeAuthenticationComponents(decodedToken)
-      return decodedToken.user
+      return await this.initializeAuthenticationComponents(response.data)
     } catch (error) {
+      this.#user = this.getEmptyUser()
       if (error.toString() === 'Error: Network Error') {
         throw new AuthReposioryException('Es konnte keine Verbindung zum Server hergestellt werden. Bitte versuchen sie es später noch einmal.')
       } else {
@@ -61,35 +37,65 @@ class AuthRepository {
     }
   }
 
+  async loadUser () {
+    if (this.#user.isEmpty()) {
+      const token = await this.#tokenClient.getToken()
+      if (!token.isEmpty()) {
+        return await this.initializeAuthenticationComponents({
+          access: token.accessToken,
+          refresh: token.refreshToken
+        })
+      }
+      this.#user = this.getEmptyUser()
+      return null
+    }
+    return this.#user
+  }
+
+  async initializeAuthenticationComponents ({ access: accessToken, refresh: refreshToken }) {
+    const token = await this.#tokenClient.saveToken({
+      accessToken,
+      refreshToken
+    })
+    this.#httpClient.setAuthorizationHeader(token.accessToken)
+    this.#user = new User(token.user.username, token.user.email, new Ability(token.user.rules), token.sessionExpirationTime)
+    return this.#user
+  }
+
   async logout () {
-    this.httpClient.clearAuthorizationHeader()
-    AuthTokenService.clearToken()
-    this.ability.update([])
+    await this.clearAuthenticationComponents()
   }
 
-  async resetPassword (email) {
-    await httpClient.client.post(AuthenticationEnpoint.Token, { email: email })
+  async isLoggedIn () {
+    const token = await this.#tokenClient.getToken()
+    return !token.isEmpty()
   }
 
-  async resetPasswordConfirm (uid, token, newPassword) {
-    const response = await httpClient.client.post(AuthenticationEnpoint.Token, {
-      uid: uid,
-      token: token,
-      newPassword: newPassword
-    })
-    return response
-  }
-
-  async changePassword (password, newPassword) {
-    const response = await httpClient.client.post(AuthenticationEnpoint.Token, {
-      password: password,
-      newPassword: newPassword
-    })
-    return response
+  async clearAuthenticationComponents () {
+    this.#httpClient.clearAuthorizationHeader()
+    this.#tokenClient.clearToken()
+    this.#user = this.getEmptyUser()
   }
 
   getAbility () {
-    return this.ability
+    return !this.#user.isEmpty() ? new Ability([]) : this.#user.ability
+  }
+
+  getEmptyUser () {
+    return new User(null, null, new Ability([]), new Date())
+  }
+}
+
+export class User {
+  constructor (username, email, ability, sessionExpirationTime) {
+    this.username = username
+    this.email = email
+    this.ability = ability
+    this.sessionExpirationTime = sessionExpirationTime
+  }
+
+  isEmpty () {
+    return !!this.username
   }
 }
 

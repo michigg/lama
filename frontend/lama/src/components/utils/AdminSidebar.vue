@@ -78,7 +78,7 @@ export default {
     }
   },
   mounted () {
-    this.$store.dispatch('realms/fetchRealms')
+    // this.$store.dispatch('realms/fetchRealms')
   }
 }
 </script>

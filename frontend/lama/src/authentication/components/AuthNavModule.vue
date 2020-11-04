@@ -1,40 +1,33 @@
 <template>
-  <b-nav-item
-    v-if="isLoggedIn"
-    @click="logout"
+  <b-nav-item-dropdown v-if="isLoggedIn"
+                       right
   >
-    Logout
-  </b-nav-item>
+    <!-- Using 'button-content' slot -->
+    <template #button-content>
+      {{ user.username }}
+    </template>
+    <b-dropdown-item :to="{ name: 'Profil' }">Profil</b-dropdown-item>
+    <b-dropdown-item @click="logout">Abmelden</b-dropdown-item>
+  </b-nav-item-dropdown>
   <b-nav-item
     v-else
     :to="{ name: 'Login' }"
   >
-    Login
+    Anmelden
   </b-nav-item>
 </template>
 
 <script>
-import RepositoryFactory from '../repositories/RepositoryFactory'
-
-const AuthenticationRepository = RepositoryFactory.get('authentication')
 
 export default {
   name: 'AuthNavModule',
   computed: {
     isLoggedIn: function () {
-      return AuthenticationRepository.isLoggedIn()
+      return this.$store.getters['authentication/isLoggedIn']
+    },
+    user: function () {
+      return this.$store.getters['authentication/user']
     }
-  },
-  created: function () {
-    // Used in term of an expired Token case
-    this.$http.interceptors.response.use(undefined, function (err) {
-      return new Promise(function () {
-        if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
-          this.$store.dispatch('logout')
-        }
-        throw err
-      })
-    })
   },
   methods: {
     logout: function () {

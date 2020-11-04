@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <admin-sidebar v-if="isLoggedIn" />
+    <admin-sidebar />
     <div class="content">
       <router-view-transistion />
     </div>

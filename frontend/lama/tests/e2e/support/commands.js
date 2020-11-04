@@ -23,22 +23,20 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import { token } from '../fixtures/authentication/token'
+
 Cypress.Commands.add('getBySel', (selector, ...args) => {
   return cy.get(`[data-test=${selector}]`, ...args)
 })
-Cypress.Commands.add('vuex', () =>
-  cy.window().its('app.$store')
-)
-
 Cypress.Commands.add('vuex', () => {
   cy.window().should('have.property', '__store__')
   return cy.window().its('__store__')
 })
 
-Cypress.Commands.add('login', (username, password, rememberUser = false) => {
-  cy.visit('/')
-  cy.vuex().invoke('dispatch', 'authentication/login', {
-    username: username,
-    password: password
+Cypress.Commands.add('login', () => {
+  cy.visit('/login')
+  cy.vuex().invoke('dispatch', 'authentication/loginWithToken', {
+    accessToken: token,
+    refreshToken: token
   })
 })
