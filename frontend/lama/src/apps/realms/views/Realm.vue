@@ -36,7 +36,6 @@
     </b-row>
     <b-row
       v-else
-      class="neo-morph"
     >
       <b-col>
         <update-realm :realm="realm" />

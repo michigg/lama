@@ -1,7 +1,7 @@
 import { Ability } from '@casl/ability'
 import { AuthenticationEnpoint } from '../api/lama'
 import { AuthReposioryException } from '../exceptions/repository'
-import httpClient from '@/authentication/clients/httpClient'
+import httpClient from '@/apps/authentication/clients/httpClient'
 import { authTokenClient } from '../clients/tokenClient'
 
 class AuthRepository {

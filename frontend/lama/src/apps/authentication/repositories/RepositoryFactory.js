@@ -1,6 +1,6 @@
-import AuthRepository from '@/authentication/repositories/authRepository'
-import RealmsRepository from '@/realms/repositories/realmsRepository'
-import RealmRepository from '@/realms/repositories/realmRepository'
+import AuthRepository from '@/apps/authentication/repositories/authRepository'
+import RealmsRepository from '@/apps/realms/repositories/realmsRepository'
+import RealmRepository from '@/apps/realms/repositories/realmRepository'
 
 class RepositoryFactory {
   constructor () {

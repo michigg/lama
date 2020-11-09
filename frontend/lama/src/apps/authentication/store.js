@@ -1,7 +1,7 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
 import router from '@/router'
-import RepositoryFactory from '@/authentication/repositories/RepositoryFactory'
+import RepositoryFactory from '@/apps/authentication/repositories/RepositoryFactory'
 import { Ability } from '@casl/ability'
 
 const AuthenticationRepository = RepositoryFactory.get('authentication')

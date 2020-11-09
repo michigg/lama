@@ -1,8 +1,8 @@
 import axios from 'axios'
-import { authTokenClient } from '../clients/tokenClient'
-import { AuthenticationEnpoint } from '@/authentication/api/lama'
+import { authTokenClient } from './tokenClient'
+import { AuthenticationEnpoint } from '@/apps/authentication/api/lama'
 
-import store from '@/store/index'
+import store from '@/store'
 
 class HttpClient {
   constructor () {

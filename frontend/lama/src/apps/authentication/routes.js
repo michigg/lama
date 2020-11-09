@@ -1,6 +1,6 @@
-import Login from '@/authentication/views/Login'
-import ForgotPassword from '@/authentication/views/ForgotPassword'
-import ForgotPasswordConfirm from '@/authentication/views/ForgotPasswordConfirm'
+import Login from '@/apps/authentication/views/Login'
+import ForgotPassword from '@/apps/authentication/views/ForgotPassword'
+import ForgotPasswordConfirm from '@/apps/authentication/views/ForgotPasswordConfirm'
 
 export default [
   {

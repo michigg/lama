@@ -62,7 +62,7 @@
               v-else
               class="text-warning"
             >Keine zugewiesen</span>
-            <!--              TODO: add user gorup update view link-->
+            <!--              TODO: add users gorup update view link-->
             <a
               v-if="!user.deleted_user && $can('change', 'Ldapuser')"
               href="#"
@@ -87,13 +87,13 @@
           >
             <span>Löschvorgang: {{ user.deleted_user.deletion_date }}</span>
             <span class="float-right">
-              <!--                  TODO: user direkt delete link/action-->
+              <!--                  TODO: users direkt delete link/action-->
               <a
                 v-if="$can('delete', 'Ldapuser')"
                 class="btn btn-danger"
                 href="#"
               >Sofort löschen</a>
-              <!--             TODO: user delete cancel     -->
+              <!--             TODO: users delete cancel     -->
               <a
                 v-if="$can('change', 'Ldapuser')"
                 class="btn btn-outline-dark"
@@ -102,21 +102,21 @@
           </b-list-group-item>
         </b-list-group>
         <div class="d-flex mt-3">
-          <!--          TODO: user update link-->
+          <!--          TODO: users update link-->
           <a
             v-if="!user.deleted_user && $can('change', 'Ldapuser')"
             href="#"
             class="btn btn-primary mr-auto p-2"
           >Nutzer
             bearbeiten</a>
-          <!--TODO: user resend welcome mail-->
+          <!--TODO: users resend welcome mail-->
           <a
             v-if="!user.user.last_login && $can('change', 'Ldapuser')"
             href="#"
             class="btn btn-secondary p-2 mr-2"
           >Wilkommensmail
             erneut senden</a>
-          <!--TODO: user delete confirm link-->
+          <!--TODO: users delete confirm link-->
           <a
             v-if="$can('delete', 'Ldapuser')"
             href="#"
