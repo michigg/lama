@@ -1,4 +1,4 @@
-export const RealmReposioryException = function (message) {
+export const RealmRepositoryException = function (message) {
   this.message = message
   this.name = 'RealmException'
 }

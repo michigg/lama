@@ -1,14 +1,28 @@
-import { RealmEndpoint } from '@/realms/api/lama'
-import { RealmReposioryException } from '@/realms/exceptions/repository'
-import httpClient from '@/authentication/clients/httpClient'
+import { RealmEndpoint } from '@/apps/realms/api/lama'
+import { RealmRepositoryException } from '@/apps/realms/exceptions/repository'
+import httpClient from '@/apps/authentication/clients/httpClient'
+import { Realm } from '@/apps/realms/models/realm'
 
 export default {
   async getRealms () {
     try {
       const response = await httpClient.client.get(RealmEndpoint.Realms)
-      return response.data.results
+      console.log('Realms', response.data.results)
+      const realms = response.data.results.map(rawRealm => {
+        return new Realm(rawRealm.realm.id,
+          rawRealm.realm.name,
+          rawRealm.realm.email,
+          rawRealm.realm.ldap_base_dn,
+          rawRealm.realm.admin_group,
+          rawRealm.realm.default_group,
+          rawRealm.user_count,
+          rawRealm.group_count
+        )
+      })
+      console.log('Realms', realms)
+      return realms
     } catch (error) {
-      throw new RealmReposioryException(error.message)
+      throw new RealmRepositoryException(error.message)
     }
   },
   async addRealm (name, ldapBaseDn) {
@@ -23,7 +37,7 @@ export default {
         ldapBaseDn: data.ldap_base_dn
       }
     } catch (error) {
-      throw new RealmReposioryException(error.message)
+      throw new RealmRepositoryException(error.message)
     }
   }
 }

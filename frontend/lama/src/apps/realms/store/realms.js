@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import RepositoryFactory from '@/authentication/repositories/RepositoryFactory'
+import RepositoryFactory from '@/apps/authentication/repositories/RepositoryFactory'
 
 const RealmsRepository = RepositoryFactory.get('realms')
 
@@ -27,26 +27,28 @@ export const realms = {
     async fetchRealms ({ commit }, user) {
       commit('SET_LOADING_STATE', {
         loading: true,
-        error: false
+        error: null
       })
       try {
         const realms = await RealmsRepository.getRealms()
         commit('SET_REALMS', { realms: realms })
         commit('SET_LOADING_STATE', {
           loading: false,
-          error: false
+          error: null
         })
       } catch (error) {
         // TODO: improve error response
         commit('SET_LOADING_STATE', {
           loading: false,
-          error: true
+          error: error.message
         })
       }
     }
   },
   getters: {
-    realms: state => state.realms
+    realms: state => state.realms,
+    loading: state => state.loading,
+    error: state => state.error
   },
   modules: {}
 }

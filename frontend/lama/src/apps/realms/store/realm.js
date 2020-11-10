@@ -1,4 +1,4 @@
-import RepositoryFactory from '@/authentication/repositories/RepositoryFactory'
+import RepositoryFactory from '@/apps/authentication/repositories/RepositoryFactory'
 
 const RealmRepository = RepositoryFactory.get('realm')
 

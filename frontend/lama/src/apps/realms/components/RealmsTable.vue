@@ -86,21 +86,7 @@
               {{ data.value }}
             </router-link>
           </template>
-          <template v-slot:cell(realm.email)="data">
-            <div
-              v-if="data.value"
-              class="text-center"
-            >
-              <a :href="`mailto:${data.value}`">{{ data.value }}</a>
-            </div>
-            <div
-              v-else
-              class="text-danger text-center"
-            >
-              <b-icon-exclamation-triangle-fill />
-            </div>
-          </template>
-          <template v-slot:cell(realm.admin_group)="data">
+          <template v-slot:cell(adminGroup)="data">
             <div
               v-if="data.value"
               class="text-center"
@@ -114,7 +100,7 @@
               <b-icon-exclamation-triangle-fill />
             </div>
           </template>
-          <template v-slot:cell(realm.default_group)="data">
+          <template v-slot:cell(defaultGroup)="data">
             <div
               v-if="data.value"
               class="text-center"
@@ -173,7 +159,7 @@ export default {
         },
         {
           key: 'adminGroup',
-          abel: 'Admingruppe',
+          label: 'Admingruppe',
           sortable: true
         },
         {

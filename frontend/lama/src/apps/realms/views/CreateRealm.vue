@@ -55,8 +55,8 @@
 
 <script>
 // @ is an alias to /src
-import Headline from '../../components/utils/Headline'
-import LoadingInfo from '../../components/utils/LoadingInfo'
+import Headline from '../../../components/utils/Headline'
+import LoadingInfo from '../../../components/utils/LoadingInfo'
 import RealmDetail from '../components/RealmDetail'
 import UpdateRealm from '../components/UpdateRealm'
 
