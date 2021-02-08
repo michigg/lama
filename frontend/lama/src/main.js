@@ -4,7 +4,7 @@ import store from './store'
 import router from './router'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import { abilitiesPlugin, Can } from '@casl/vue'
-import RepositoryFactory from '@/authentication/repositories/RepositoryFactory'
+import RepositoryFactory from '@/apps/authentication/repositories/RepositoryFactory'
 
 const AuthenticationRepository = RepositoryFactory.get('authentication')
 
@@ -20,7 +20,6 @@ const getRuntimeConfig = async () => {
   return await runtimeConfig.json()
 }
 
-let app
 getRuntimeConfig().then(function (json) {
   store.dispatch('initConfig', { lamaEndpoint: json.LAMA_ENDPOINT })
   if (window.Cypress) {
@@ -28,12 +27,11 @@ getRuntimeConfig().then(function (json) {
     window.__store__ = store
   }
   store.dispatch('authentication/loadUser').then(() => {
-    if (!app) {
-      app = new Vue({
-        router,
-        store,
-        render: h => h(App)
-      }).$mount('#app')
-    }
+    console.log('MAIN: User loaded')
+    new Vue({
+      router,
+      store,
+      render: h => h(App)
+    }).$mount('#app')
   })
 })

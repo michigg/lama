@@ -35,7 +35,7 @@ export const realm = {
       } catch (error) {
         commit('SET_LOADING_STATE', {
           loading: false,
-          error: error.message
+          error: true
         })
       }
     }

@@ -1,18 +1,22 @@
+import Vue from 'vue'
+import Vuex from 'vuex'
 import RepositoryFactory from '@/apps/authentication/repositories/RepositoryFactory'
 
-const RealmRepository = RepositoryFactory.get('realm')
+const RealmsRepository = RepositoryFactory.get('realms')
 
-export const realm = {
+Vue.use(Vuex)
+
+export const realms = {
   namespaced: true,
   state: {
     status: '',
     loading: false,
     error: false,
-    realm: {}
+    realms: []
   },
   mutations: {
-    SET_REALM (state, { realm }) {
-      state.realm = realm
+    SET_REALMS (state, { realms }) {
+      state.realms = realms
     },
     SET_LOADING_STATE (state, { loading, error }) {
       state.loading = loading
@@ -20,28 +24,29 @@ export const realm = {
     }
   },
   actions: {
-    async fetchRealm ({ commit }, { realmId }) {
+    async fetchRealms ({ commit }, user) {
       commit('SET_LOADING_STATE', {
         loading: true,
         error: false
       })
       try {
-        const realm = await RealmRepository.getRealm(realmId)
-        commit('SET_REALM', { realm: realm })
+        const realms = await RealmsRepository.getRealms()
+        commit('SET_REALMS', { realms: realms })
         commit('SET_LOADING_STATE', {
           loading: false,
           error: false
         })
       } catch (error) {
+        // TODO: improve error response
         commit('SET_LOADING_STATE', {
           loading: false,
-          error: error.message
+          error: true
         })
       }
     }
   },
   getters: {
-    realm: state => state.realm,
-    loading: state => state.loading
-  }
+    realms: state => state.realms
+  },
+  modules: {}
 }

@@ -81,8 +81,8 @@
           small
           data-test="realms-table"
         >
-          <template v-slot:cell(realm.name)="data">
-            <router-link :to="{name: 'Realm', params: {realmId: data.item.realm.id}}">
+          <template v-slot:cell(name)="data">
+            <router-link :to="{name: 'Realm', params: {realmId: data.item.id}}">
               {{ data.value }}
             </router-link>
           </template>

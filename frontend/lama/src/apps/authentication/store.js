@@ -39,7 +39,9 @@ export const store = {
       commit('SET_USER', user)
     },
     async loadUser ({ commit, state }) {
+      console.log('STORE: loadUser')
       const user = await AuthenticationRepository.loadUser()
+      console.log('STORE: loadUser', user)
       if (!user.isEmpty()) {
         commit('SET_USER', user)
       } else if (!state.user.username) {
@@ -54,6 +56,7 @@ export const store = {
       commit('SET_USER', user)
     },
     async logout ({ commit }) {
+      console.log('STORE: logout')
       await AuthenticationRepository.logout()
       commit('INIT_USER')
       await router.push({ name: 'Login' })

@@ -1,4 +1,4 @@
-export function AuthReposioryException (message) {
+export function AuthRepositoryException (message) {
   this.message = message
   this.name = 'AuthException'
 }

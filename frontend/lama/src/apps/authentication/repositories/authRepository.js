@@ -1,8 +1,9 @@
 import { Ability } from '@casl/ability'
-import { AuthenticationEnpoint } from '../api/lama'
-import { AuthReposioryException } from '../exceptions/repository'
+import { AuthenticationEndpoint } from '../api/lama'
+import { AuthRepositoryException } from '../exceptions/repository'
 import httpClient from '@/apps/authentication/clients/httpClient'
 import { authTokenClient } from '../clients/tokenClient'
+import { User } from '@/apps/authentication/models/user'
 
 class AuthRepository {
   #httpClient
@@ -18,8 +19,9 @@ class AuthRepository {
   }
 
   async login (username, password) {
+    console.info('AUTH REPO: login')
     try {
-      const response = await this.#httpClient.client.post(AuthenticationEnpoint.Token, {
+      const response = await this.#httpClient.client.post(AuthenticationEndpoint.Token, {
         username: username,
         password: password
       })
@@ -27,26 +29,31 @@ class AuthRepository {
     } catch (error) {
       this.#user = this.getEmptyUser()
       if (error.toString() === 'Error: Network Error') {
-        throw new AuthReposioryException('Es konnte keine Verbindung zum Server hergestellt werden. Bitte versuchen sie es später noch einmal.')
+        throw new AuthRepositoryException('Es konnte keine Verbindung zum Server hergestellt werden. Bitte versuchen sie es später noch einmal.')
       } else {
         if (error.response.status === 401) {
-          throw new AuthReposioryException('Fehlerhafter Nutzername oder fehlerhaftes Passwort')
+          throw new AuthRepositoryException('Fehlerhafter Nutzername oder fehlerhaftes Passwort')
         } else {
-          throw new AuthReposioryException('Es ist ein unbekannter Fehler aufgetreten. Bitte versuchen sie es später erneut.')
+          throw new AuthRepositoryException('Es ist ein unbekannter Fehler aufgetreten. Bitte versuchen sie es später erneut.')
         }
       }
     }
   }
 
   async loadUser () {
+    console.info('AUTH REPO: loadUser')
     if (this.#user.isEmpty()) {
+      console.log('AUTH REPO: loadUser: user empty')
       const token = await this.#tokenClient.getToken()
+      console.log('AUTH REPO: loadUser:', token)
       if (!token.isEmpty()) {
+        console.log('AUTH REPO: loadUser: initializeAuthenticationComponents')
         return await this.initializeAuthenticationComponents({
           access: token.accessToken,
           refresh: token.refreshToken
         })
       }
+      console.log('AUTH REPO: loadUser: Token EMPTY')
       this.#user = this.getEmptyUser()
     }
     return this.#user
@@ -64,6 +71,7 @@ class AuthRepository {
   }
 
   async logout () {
+    console.log('AUTH REPO: logout')
     await this.clearAuthenticationComponents()
   }
 
@@ -84,19 +92,6 @@ class AuthRepository {
 
   getEmptyUser () {
     return new User(null, null, this.#ability, new Date())
-  }
-}
-
-export class User {
-  constructor (username, email, ability, sessionExpirationTime) {
-    this.username = username
-    this.email = email
-    this.ability = ability
-    this.sessionExpirationTime = sessionExpirationTime
-  }
-
-  isEmpty () {
-    return !this.username
   }
 }
 

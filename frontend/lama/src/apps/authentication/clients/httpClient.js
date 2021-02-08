@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { authTokenClient } from './tokenClient'
-import { AuthenticationEnpoint } from '@/apps/authentication/api/lama'
+import { AuthenticationEndpoint } from '@/apps/authentication/api/lama'
 
 import store from '@/store'
 
@@ -44,8 +44,9 @@ class HttpClient {
   async resetTokenAndReattemptRequest (error) {
     try {
       const { response: errorResponse } = error
-      const token = await authTokenClient.getToken().refreshToken
+      const token = await authTokenClient.getToken()
       if (token.isEmpty()) {
+        console.log('HTTPCLIENT: Token is empty')
         // Refresh not possible
         return Promise.reject(error)
       }
@@ -60,9 +61,10 @@ class HttpClient {
         })
       })
       if (!this.isAlreadyFetchingAccessToken) {
+        console.log('HTTPCLIENT: !isAlreadyFetchingAccessToken')
         this.isAlreadyFetchingAccessToken = true
         const data = { refresh: token.refreshToken }
-        const response = await this.client.post(AuthenticationEnpoint.RefreshToken, data)
+        const response = await this.client.post(AuthenticationEndpoint.RefreshToken, data)
         if (!response.data) {
           return Promise.reject(error)
         }
@@ -72,6 +74,7 @@ class HttpClient {
       }
       return retryOriginalRequest
     } catch (error) {
+      console.log(error)
       await this.onAccessTokenFetchedFailed()
 
       return Promise.reject(error)

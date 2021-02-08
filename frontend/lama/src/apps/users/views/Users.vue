@@ -118,7 +118,7 @@
 
 <script>
 // @ is an alias to /src
-import Headline from '../../components/utils/Headline'
+import Headline from '../../../components/utils/Headline'
 
 export default {
   name: 'Realms',

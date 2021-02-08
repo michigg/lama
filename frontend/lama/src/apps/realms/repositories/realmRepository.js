@@ -7,7 +7,16 @@ export default {
   async getRealm (id) {
     try {
       const response = await httpClient.client.get(RealmEndpoint.Realm(id))
-      return new Realm(...response.data)
+      return new Realm(
+        response.data.realm.id,
+        response.data.realm.name,
+        response.data.realm.email,
+        response.data.realm.ldap_base_dn,
+        response.data.realm.admin_group,
+        response.data.realm.default_group,
+        response.data.user_count,
+        response.data.group_count
+      )
     } catch (error) {
       throw new RealmRepositoryException(error.message)
     }
@@ -15,7 +24,16 @@ export default {
   async updateRealm (id, data) {
     try {
       const response = await httpClient.client.patch(RealmEndpoint.Realm(id))
-      return new Realm(...response.data)
+      return new Realm(
+        response.data.realm.id,
+        response.data.realm.name,
+        response.data.realm.email,
+        response.data.realm.ldap_base_dn,
+        response.data.realm.admin_group,
+        response.data.realm.default_group,
+        response.data.user_count,
+        response.data.group_count
+      )
     } catch (error) {
       throw new RealmRepositoryException(error.message)
     }
@@ -23,7 +41,16 @@ export default {
   async deleteRealm (id) {
     try {
       const response = await httpClient.client.delete(RealmEndpoint.Realm(id))
-      return new Realm(...response.data)
+      return new Realm(
+        response.data.realm.id,
+        response.data.realm.name,
+        response.data.realm.email,
+        response.data.realm.ldap_base_dn,
+        response.data.realm.admin_group,
+        response.data.realm.default_group,
+        response.data.user_count,
+        response.data.group_count
+      )
     } catch (error) {
       throw new RealmRepositoryException(error.message)
     }

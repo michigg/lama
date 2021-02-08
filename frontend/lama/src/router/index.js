@@ -1,15 +1,15 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '@/store/index'
-import Realm from '@/realms/views/Realm'
-import Realms from '../realms/views/Realms'
+import Realm from '@/apps/realms/views/Realm'
+import Realms from '../apps/realms/views/Realms'
 import PermissionDenied from '@/views/PermissionDenied'
 import Groups from '@/views/group/Groups'
-import Users from '@/views/user/Users'
-import User from '@/views/user/User'
+import Users from '@/apps/users/views/Users'
+import User from '@/apps/users/views/User'
 import Group from '@/views/group/Group'
-import authenticationRoutes from '@/authentication/routes'
-import CreateRealm from '@/realms/views/CreateRealm'
+import authenticationRoutes from '@/apps/authentication/routes'
+import CreateRealm from '@/apps/realms/views/CreateRealm'
 
 Vue.use(VueRouter)
 

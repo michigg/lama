@@ -1,6 +1,6 @@
-const BaseUrl = 'http://localhost:8888/api'.concat('/auth')
+const BaseUrl = 'http://localhost:8000/api'.concat('/auth')
 
-export const AuthenticationEnpoint = {
+export const AuthenticationEndpoint = {
   Token: BaseUrl + '/token/',
   RefreshToken: BaseUrl + '/token/refresh/'
 }

@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import AuthNavModule from '../../authentication/components/AuthNavModule'
+import AuthNavModule from '../../apps/authentication/components/AuthNavModule'
 
 export default {
   name: 'Navbar',

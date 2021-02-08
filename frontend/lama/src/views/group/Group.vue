@@ -10,7 +10,7 @@
           </b-list-group-item>
         </b-list-group>
         <h3>Mitglieder</h3>
-        <!--        TODO: render user table-->
+        <!--        TODO: render users table-->
         <div class="d-flex mt-3">
           <!--          TODO: group update link-->
           <a

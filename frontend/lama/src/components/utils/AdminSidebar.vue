@@ -17,14 +17,15 @@
         </p>
         <b-list-group>
           <b-list-group-item
-            v-for="realm in realms"
-            :key="realm.realm.id"
-            :to="{name: 'Realm', params: {realmId: realm.realm.id}}"
+            v-for="realmItem in realms"
+            :key="realmItem.id"
+            :to="{name: 'Realm', params: {realmId: realmItem.id}}"
           >
-            {{ realm.realm.name }}
+            {{ realmItem.name }}
           </b-list-group-item>
         </b-list-group>
-        <div v-if="realm">
+        Hallo {{ realm }}
+        <div v-if="!!realm.id">
           <p class="h4 p-2 mb-0">
             Bereich {{ realm.name }}
           </p>
