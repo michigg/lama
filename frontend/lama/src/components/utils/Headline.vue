@@ -7,7 +7,12 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'Headline',
-  props: ['title']
+  props: {
+    title: {
+      type: String,
+      required: true
+    }
+  }
 })
 </script>
 

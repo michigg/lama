@@ -77,17 +77,17 @@
           stacked="md"
           small
         >
-          <template v-slot:cell(user.username)="data">
+          <template #cell(user.username)="data">
             <router-link :to="{name: 'User', params: {realmId: realmId, userDn: data.item.user.dn}}">
               {{ data.value }}
             </router-link>
           </template>
-          <template v-slot:cell(user.email)="data">
+          <template #cell(user.email)="data">
             <div class="text-center">
               <a :href="`mailto:${data.value}`">{{ data.value }}</a>
             </div>
           </template>
-          <template v-slot:cell(active)="data">
+          <template #cell(active)="data">
             <div
               v-if="data.value"
               class="text-center text-success"
@@ -101,7 +101,7 @@
               <b-icon-x-circle-fill />
             </div>
           </template>
-          <template v-slot:cell(user.last_login)="data">
+          <template #cell(user.last_login)="data">
             <div
               v-if="data.value"
               class="text-center"

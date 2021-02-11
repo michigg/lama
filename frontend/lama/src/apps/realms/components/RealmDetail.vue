@@ -44,7 +44,9 @@
 export default {
   name: 'RealmDetail',
   props: {
-    realm: {}
+    realm: {
+      required: true
+    }
   }
 }
 </script>

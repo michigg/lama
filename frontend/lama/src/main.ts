@@ -5,6 +5,7 @@ import { router } from './router'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import { abilitiesPlugin, Can } from '@casl/vue'
 import RepositoryFactory from '@/apps/authentication/repositories/RepositoryFactory'
+import './registerServiceWorker'
 
 const AuthenticationRepository = RepositoryFactory.get('authentication')
 

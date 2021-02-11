@@ -10,9 +10,9 @@
           <b-list-group-item>Ldap Domain: <span class="float-right">{{ user.user.dn }}</span></b-list-group-item>
           <b-list-group-item>
             Anzeigename: <span
-            v-if="user.user.display_name"
-            class="float-right"
-          >{{ user.user.display_name }}</span>
+              v-if="user.user.display_name"
+              class="float-right"
+            >{{ user.user.display_name }}</span>
             <span
               v-else
               class="float-right text-warning"
@@ -20,21 +20,21 @@
           </b-list-group-item>
           <b-list-group-item v-if="user.user.first_name">
             Vorname: <span
-            class="float-right"
-          >{{ user.user.first_name }}</span>
+              class="float-right"
+            >{{ user.user.first_name }}</span>
           </b-list-group-item>
           <b-list-group-item v-if="user.user.last_name">
             Nachname: <span
-            class="float-right"
-          >{{ user.user.last_name }}</span>
+              class="float-right"
+            >{{ user.user.last_name }}</span>
           </b-list-group-item>
           <b-list-group-item>Email: <span class="float-right">{{ user.user.email }}</span></b-list-group-item>
           <!--           TODO: add password reset href-->
           <b-list-group-item>
             Passwort: <a
-            href="#"
-            class="float-right"
-          >Nutzerpasswort zurücksetzen</a>
+              href="#"
+              class="float-right"
+            >Nutzerpasswort zurücksetzen</a>
           </b-list-group-item>
           <b-list-group-item v-if="user.user.phone">
             Telefon: <span class="float-right">{{ user.user.phone }}</span>

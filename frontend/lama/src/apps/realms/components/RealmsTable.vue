@@ -81,12 +81,12 @@
           small
           data-test="realms-table"
         >
-          <template v-slot:cell(name)="data">
+          <template #cell(name)="data">
             <router-link :to="{name: 'Realm', params: {realmId: data.item.id}}">
               {{ data.value }}
             </router-link>
           </template>
-          <template v-slot:cell(adminGroup)="data">
+          <template #cell(adminGroup)="data">
             <div
               v-if="data.value"
               class="text-center"
@@ -100,7 +100,7 @@
               <b-icon-exclamation-triangle-fill />
             </div>
           </template>
-          <template v-slot:cell(defaultGroup)="data">
+          <template #cell(defaultGroup)="data">
             <div
               v-if="data.value"
               class="text-center"

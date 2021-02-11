@@ -77,7 +77,7 @@
           stacked="md"
           small
         >
-          <template v-slot:cell(name)="data">
+          <template #cell(name)="data">
             <router-link :to="{name: 'Group', params: {realmId: realmId, groupDn: data.item.dn}}">
               {{ data.value }}
             </router-link>
