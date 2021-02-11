@@ -31,14 +31,15 @@
   </b-navbar>
 </template>
 
-<script>
-import AuthNavModule from '../../apps/authentication/components/AuthNavModule'
+<script lang="ts">
+import AuthNavModule from '../../apps/authentication/components/AuthNavModule.vue'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   name: 'Navbar',
   components: { AuthNavModule }
 
-}
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

@@ -60,10 +60,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
 
-export default {
+import { useStore } from '@/store'
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'Login',
   data () {
     return {
@@ -77,7 +80,8 @@ export default {
   },
   computed: {
     loginError: function () {
-      return this.$store.getters['authentication/loginError']
+      const store = useStore()
+      return store.getters['authentication/loginError']
     }
   },
   methods: {
@@ -85,12 +89,14 @@ export default {
       this.error = ''
       this.loading = true
       try {
-        await this.$store.dispatch('authentication/login', {
+        const store = useStore()
+        await store.dispatch('authentication/login', {
           username: this.form.username,
           password: this.form.password
         })
         if (this.$route.query.redirect) {
-          await this.$router.push({ path: this.$route.query.redirect })
+          const redirect: string = String(this.$route.query.redirect)
+          await this.$router.push({ path: redirect })
         } else {
           await this.$router.push({ name: 'Home' })
         }
@@ -101,7 +107,7 @@ export default {
       }
     }
   }
-}
+})
 </script>
 <style lang="scss" scoped>
 .login {

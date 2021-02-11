@@ -85,10 +85,12 @@
     </b-row>
   </b-container>
 </template>
-<script>
+<script lang="ts">
 // @ is an alias to /src
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'About',
   data () {
     return {
@@ -114,5 +116,5 @@ export default {
       ]
     }
   }
-}
+})
 </script>

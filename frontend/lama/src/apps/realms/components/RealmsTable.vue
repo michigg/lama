@@ -121,6 +121,8 @@
 </template>
 
 <script>
+import { useStore } from '@/store'
+
 export default {
   name: 'RealmsTable',
   data () {
@@ -182,10 +184,12 @@ export default {
   },
   computed: {
     realms: function () {
-      return this.$store.getters['realms/realms']
+      const store = useStore()
+      return store.getters['realms/realms']
     },
     rows: function () {
-      return this.$store.getters['realms/realms'].length
+      const store = useStore()
+      return store.getters['realms/realms'].length
     }
   }
 }

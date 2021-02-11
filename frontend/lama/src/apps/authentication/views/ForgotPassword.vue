@@ -3,8 +3,7 @@
     <h1>Passwort zurücksetzen</h1>
     <b-form @submit.prevent="passwordReset">
       <b-alert
-        v-if="passwordResetError"
-        show
+        :show="passwordResetError"
         variant="danger"
       >
         {{ passwordResetError }}
@@ -36,10 +35,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
 
-export default {
+import { useStore } from '@/store'
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'ForgotPassword',
   data () {
     return {
@@ -50,12 +52,14 @@ export default {
   },
   computed: {
     passwordResetError: function () {
-      return this.$store.getters['authentication/passwordResetError']
+      const store = useStore()
+      return store.getters['authentication/passwordResetError']
     }
   },
   methods: {
     passwordReset: function () {
-      this.$store.dispatch('authentication/resetPassword', {
+      const store = useStore()
+      store.dispatch('authentication/resetPassword', {
         email: this.form.email
       })
         .then(() => {
@@ -68,7 +72,7 @@ export default {
         .catch()
     }
   }
-}
+})
 </script>
 <style lang="scss" scoped>
   .forgot-password {

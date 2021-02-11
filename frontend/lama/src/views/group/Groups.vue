@@ -88,11 +88,13 @@
   </b-container>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
-import Headline from '../../components/utils/Headline'
+import Headline from '../../components/utils/Headline.vue'
+import { useStore } from '@/store'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   name: 'Realms',
   components: { Headline },
   data () {
@@ -116,21 +118,25 @@ export default {
   },
   computed: {
     groups: function () {
-      return this.$store.getters['groups/groups']
+      const store = useStore()
+      return store.getters['groups/groups']
     },
     rows: function () {
-      return this.$store.getters['groups/groups'].length
+      const store = useStore()
+      return store.getters['groups/groups'].length
     }
   },
   watch: {
     '$route.params.realmId': function (realmId) {
-      this.$store.dispatch('users/fetchGroups', { realmId: realmId })
+      const store = useStore()
+      store.dispatch('users/fetchGroups', { realmId: realmId })
     }
   },
   mounted () {
     const realmId = this.$route.params.realmId
-    this.$store.dispatch('groups/fetchGroups', { realmId: realmId })
-    this.realmId = realmId
+    const store = useStore()
+    store.dispatch('groups/fetchGroups', { realmId: realmId })
+    this.realmId = +realmId
   },
   methods: {
     getMemberCount (value, key, item) {
@@ -138,7 +144,7 @@ export default {
       return JSON.parse(preparedString).length
     }
   }
-}
+})
 </script>
 
 <style scoped>

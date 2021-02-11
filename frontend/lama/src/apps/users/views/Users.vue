@@ -116,11 +116,13 @@
   </b-container>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
-import Headline from '../../../components/utils/Headline'
+import Headline from '@/components/utils/Headline.vue'
+import { useStore } from '@/store'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   name: 'Realms',
   components: { Headline },
   data () {
@@ -148,23 +150,27 @@ export default {
   },
   computed: {
     users: function () {
-      return this.$store.getters['users/users']
+      const store = useStore()
+      return store.getters['users/users']
     },
     rows: function () {
-      return this.$store.getters['users/users'].length
+      const store = useStore()
+      return store.getters['users/users'].length
     }
   },
   watch: {
     '$route.params.realmId': function (realmId) {
-      this.$store.dispatch('users/fetchUsers', { realmId: realmId })
+      const store = useStore()
+      store.dispatch('users/fetchUsers', { realmId: realmId })
     }
   },
   mounted () {
     const realmId = this.$route.params.realmId
-    this.$store.dispatch('users/fetchUsers', { realmId: realmId })
+    const store = useStore()
+    store.dispatch('users/fetchUsers', { realmId: realmId })
     this.realmId = realmId
   }
-}
+})
 </script>
 
 <style scoped>

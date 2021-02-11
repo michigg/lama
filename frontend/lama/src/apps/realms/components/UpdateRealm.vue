@@ -1,6 +1,6 @@
 <template>
   <b-form @submit.prevent="login">
-    {{realm}}
+    {{ realm }}
     <div class="floating-label-input-group">
       <input
         id="ldap-base-dn-input"

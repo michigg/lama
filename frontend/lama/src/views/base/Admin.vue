@@ -7,12 +7,14 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
-import AdminSidebar from '../../components/utils/AdminSidebar'
-import RouterViewTransistion from '@/views/base/RouterViewTransistion'
+import AdminSidebar from '../../components/utils/AdminSidebar.vue'
+import RouterViewTransistion from '@/views/base/RouterViewTransistion.vue'
+import { useStore } from '@/store'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   name: 'AdminBasePage',
   components: {
     RouterViewTransistion,
@@ -20,10 +22,11 @@ export default {
   },
   computed: {
     isLoggedIn: function () {
-      return this.$store.getters['authentication/isLoggedIn']
+      const store = useStore()
+      return store.getters['authentication/isLoggedIn']
     }
   }
-}
+})
 </script>
 
 <style scoped>

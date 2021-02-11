@@ -10,9 +10,9 @@
           <b-list-group-item>Ldap Domain: <span class="float-right">{{ user.user.dn }}</span></b-list-group-item>
           <b-list-group-item>
             Anzeigename: <span
-              v-if="user.user.display_name"
-              class="float-right"
-            >{{ user.user.display_name }}</span>
+            v-if="user.user.display_name"
+            class="float-right"
+          >{{ user.user.display_name }}</span>
             <span
               v-else
               class="float-right text-warning"
@@ -20,21 +20,21 @@
           </b-list-group-item>
           <b-list-group-item v-if="user.user.first_name">
             Vorname: <span
-              class="float-right"
-            >{{ user.user.first_name }}</span>
+            class="float-right"
+          >{{ user.user.first_name }}</span>
           </b-list-group-item>
           <b-list-group-item v-if="user.user.last_name">
             Nachname: <span
-              class="float-right"
-            >{{ user.user.last_name }}</span>
+            class="float-right"
+          >{{ user.user.last_name }}</span>
           </b-list-group-item>
           <b-list-group-item>Email: <span class="float-right">{{ user.user.email }}</span></b-list-group-item>
           <!--           TODO: add password reset href-->
           <b-list-group-item>
             Passwort: <a
-              href="#"
-              class="float-right"
-            >Nutzerpasswort zurücksetzen</a>
+            href="#"
+            class="float-right"
+          >Nutzerpasswort zurücksetzen</a>
           </b-list-group-item>
           <b-list-group-item v-if="user.user.phone">
             Telefon: <span class="float-right">{{ user.user.phone }}</span>
@@ -128,12 +128,14 @@
   </b-container>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
-import Headline from '../../../components/utils/Headline'
+import Headline from '@/components/utils/Headline.vue'
+import { defineComponent } from 'vue'
+import { useStore } from '@/store'
 
-export default {
-  name: 'Realms',
+export default defineComponent({
+  name: 'User',
   components: { Headline },
   data () {
     return {
@@ -142,19 +144,21 @@ export default {
   },
   computed: {
     user: function () {
-      return this.$store.getters['user/user']
+      const store = useStore()
+      return store.getters['user/user']
     }
   },
   mounted () {
     const realmId = this.$route.params.realmId
     const userDn = this.$route.params.userDn
-    this.$store.dispatch('user/fetchUser', {
+    const store = useStore()
+    store.dispatch('user/fetchUser', {
       realmId: realmId,
       userDn: userDn
     })
-    this.realmId = realmId
+    this.realmId = +realmId
   }
-}
+})
 </script>
 
 <style scoped>

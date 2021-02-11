@@ -3,8 +3,10 @@
     <router-view class="child-view" />
   </transition>
 </template>
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'RouterViewTransistion',
   data () {
     return {
@@ -18,7 +20,7 @@ export default {
       this.transitionName = toDepth < fromDepth ? 'slide-left' : 'slide-right'
     }
   }
-}
+})
 </script>
 <style>
 /*.fade-enter-active, .fade-leave-active {*/

@@ -4,15 +4,16 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
 
-import RouterViewTransistion from '@/views/base/RouterViewTransistion'
+import RouterViewTransistion from '@/views/base/RouterViewTransistion.vue'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   name: 'UserBasePage',
   components: { RouterViewTransistion }
-}
+})
 </script>
 <style scoped>
   .content {

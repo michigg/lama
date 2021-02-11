@@ -2,11 +2,13 @@
   <h1>{{ title }}</h1>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'Headline',
   props: ['title']
-}
+})
 </script>
 
 <style scoped>

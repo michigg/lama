@@ -28,11 +28,13 @@
   </b-container>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
-import Headline from '../../components/utils/Headline'
+import Headline from '../../components/utils/Headline.vue'
+import { useStore } from '@/store'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   name: 'Group',
   components: { Headline },
   data () {
@@ -40,15 +42,17 @@ export default {
   },
   computed: {
     group: function () {
-      return this.$store.getters['group/group']
+      const store = useStore()
+      return store.getters['group/group']
     }
   },
   mounted () {
     const realmId = this.$route.params.realmId
     const groupDn = this.$route.params.groupDn
-    this.$store.dispatch('group/fetchGroup', { realmId: realmId, groupDn: groupDn })
+    const store = useStore()
+    store.dispatch('group/fetchGroup', { realmId: realmId, groupDn: groupDn })
   }
-}
+})
 </script>
 
 <style scoped>

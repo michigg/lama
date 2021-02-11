@@ -5,13 +5,8 @@ module.exports = {
     node: true
   },
 
-  extends: [
-    'plugin:vue/recommended',
-    '@vue/standard'
-  ],
-
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: '@typescript-eslint/parser'
   },
 
   rules: {
@@ -29,5 +24,11 @@ module.exports = {
         jest: true
       }
     }
+  ],
+
+  extends: [
+    'plugin:vue/recommended',
+    '@vue/standard',
+    '@vue/typescript'
   ]
 }

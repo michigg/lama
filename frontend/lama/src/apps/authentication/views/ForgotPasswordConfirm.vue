@@ -3,8 +3,7 @@
     <h1>Login</h1>
     <b-form @submit.prevent="login">
       <b-alert
-        v-if="loginError"
-        show
+        :show="!!loginError"
         variant="danger"
       >
         {{ loginError }}
@@ -46,10 +45,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
 
-export default {
+import { useStore } from '@/store'
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'ForgotPasswordConfirm',
   data () {
     return {
@@ -61,12 +63,14 @@ export default {
   },
   computed: {
     loginError: function () {
-      return this.$store.getters['authentication/loginError']
+      const store = useStore()
+      return store.getters['authentication/loginError']
     }
   },
   methods: {
     login: function () {
-      this.$store.dispatch('authentication/login', {
+      const store = useStore()
+      store.dispatch('authentication/login', {
         username: this.form.username,
         password: this.form.password
       })
@@ -80,13 +84,13 @@ export default {
         .catch()
     }
   }
-}
+})
 </script>
 <style lang="scss" scoped>
-  .login {
-    display: flex;
-    flex-flow: column;
-    padding: 2rem;
-    margin: 2rem;
-  }
+.login {
+  display: flex;
+  flex-flow: column;
+  padding: 2rem;
+  margin: 2rem;
+}
 </style>

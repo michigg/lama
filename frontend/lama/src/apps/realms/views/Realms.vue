@@ -22,13 +22,15 @@
   </b-container>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
-import Headline from '@/components/utils/Headline'
-import RealmsTable from '@/apps/realms/components/RealmsTable'
-import LoadingInfo from '@/components/utils/LoadingInfo'
+import Headline from '@/components/utils/Headline.vue'
+import RealmsTable from '@/apps/realms/components/RealmsTable.vue'
+import LoadingInfo from '@/components/utils/LoadingInfo.vue'
+import { useStore } from '@/store'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   name: 'Realms',
   components: {
     LoadingInfo,
@@ -37,19 +39,23 @@ export default {
   },
   computed: {
     rows () {
-      return this.$store.getters['realms/realms'].length
+      const store = useStore()
+      return store.getters['realms/realms'].length
     },
     loading () {
-      return this.$store.getters['realms/loading']
+      const store = useStore()
+      return store.getters['realms/loading']
     },
     error () {
-      return this.$store.getters['realms/loading']
+      const store = useStore()
+      return store.getters['realms/loading']
     }
   },
   mounted () {
-    this.$store.dispatch('realms/fetchRealms')
+    const store = useStore()
+    store.dispatch('realms/fetchRealms')
   }
-}
+})
 </script>
 
 <style scoped>

@@ -5,7 +5,7 @@
       :class="{ active: active }"
       @click="active = !active"
     >
-      <b-icon-layers/>
+      <b-icon-layers />
     </button>
     <div
       class="sidebar dynamic-sidebar border-right shadow"
@@ -31,15 +31,15 @@
           </p>
           <b-list-group>
             <b-list-group-item :to="{name: 'Realm', params: {realmId: realm.id}}">
-              <b-icon-gear/>
+              <b-icon-gear />
               Einstellungen
             </b-list-group-item>
             <b-list-group-item :to="{name: 'Users', params: {realmId: realm.id}}">
-              <b-icon-person/>
+              <b-icon-person />
               Nutzer
             </b-list-group-item>
             <b-list-group-item :to="{name: 'Groups', params: {realmId: realm.id}}">
-              <b-icon-people/>
+              <b-icon-people />
               Gruppen
             </b-list-group-item>
           </b-list-group>
@@ -68,8 +68,11 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { useStore } from '@/store'
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'AdminSidebar',
   data () {
     return {
@@ -78,16 +81,19 @@ export default {
   },
   computed: {
     realms: function () {
-      return this.$store.getters['realms/realms']
+      const store = useStore()
+      return store.getters['realms/realms']
     },
     realm: function () {
-      return this.$store.getters['realm/realm']
+      const store = useStore()
+      return store.getters['realm/realm']
     }
   },
   mounted () {
-    this.$store.dispatch('realms/fetchRealms')
+    const store = useStore()
+    store.dispatch('realms/fetchRealms')
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

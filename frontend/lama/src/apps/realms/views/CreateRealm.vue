@@ -53,14 +53,16 @@
   </b-container>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
-import Headline from '../../../components/utils/Headline'
-import LoadingInfo from '../../../components/utils/LoadingInfo'
-import RealmDetail from '../components/RealmDetail'
-import UpdateRealm from '../components/UpdateRealm'
+import Headline from '../../../components/utils/Headline.vue'
+import LoadingInfo from '../../../components/utils/LoadingInfo.vue'
+import RealmDetail from '../components/RealmDetail.vue'
+import UpdateRealm from '../components/UpdateRealm.vue'
+import { useStore } from '@/store'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   name: 'Realm',
   components: {
     UpdateRealm,
@@ -75,20 +77,24 @@ export default {
   },
   computed: {
     realm: function () {
-      return this.$store.getters['realm/realm']
+      const store = useStore()
+      return store.getters['realm/realm']
     },
     loading: function () {
-      return this.$store.getters['realm/loading']
+      const store = useStore()
+      return store.getters['realm/loading']
     }
   },
   watch: {
     '$route.params.realmId': function (realmId) {
-      this.$store.dispatch('realm/fetchRealm', { realmId: realmId })
+      const store = useStore()
+      store.dispatch('realm/fetchRealm', { realmId: realmId })
     }
   },
   mounted () {
     const realmId = this.$route.params.realmId
-    this.$store.dispatch('realm/fetchRealm', { realmId: realmId })
+    const store = useStore()
+    store.dispatch('realm/fetchRealm', { realmId: realmId })
   }
-}
+})
 </script>
