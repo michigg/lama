@@ -1,0 +1,43 @@
+{
+  "count": 3,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "realm": {
+        "id": 3,
+        "name": "HUWI",
+        "email": "",
+        "ldap_base_dn": "ou=huwi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 2,
+        "name": "SOWI",
+        "email": "",
+        "ldap_base_dn": "ou=sowi,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 0,
+      "group_count": 0
+    },
+    {
+      "realm": {
+        "id": 1,
+        "name": "WIAI",
+        "email": "test@root.de",
+        "ldap_base_dn": "ou=wiai,ou=fachschaften,dc=test,dc=de",
+        "admin_group": null,
+        "default_group": null
+      },
+      "user_count": 1,
+      "group_count": 1
+    }
+  ]
+}

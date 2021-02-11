@@ -1,0 +1,352 @@
+# Create your models here.
+import logging
+import os
+import re
+from datetime import datetime, timedelta
+from typing import List
+
+from django.contrib.auth.models import User, Group
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db.models import Q
+from ldap import NO_SUCH_OBJECT, ALREADY_EXISTS
+from ldapdb.models import fields as ldap_fields
+from ldapdb.models.base import Model
+
+from account_helper.models import DeletedUser, Realm
+from account_manager.utils.mail_utils import send_welcome_mail
+
+logger = logging.getLogger(__name__)
+
+
+class LdapUser(Model):
+    """
+    Class for representing an LDAP user entry.
+    """
+    # LDAP meta-data
+    ROOT_DN = os.environ.get('LDAP_USER_ENTRY', 'dc=test,dc=de')
+    base_dn = ROOT_DN
+    object_classes = ['inetOrgPerson']
+
+    # inetOrgPerson
+    username = ldap_fields.CharField(db_column='uid', primary_key=True)
+    display_name = ldap_fields.CharField(db_column='displayName', blank=True)
+    password = ldap_fields.CharField(db_column='userPassword')
+    first_name = ldap_fields.CharField(db_column='cn', blank=True)
+    last_name = ldap_fields.CharField(db_column='sn', blank=True)
+    email = ldap_fields.CharField(db_column='mail')
+    phone = ldap_fields.CharField(db_column='telephoneNumber', blank=True)
+    mobile_phone = ldap_fields.CharField(db_column='mobile', blank=True)
+    photo = ldap_fields.ImageField(db_column='photo')
+    last_login = ldap_fields.DateTimeField(db_column='authTimestamp', blank=True)
+
+    def __str__(self):
+        return self.username
+
+    def __unicode__(self):
+        return self.full_name
+
+    @staticmethod
+    def creation_test(base_dn):
+        try:
+            LdapUser.base_dn = f'ou=people,{base_dn}'
+            user = LdapUser.objects.create(username='dummy', first_name=' ', last_name=' ')
+            user.save()
+            user.delete()
+        except Exception:
+            raise ValidationError(
+                'Realm user creation test failed. Please prove the provided dn',
+            )
+
+    def is_deleteable(self, realm: Realm):
+        user_groups = LdapGroup.get_user_groups(realm, self)
+        user_group_names = [group.name for group in user_groups]
+        user_admin_realms = Realm.objects.filter(id=realm.id).filter(admin_group__name__in=user_group_names)
+        return not user_admin_realms.exists()
+
+    @staticmethod
+    def create_user(realm, username, email, password=None):
+        if not LdapUser.is_user_duplicate(username):
+            LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}'
+            if password:
+                ldap_user = LdapUser.objects.create(username=username, email=email, display_name=email, first_name=" ",
+                                                    last_name=" ", password=password)
+            else:
+                ldap_user = LdapUser.objects.create(username=username, email=email, display_name=email, first_name=" ",
+                                                    last_name=" ")
+            return ldap_user
+        else:
+            raise ALREADY_EXISTS('User already exists')
+
+    @staticmethod
+    def create_with_django_user_creation_and_welcome_mail(realm, protocol, domain, username, email):
+        ldap_user, user = LdapUser.create_with_django_user(realm, username, email)
+        send_welcome_mail(domain, email, protocol, realm, user)
+        return ldap_user
+
+    @staticmethod
+    def create_with_django_user(realm, username, email, password=None) -> ('LdapUser', User):
+        if not LdapUser.is_user_duplicate(username):
+            ldap_user = LdapUser.create_user(realm, username, email, password)
+            LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}'
+            if password:
+                user, _ = User.objects.get_or_create(username=username, email=email, password=password)
+            else:
+                user, _ = User.objects.get_or_create(username=username, email=email)
+            if realm.default_group:
+                ldap_default_group = LdapGroup.get_group(group_name=realm.default_group.name, realm=realm)
+                LdapGroup.add_user_to_groups(ldap_user=ldap_user, ldap_groups=[ldap_default_group, ])
+            return ldap_user, user
+        else:
+            raise ALREADY_EXISTS('User already exists')
+
+    @staticmethod
+    def update_user(ldap_user, validated_data):
+        ldap_user.email = validated_data.get('email', ldap_user.email)
+        ldap_user.username = validated_data.get('username', ldap_user.username)
+        first_name = validated_data.get('first_name', ldap_user.first_name)
+        ldap_user.first_name = first_name if first_name else ' '
+        last_name = validated_data.get('last_name', ldap_user.last_name)
+        if first_name and last_name:
+            ldap_user.display_name = f'{first_name} {last_name}'
+        else:
+            ldap_user.display_name = ldap_user.email
+        ldap_user.last_name = last_name if last_name else ' '
+        ldap_user.phone = validated_data.get('phone', ldap_user.phone)
+        ldap_user.mobile_phone = validated_data.get('mobile_phone', ldap_user.mobile_phone)
+        ldap_user.save()
+
+    @staticmethod
+    def get_extended_user(ldap_user):
+        wrapper = {'user': ldap_user}
+        try:
+            wrapper['deleted_user'] = DeletedUser.objects.get(ldap_dn=ldap_user.dn)
+        except ObjectDoesNotExist:
+            wrapper['deleted_user'] = None
+        try:
+            django_user = User.objects.get(username=ldap_user.username)
+            wrapper['active'] = True if django_user.last_login else False
+        except ObjectDoesNotExist:
+            wrapper['active'] = False
+        return wrapper
+
+    @staticmethod
+    def password_reset(user, raw_password):
+        LdapUser.base_dn = LdapUser.ROOT_DN
+        ldap_user = LdapUser.objects.get(username=user.username)
+        ldap_user.password = raw_password
+        LdapUser.base_dn = re.compile('(uid=[a-zA-Z0-9_-]*),(.*)').match(ldap_user.dn).group(2)
+        ldap_user.save()
+
+    @staticmethod
+    def get_users_by_dn(realm, users):
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}'
+        users = [re.compile('uid=([a-zA-Z0-9_-]*),(ou=[a-zA-Z_]*),(.*)').match(user).group(1) for
+                 user in users]
+        query = Q(username=users.pop())
+        for user in users:
+            query = query | Q(username=user)
+        LdapUser.base_dn = LdapUser.ROOT_DN
+        return LdapUser.objects.filter(query)
+
+    @staticmethod
+    def is_user_duplicate(username: str):
+        LdapUser.base_dn = LdapUser.ROOT_DN
+        try:
+            LdapUser.objects.get(username=username)
+            return True
+        except (NO_SUCH_OBJECT, ObjectDoesNotExist):
+            return False
+
+    @staticmethod
+    def is_active_user(ldap_user):
+        try:
+            django_user = User.objects.get(username=ldap_user.username)
+            return django_user.last_login
+        except ObjectDoesNotExist:
+            return False
+
+    @staticmethod
+    def get_user_active_marked(ldap_users):
+        user_wrappers = []
+        for user in ldap_users:
+            if LdapUser.is_active_user(user):
+                user_wrappers.append({'user': user, 'active': True})
+            else:
+                user_wrappers.append({'user': user, 'active': False})
+        return user_wrappers
+
+    def get_users_realm_base_dn(self):
+        return re.compile('(uid=[a-zA-Z0-9_-]*),(ou=[a-zA-Z_-]*),(.*)').match(self.dn).group(3)
+
+    @staticmethod
+    def get_user(username: str, realm: Realm = None):
+        LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}' if realm else LdapUser.ROOT_DN
+        try:
+            return LdapUser.objects.get(username=username)
+        except Exception:
+            return None
+
+    @staticmethod
+    def get_user_by_dn(dn: str, realm: Realm = None):
+        LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}' if realm else LdapUser.ROOT_DN
+        try:
+            return LdapUser.objects.get(dn=dn)
+        except Exception:
+            return None
+
+    @staticmethod
+    def get_users(realm: Realm = None):
+        LdapUser.base_dn = f'ou=people, {realm.ldap_base_dn}' if realm else LdapUser.ROOT_DN
+        try:
+            return LdapUser.objects.all()
+        except Exception:
+            return None
+
+    @staticmethod
+    def get_inactive_users(realm: Realm = None):
+        LdapUser.base_dn = realm.ldap_base_dn if realm else LdapUser.ROOT_DN
+        last_semester = datetime.now() - timedelta(days=182)
+        return (LdapUser.objects.filter(last_login__lte=last_semester) | LdapUser.objects.exclude(
+            last_login__lte=datetime.now() + timedelta(days=1)))
+
+    def get_django_user(self):
+        try:
+            return User.objects.get(username=self.username)
+        except ObjectDoesNotExist:
+            return None
+
+    def get_deletable(self):
+        try:
+            return DeletedUser.objects.get(ldap_dn=self.dn)
+        except ObjectDoesNotExist:
+            return None
+
+    def delete_complete(self):
+        django_user = self.get_django_user()
+        deletable_user = self.get_deletable()
+        LdapGroup.remove_user_from_groups(self.dn)
+        self.delete()
+        if django_user:
+            django_user.delete()
+        if deletable_user:
+            deletable_user.delete()
+
+    @staticmethod
+    def set_root_dn(realm):
+        LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+
+
+class LdapGroup(Model):
+    """
+    Class for representing an LDAP group entry.
+    """
+    # LDAP meta-data
+    ROOT_DN = os.environ.get('LDAP_USER_ENTRY', 'dc=test,dc=de')
+    base_dn = ROOT_DN
+    object_classes = ['groupOfNames']
+
+    name = ldap_fields.CharField(db_column='cn', max_length=200, primary_key=True)
+    description = ldap_fields.CharField(db_column='description', max_length=1024, blank=True, null=True)
+    members = ldap_fields.ListField(db_column='member')
+
+    @staticmethod
+    def get_user_groups(realm: Realm, ldap_user: LdapUser):
+        LdapUser.base_dn = f'ou=people,{realm.ldap_base_dn}'
+        LdapGroup.base_dn = LdapGroup.ROOT_DN
+        return LdapGroup.objects.filter(members=ldap_user.dn)
+
+    @staticmethod
+    def add_user_to_groups(ldap_user: LdapUser, ldap_groups: List):
+        for ldap_group in ldap_groups:
+            ldap_group.members.append(ldap_user.dn)
+            ldap_group.save()
+
+    @staticmethod
+    def remove_user_from_groups(ldap_user_dn, user_groups=None):
+        if not user_groups:
+            LdapGroup.base_dn = LdapGroup.ROOT_DN
+            user_groups = LdapGroup.objects.filter(members__contains=ldap_user_dn)
+        for group in user_groups:
+            LdapGroup.base_dn = re.compile('cn=([a-zA-Z0-9_-]*),(ou=[a-zA-Z_]*.*)').match(group.dn).group(2)
+            group.members.remove(ldap_user_dn)
+            group.save()
+
+    def get_django_group(self) -> Group:
+        django_group, _ = Group.objects.get_or_create(name=self.name)
+        return django_group
+
+    @staticmethod
+    def get_group(group_name: str = None, group_dn: str = None, realm: Realm = None):
+        if not group_name and not group_dn:
+            raise ValidationError("group_name or group_dn required")
+        LdapGroup.set_root_dn(realm)
+        logger.error(group_dn)
+        try:
+            if group_name:
+                return LdapGroup.objects.get(name=group_name)
+            else:
+                return LdapGroup.objects.get(dn=group_dn)
+        except Exception as e:
+            logger.error(e)
+            return None
+
+    @staticmethod
+    def get_groups(realm: Realm = None):
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}' if realm else LdapGroup.ROOT_DN
+        try:
+            return LdapGroup.objects.all()
+        except Exception as e:
+            logger.error(e)
+            return None
+
+    @staticmethod
+    def group_exists(group_name: str, realm: Realm = None):
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}' if realm else LdapGroup.ROOT_DN
+        return LdapGroup.objects.filter(name=group_name).exists()
+
+    @staticmethod
+    def set_root_dn(realm: Realm = None):
+        LdapGroup.base_dn = f'ou=groups,{realm.ldap_base_dn}' if realm else LdapGroup.ROOT_DN
+
+    def full_update(self, instance, **validated_data):
+        django_group = self.get_django_group()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if django_group:
+            # TODO: implement User update
+            django_group.name = validated_data.get('name')
+            django_group.save()
+        return instance
+
+    @staticmethod
+    def full_create(realm, **kwargs):
+        logger.error(realm)
+        LdapGroup.set_root_dn(realm)
+        ldap_group = LdapGroup.objects.create(**kwargs)
+        if 'description' in kwargs:
+            del kwargs['description']
+        del kwargs['members']
+        logger.error('members')
+        Group.objects.get_or_create(**kwargs)
+        return ldap_group
+
+    def full_delete(self, realm):
+        if realm.admin_group and realm.admin_group.name == self.name:
+            realm.admin_group = None
+            realm.save()
+        if realm.default_group and realm.default_group.name == self.name:
+            realm.default_group = None
+            realm.save()
+        django_group = self.get_django_group()
+        if django_group:
+            django_group.delete()
+        return self.delete()
+
+    def __str__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.name

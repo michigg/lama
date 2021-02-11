@@ -1,0 +1,64 @@
+$enable-rounded: false;
+$enable-shadows: true;
+$bv-enable-table-stacked: true;
+$body-bg: #ffefd9;
+$body-color: #2f2f2f;
+//$primary-color: #e97e2e;
+$primary-color: #1260ff;
+
+// Theme color default definitions
+//$primary: #e97e2e !default;
+$primary: #005eff !default;
+$secondary: #898886 !default;
+$success: #7751ff !default;
+//$info: $cyan !default;
+//$warning: $yellow !default;
+$danger: #f48882 !default;
+//$light: $gray-100 !default;
+//$dark: $gray-800 !default;
+
+$border-radius:        2rem !default;
+$border-radius-base:        1rem !default;
+$border-radius-large:       50% !default;
+$border-radius-small:       50% !default;
+
+$btn-border-radius-base:         $border-radius-base !default;
+$btn-border-radius-large:        $border-radius-large !default;
+$btn-border-radius-small:        $border-radius-small !default;
+
+$input-border-radius:            $border-radius-base !default;
+$input-border-radius-large:      $border-radius-large !default;
+$input-border-radius-small:      $border-radius-small !default;
+
+$navbar-border-radius:             $border-radius-base !default;
+$nav-pills-border-radius:                   $border-radius-base !default;
+$pager-border-radius:                  15px !default;
+$alert-border-radius:         $border-radius-base !default;
+$progress-border-radius:      $border-radius-base !default;
+$list-group-border-radius:      $border-radius-base !default;
+$panel-border-radius:         $border-radius-base !default;
+$thumbnail-border-radius:     $border-radius-base !default;
+$badge-border-radius:         10px !default;
+
+ //@media (prefers-color-scheme: light) {
+ //   :root {
+ //     --background-color: #ffffff;
+ //     --footer-background-color: #282828;
+ //     --secondary: #fbb071 !important;
+ //     --sidbar-background-color: #f6d76f;
+ //     --sidbar-activation-button-background-color: #f6d76f;
+ //     --sidbar-activation-button-color: #000;
+ //     --page-background: #fbb071;
+ //     --primary: #fbb071 !important;
+ //     --text-color: #343a40;
+ //   }
+ // }
+ //
+ // @media (prefers-color-scheme: dark) {
+ //   :root {
+ //     --background-color: #222831;
+ //     --page-background: #393e46;
+ //     --primary-color: #b55400;
+ //     --text-color: #eeeeee;
+ //   }
+ // }

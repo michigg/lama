@@ -1,0 +1,58 @@
+# DEV SETUP!
+version: "3"
+
+networks:
+  pg_db:
+    external: false
+  ldap_net:
+    external: false
+
+services:
+  api:
+    image: lama:0.1
+    build:
+      context: docker/lama
+      dockerfile: Dockerfile.dev
+    networks:
+      - ldap_net
+      - pg_db
+    env_file:
+      - docker/lama/dev.env
+    volumes:
+      - ./src:/lama
+      - ./coverage-reports:/coverage-reports
+    depends_on:
+      - db
+      - ldap
+    ports:
+      - 0.0.0.0:8000:80
+
+  db:
+    image: postgres:11.2-alpine
+    networks:
+      - pg_db
+    volumes:
+      - ./db/pgdata/:/var/lib/postgresql/data/
+    env_file:
+      - docker/lama/dev.env
+
+  ldap:
+    image: docker.clkl.de/ldap/ldap:0.3-lama
+    build:
+      context: docker/ldap
+      dockerfile: Dockerfile.ldap
+    env_file: docker/ldap/ldap.env
+    networks:
+      - ldap_net
+
+  ldap_admin:
+    image: docker.clkl.de/ldap/admin:0.1-lama
+    build:
+      context: docker/ldap
+      dockerfile: Dockerfile.admin
+    networks:
+      - ldap_net
+    depends_on:
+      - ldap
+    ports:
+      - 0.0.0.0:8888:80

@@ -1,0 +1,70 @@
+FROM alpine:3.11
+
+ENV LDAP_PACKAGE_NAME OPENLDAP_REL_ENG_2_4_49
+
+RUN apk add --upgrade --no-cache build-base groff libtool openldap openssl-dev cyrus-sasl-dev util-linux-dev
+
+WORKDIR /openldap
+RUN wget https://github.com/openldap/openldap/archive/${LDAP_PACKAGE_NAME}.zip \
+  && unzip -d /openldap ${LDAP_PACKAGE_NAME}.zip\
+  && rm ${LDAP_PACKAGE_NAME}.zip\
+  && mv openldap-${LDAP_PACKAGE_NAME}/* .\
+  && rm -r openldap-${LDAP_PACKAGE_NAME}/
+
+RUN ./configure --prefix=/usr	\
+	--sysconfdir=/etc	\
+	--localstatedir=/var/lib/openldap	\
+	--libexecdir=/usr/lib	\
+		--enable-slapd \
+		--enable-crypt \
+		--enable-modules \
+		--enable-dynamic \
+		--enable-bdb=no \
+		--enable-dnssrv=mod \
+		--enable-hdb=no \
+		--enable-ldap=mod \
+		--enable-mdb=mod \
+		--enable-meta=mod \
+		--enable-monitor=mod \
+		--enable-null=mod \
+		--enable-passwd=mod \
+		--enable-relay=mod \
+		--enable-shell=mod \
+		--enable-sock=mod \
+		--enable-sql=no \
+		--enable-overlays=mod \
+		--with-tls=openssl \
+		--with-cyrus-sasl
+RUN make depend \
+	&& make \
+	&& make prefix=/usr libexec=/usr/lib -C contrib/slapd-modules/lastbind \
+	&& make install \
+	&& make prefix=/usr libexec=/usr/lib -C contrib/slapd-modules/lastbind install
+
+
+#RUN adduser ldap -D
+
+#EXPOSE 389
+
+#CMD ["slapd", "-u", "ldap", "-g", "ldap", "-d", "32768"]
+
+WORKDIR /
+
+ENV dc=stuve
+ENV dcr=test
+COPY entrypoint.sh /
+
+RUN sed -i 's!/run/openldap/slapd.pid!/tmp/openladp.pid!' /etc/openldap/slapd.conf
+RUN sed -i 's!/run/openldap/slapd.args!/tmp/openladp.args!' /etc/openldap/slapd.conf
+
+ADD start.ldif /etc/openldap/start.ldif
+RUN sed -i s/dc=$dc/dc=$dcr/g /etc/openldap/start.ldif
+RUN sed -i s/dc:\ $dc/dc:\ $dcr/g /etc/openldap/start.ldif
+ADD slapd.conf /etc/openldap/slapd.conf
+RUN chown ldap:ldap -R /etc/openldap
+RUN chown ldap:ldap -R /var/lib/openldap
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 389
+
+CMD ["/entrypoint.sh"]

@@ -1,59 +1,55 @@
-# DEV SETUP!
-version: "3"
-
-networks:
-  pg_db:
-    external: false
-  ldap_net:
-    external: false
+version: '3.7'
 
 services:
-  lama:
-    image: lama:0.1
+  web:
     build:
-      context: docker/lama
-      dockerfile: Dockerfile.dev
-    networks:
-      - ldap_net
-      - pg_db
-    env_file:
-      - docker/lama/dev.env
+      context: frontend
+      target: 'develop-stage'
+    command: /bin/sh -c "npm run serve"
     volumes:
-      - ./src:/lama
-    depends_on:
-      - dblama
-      - ldap
+      - ./frontend/lama:/app
     ports:
-      - 0.0.0.0:8888:80
-  
-  dblama:
-    image: postgres:11.2-alpine
-    networks:
-      - pg_db
+      - 8080:8080
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./backend/docker/lama
+      dockerfile: Dockerfile.dev
     volumes:
-      - ./db/pgdata/:/var/lib/postgresql/data/
+      - ./backend/src:/lama
+    ports:
+      - 8000:80
     env_file:
-      - docker/lama/dev.env
+      - ./backend/docker/lama/dev.env
+    depends_on:
+      - db
+      - ldap
+
+  db:
+    image: postgres:12.0-alpine
+    env_file:
+      - ./backend/docker/lama/dev.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ldap:
     image: docker.clkl.de/ldap/ldap:0.3-lama
     build:
-      context: docker/ldap
+      context: backend/docker/ldap
       dockerfile: Dockerfile.ldap
-    env_file: docker/ldap/ldap.env
-    volumes:
-      - ./docker/ldap/data/var/:/var/lib/openldap/
-    networks:
-      - ldap_net
+    env_file: ./backend/docker/ldap/ldap.env
 
   ldap_admin:
     image: docker.clkl.de/ldap/admin:0.1-lama
     build:
-      context: docker/ldap
+      context: backend/docker/ldap
       dockerfile: Dockerfile.admin
-    networks:
-      - ldap_net
     depends_on:
       - ldap
     ports:
-      - 0.0.0.0:8080:80
+      - 0.0.0.0:8888:80

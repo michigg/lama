@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  lama:
+    image: lama:0.2.0
+    build: .
+    volumes:
+      - ./lama/public/config/config.json:/usr/share/nginx/html/config/config.json
+    ports:
+      - 8080:80

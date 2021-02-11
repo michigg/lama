@@ -1,0 +1,81 @@
+@startuml
+class AuthenticationStore {
+    -user: User
+    +user(): User
+    +isLoggedIn(): bool
+    -SET_USER(User): void
+    -INIT_USER(): void
+    +async login(username: String, password: String): void
+    +async loadUser(): void
+    +async loginWithToken(token: Token): void
+    +async logout(): void
+}
+
+class VueRouter {}
+class Ability {}
+
+class AuthenticationRepository {
+    -httpClient: HttpClient
+    -tokenClient: AuthenticationTokenClient
+    +async login(username: String, password: String): User
+    +async loadUser(): User
+    +async initializeAuthenticationComponents(RawToken): User
+    +async logout(): void
+    +async isLoggedIn(): bool
+    +async clearAuthenticationComponents(): void
+    +getAbility(): Ability
+}
+
+class User {
+    +username: String
+    +email: String
+    +ability: Ability
+    +sessionExpirationTime: Date
+}
+
+class HttpClient {
+    +client: Axios
+    -isAlreadyFetchingAccessToken: bool
+    -subscribers: List
+    +clearAuthenticationHeader(): void
+    +setAuthenticationHeader(accessToken: String): void
+    -setResponseInterceptor(): void
+    -isTokenExpiredError(errorResponse: Axios.Response): bool
+    -async resetTokenAndReattemptRequest(error: Axios.Error): void
+    -async onAccessTokenFetched(rawToken): void
+    -async onAccessTokenFetchedFailed: void
+    -addSubscriber(callback: Function): void
+}
+
+class AuthenticationTokenClient {
+    -accessTokenKey: String
+    -refreshTokenKey: String
+    -token: Token
+    +async saveToken(accessToken, refreshToken): Token
+    +clearToken(): void
+    +async getToken(): Token
+    -async loadToken(): Token
+}
+
+class Token {
+    +accessToken: String
+    +refreshToken: String
+    +user: Object
+    +sessionExpirationTime: Date
+
+    +isEmpty(): bool
+    +isExpired(): bool
+}
+
+AuthenticationStore o-- AuthenticationRepository
+AuthenticationStore --> VueRouter
+AuthenticationStore o-- User
+AuthenticationRepository o-- User
+User o-- Ability
+AuthenticationRepository o-- HttpClient
+AuthenticationRepository o-- AuthenticationTokenClient
+HttpClient --> AuthenticationTokenClient
+HttpClient --> AuthenticationStore
+AuthenticationTokenClient o-- Token
+
+@enduml

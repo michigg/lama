@@ -1,0 +1,58 @@
+@startuml
+actor User
+participant AuthenticationStore
+participant AuthenticationRepository
+participant HttpClient
+participant AuthenticationTokenClient
+participant Backend
+
+alt login
+User -> AuthenticationStore: login(username, password)
+AuthenticationStore -> AuthenticationRepository: login(username, password)
+AuthenticationRepository -> HttpClient: post({username, password})
+HttpClient -> Backend: POST /auth/token/
+Backend -> HttpClient: rawToken
+HttpClient -> AuthenticationRepository: response
+AuthenticationRepository -> AuthenticationTokenClient: saveToken(rawToken)
+AuthenticationTokenClient -> AuthenticationRepository: Token
+AuthenticationRepository -> HttpClient: setAuthorizationHeader(accessToken)
+AuthenticationRepository -> AuthenticationStore: User
+AuthenticationStore -> User: success
+end
+alt logout
+User -> AuthenticationStore: logout()
+AuthenticationStore -> AuthenticationRepository: logout()
+AuthenticationRepository -> HttpClient: clearAuthorizationHeader()
+AuthenticationRepository -> AuthenticationTokenClient: clearToken()
+AuthenticationStore -> User: success
+end
+alt refreshTokenInvalid
+User -> HttpClient: get(something)
+HttpClient -> Backend: GET something
+Backend -> HttpClient: Response 401
+HttpClient -> Backend: POST /auth/token/refresh/
+Backend -> HttpClient: Response 401
+HttpClient -> AuthenticationStore: logout()
+AuthenticationStore -> AuthenticationRepository: logout()
+AuthenticationRepository -> HttpClient: clearAuthorizationHeader()
+AuthenticationRepository -> AuthenticationTokenClient: clearToken()
+AuthenticationStore -> User: success
+end
+alt accessTokenInvalid
+User -> HttpClient: get(something)
+HttpClient -> Backend: GET something
+Backend -> HttpClient: Response 401
+HttpClient -> Backend: POST /auth/token/refresh/
+Backend -> HttpClient: Response 201
+HttpClient -> AuthenticationStore: loginWithToken(token)
+AuthenticationStore -> AuthenticationRepository: initializeAuthenticationComponents(...)
+AuthenticationRepository -> AuthenticationTokenClient: saveToken(rawToken)
+AuthenticationTokenClient -> AuthenticationRepository: Token
+AuthenticationRepository -> HttpClient: setAuthorizationHeader(accessToken)
+AuthenticationRepository -> AuthenticationStore: User
+AuthenticationStore -> HttpClient: success
+HttpClient -> Backend: GET something
+Backend -> HttpClient: Response 200
+HttpClient -> User : response
+end
+@enduml
